@@ -1,0 +1,812 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap');
+
+.modal-content {
+  position: relative;
+  flex-direction: column;
+  width: 100%;
+  color: var(--bs-modal-color);
+  pointer-events: auto;
+  background-color: #2C2C2C;
+  background-clip: padding-box;
+  border-radius: var(--bs-modal-border-radius);
+  outline: 0;
+}
+.modal-contentnew {
+  position: relative;
+  flex-direction: column;
+  width: 100%;
+  color: var(--bs-modal-color);
+  pointer-events: auto;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border-radius: var(--bs-modal-border-radius);
+  outline: 0;
+}
+.modal-contentnew2 {
+  position: relative;
+  flex-direction: column;
+  width: 100%;
+  color: var(--bs-modal-color);
+  pointer-events: auto;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border-radius: 14.5px;
+  outline: 0;
+  height: 185px;
+  width: 100px; /* ปรับขนาดความกว้าง */
+    padding: 30px; /* ปรับขนาดช่องว่างด้านใน */
+    border-radius: 10px;
+    text-align: center; /* จัดกลางข้อความ */
+}
+.text-cut {
+  white-space: nowrap;  /* ไม่ให้ข้อความขึ้นบรรทัดใหม่ */
+  overflow: hidden;     /* ซ่อนข้อความที่เกิน */
+  text-overflow: ellipsis; /* แสดง "..." เมื่อข้อความเกิน */
+  width: 200px; /* ปรับขนาดกล่องให้เหมาะสมกับพื้นที่ที่ต้องการ */
+}
+.accordion-item {
+  padding: 10px 10px 10px 10px;
+  width: 445px;
+  height: 180px;
+}
+.accordion {
+  --bs-accordion-color: #ffffff;
+  --bs-accordion-bg: #2C2C2C;
+  --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+  --bs-accordion-border-color: var(--bs-border-color);
+  --bs-accordion-border-width: var(--bs-border-width);
+  --bs-accordion-border-radius: var(--bs-border-radius);
+  --bs-accordion-inner-border-radius: calc(var(--bs-border-radius) -(var(--bs-border-width)));
+  --bs-accordion-btn-padding-x: 1.25rem;
+  --bs-accordion-btn-padding-y: 1rem;
+  --bs-accordion-btn-color: var(--bs-body-color);
+  --bs-accordion-btn-bg: var(--bs-accordion-bg);
+  --bs-accordion-btn-icon: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e);
+  --bs-accordion-btn-icon-width: 1.25rem;
+  --bs-accordion-btn-icon-transform: rotate(-180deg);
+  --bs-accordion-btn-icon-transition: transform 0.2s ease-in-out;
+  --bs-accordion-btn-active-icon: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23052c65' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e);
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  --bs-accordion-body-padding-x: 1.25rem;
+  --bs-accordion-body-padding-y: 1rem;
+  --bs-accordion-active-color: var(--bs-primary-text-emphasis);
+  --bs-accordion-active-bg: var(--bs-primary-bg-subtle);
+  width: 480px;
+  height: 210px;
+  padding: 10px 10px 10px 25px;
+}
+  .page .page-product {
+    border-radius: 14.6px;
+    background: #2C2C2C;
+    position: absolute;
+    left: 50%;
+    bottom: 163px;
+    translate: -50% 0;
+    display: flex;
+    padding: 32px 31px 40.2px 54.6px;
+    box-sizing: border-box;
+  }
+  .page .container-4 {
+    overflow-wrap: break-word;
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 30px;
+    color: #FFFFFF;
+  }
+  .page .container-4 {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+  }
+#coin {
+    border-radius: 10px;
+    background: #2C2C2C;
+    position: absolute;
+    right: 36.6px;
+    bottom: 24.3px;
+    display: flex;
+    padding: 1px 3.8px 6.7px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 109px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 250px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    height: 35px;
+    width: 42px;
+    
+  }
+  #coin2 {
+    width: 28px;
+    height: 30px;
+    border-radius: 1px;
+    background: #ffffff;
+    position: absolute;
+    right: 20px;
+    bottom: 24.3px;
+    display: flex;
+    padding: 1px 3.8px 6.7px 2px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 168px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 387px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    height: 35px;
+    width: 35px;
+    
+  }
+  .page .container-9 {
+    background: #2A2525;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 4px 0 18px 72px;
+    width: 1440px;
+    height: fit-content;
+    box-sizing: border-box;
+  }
+  .page .container-11 {
+    position: relative;
+    display: flex;
+    align-self: flex-start;
+    box-sizing: border-box;
+  }
+
+ .wraptag{
+  /* background-color: #21ED00; */
+  width: 300px;
+  height: 50px;
+  position: absolute;
+  top: 50px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+  left:  185px; 
+ } 
+ .wraptagin{
+  /* background-color: #0000ed; */
+  display: flex;
+  margin: 5px;
+  width: 90%;
+  height: 90%;
+  
+ }
+
+#tag {
+    margin-right: 4px;
+    border-radius: 6.9px;
+    background: #CFF7D3;
+    padding: 2px 4px ;
+    margin-bottom: 3.4px;
+      
+  }
+#tag1 { 
+        margin-right: 4px;
+        padding: 2px 4px ;
+        border-radius: 6.9px;
+        background: #FCB3AD;
+        margin-bottom: 3.4px;
+  }
+#tag2 {
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 14px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #682D03;
+  }
+  #tag4 {
+    border-radius: 6.9px;
+    background: #FCB3AD;
+    margin-bottom: 3.4px;
+    display: flex;
+    padding: 2px 6px 2px 6px ;
+}
+#buttonlock {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #2C2C2C;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 250px;
+    height: 35px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 215px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 200px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  #buttonread {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #2C2C2C;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 150px;
+    height: 35px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 215px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 250px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #buttonsubmit {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #2C2C2C;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 120px;
+    height: 35px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 250px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 350px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  #buttonbook {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #2C2C2C;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 100px;
+    height: 30px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 140px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 100px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #buttonin {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #2C2C2C;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 100px;
+    height: 30px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 130px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 99px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #buttoncoin {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #2C2C2C;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 100px;
+    height: 30px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 140px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 92px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  
+  #buttoncancle {
+    border-radius: 6.9px;
+    border: 1px solid #F5F5F5;
+    background: #4b4a4a;
+    position: relative;
+    margin-bottom: 20.5px;
+    display: flex;
+    padding: 9.4px 6.7px 7.4px 3px;
+    width: 120px;
+    height: 35px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 250px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 200px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  #button1 {
+    position: relative;
+    overflow-wrap: break-word;
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 17px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #F5F5F5;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 8px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 60px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #buttonread2 {
+    position: relative;
+    overflow-wrap: break-word;
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 17px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #F5F5F5;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 8px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 47px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+
+  #button2 {
+    position: relative;
+    overflow-wrap: break-word;
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 17px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #F5F5F5;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 8px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 28px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #button3 {
+    position: relative;
+    overflow-wrap: break-word;
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 15px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #F5F5F5;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 8px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 17px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+#unlock {
+    display: flex;
+    width: 13.6px;
+    height: 13.6px;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 225.6px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 365px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+#lock {
+    width: 10.2px;
+    height: 11.4px;
+  }
+  .page .text {
+    display: flex;
+    align-self: flex-start;
+    box-sizing: border-box;
+  }
+.text2 {
+    overflow-wrap: break-word;
+    font-family: var(--body-base-font-family, 'Inter');
+    font-weight: var(--body-base-font-weight, 400);
+    font-size: var(--body-base-font-size, 19px);
+    line-height: var(--body-base-line-height, 1.4);
+    color: #000000;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 50px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 80px
+    ; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+#writer {
+    overflow-wrap: break-word;
+    font-family: var(--body-base-font-family, 'Inter');
+    font-weight: var(--body-base-font-weight, 400);
+    font-size: var(--body-base-font-size, 16px);
+    line-height: var(--body-base-line-height, 1.4);
+    color: #F5F5F5;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 148px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 200px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #ready2 {
+    overflow-wrap: break-word;
+    font-family: var(--body-base-font-family, 'Inter');
+    font-weight: var(--body-base-font-weight, 400);
+    font-size: var(--body-base-font-size, 16px);
+    line-height: var(--body-base-line-height, 1.4);
+    color: #000000;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 85px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 85px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #nocoin {
+    overflow-wrap: break-word;
+    font-family: var(--body-base-font-family, 'Inter');
+    font-weight: var(--body-base-font-weight, 400);
+    font-size: var(--body-base-font-size, 16px);
+    line-height: var(--body-base-line-height, 1.4);
+    color: #000000;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 85px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 62px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  .page .section {
+    margin: 22.6px 9.6px 0 0;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+  }
+#price {
+    margin-right: 2.9px;
+    display: flex;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 90px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 195px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  #price2 {
+    margin-right: 2.9px;
+    display: flex;
+    box-sizing: border-box;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 150px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 330px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+#textprice {
+    overflow-wrap: break-word;
+    font-family: var(--title-page-font-family, 'Inter');
+    font-weight: var(--title-page-font-weight, 700);
+    font-size: var(--title-page-font-size, 48px);
+    letter-spacing: var(--title-page-letter-spacing, -1px);
+    line-height: var(--title-page-line-height, 1.2);
+    color: #F5F5F5;
+  }
+  #textprice2 {
+    overflow-wrap: break-word;
+    font-family: var(--title-page-font-family, 'Inter');
+    font-weight: var(--title-page-font-weight, 700);
+    font-size: var(--title-page-font-size, 48px);
+    letter-spacing: var(--title-page-letter-spacing, -1px);
+    line-height: var(--title-page-line-height, 1.2);
+    color: #000000;
+  }
+  .page .column {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+#text-heading {
+    margin-bottom: 9.4px;
+    display: flex;
+    box-sizing: border-box;
+  }
+#text1 {
+    margin-bottom: 9.4px;
+    display: flex;
+    box-sizing: border-box;
+    font-weight: var(--title-page-font-weight, 700);
+    font-size: var(--title-page-font-size, 24px);
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 160px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 199px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+.text-heading-1 {
+    overflow-wrap: break-word;
+    font-family: var(--heading-font-family, 'Inter');
+    font-weight: var(--heading-font-weight, 600);
+    font-size: var(--heading-font-size, 20px);
+    letter-spacing: var(--heading-letter-spacing, -0.5px);
+    line-height: var(--heading-line-height, 1.2);
+    color: #F5F5F5;
+    width: 270px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 20px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 195px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  .text-heading-2 {
+    overflow-wrap: break-word;
+    font-family: var(--heading-font-family, 'Inter');
+    font-weight: var(--heading-font-weight, 600);
+    font-size: var(--heading-font-size, 20px);
+    letter-spacing: var(--heading-letter-spacing, -0.5px);
+    line-height: var(--heading-line-height, 1.2);
+    color: #000000;
+    width: 300px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 85px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 198px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  .page .title {
+    margin-bottom: 4.6px;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    box-sizing: border-box;
+  }
+  .page .body {
+    margin-bottom: 17.5px;
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+    width: fit-content;
+    box-sizing: border-box;
+  }
+  .page .price {
+    margin: 0.2px 13.6px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .page .accordion {
+    display: flex;
+    box-sizing: border-box;
+  }
+#title {
+    border-radius: 6.9px;
+    border: 0.9px solid #D9D9D9;
+    background: #2C2C2C;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12.8px 15.1px 11.8px 12.8px;
+    box-sizing: border-box;
+    width: 160px;
+    height: 200px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 165px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 173px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  
+  .page .title1 {
+    margin-right: 11px;
+    width: 277.5px;
+    overflow-wrap: break-word;
+    font-family: var(--body-strong-font-family, 'Inter');
+    font-weight: var(--body-strong-font-weight, 600);
+    font-size: var(--body-strong-font-size, 16px);
+    line-height: var(--body-strong-line-height, 1.4);
+    color: #F5F5F5;
+  }
+  .page .accordion-content {
+    display: flex;
+    box-sizing: border-box;
+  }
+#title2 {
+    overflow-wrap: break-word;
+    font-family: var(--body-base-font-family, 'Inter');
+    font-weight: var(--body-base-font-weight, 400);
+    font-size: var(--body-base-font-size, 16px);
+    line-height: var(--body-base-line-height, 1.4);
+    color: #F5F5F5;
+  }
+#title1 {
+    overflow-wrap: break-word;
+    font-family: var(--body-base-font-family, 'Inter');
+    font-weight: var(--body-base-font-weight, 400);
+    font-size: var(--body-base-font-size, 16px);
+    line-height: var(--body-base-line-height, 1.4);
+    color: #F5F5F5;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 100px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 173px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+
+  }
+.like {
+    width: 20px;
+    height: 20px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 20px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 20px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  .like1 {
+    width: 20px;
+    height: 20px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 20px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 20px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+.cancle {
+    width: 25px;
+    height: 25px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 10px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 460px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  .cancle2 {
+    width: 20px;
+    height: 20px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 7px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 75px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  .cancle3 {
+    width: 23px;
+    height: 23px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 10px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 265px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  .submit {
+    width: 18px;
+    height: 18px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 7.5px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 73px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+    cursor: pointer;
+  }
+  .ready {
+    width: 23px;
+    height: 23px;
+    position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+    top: 51px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+    left: 54px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+  }
+  .page .container-11 {
+    margin: 0 1.6px 8px 0;
+    display: inline-block;
+    overflow-wrap: break-word;
+    font-family: 'Inter';
+    font-weight: 700;
+    font-size: 17px;
+    color: #FFFFFF;
+  }
+  .page .container-26 {
+    margin-bottom: 8px;
+    display: inline-block;
+    align-self: flex-start;
+    overflow-wrap: break-word;
+    font-family: 'Inter';
+    font-weight: 700;
+    font-size: 17px;
+    color: #FFFFFF;
+  }
+  .page .f-1 {
+    overflow-wrap: break-word;
+    font-family: 'Inter';
+    font-weight: 700;
+    font-size: 16.9px;
+    color: #21ED00;
+  }
+#tag3 {
+    overflow-wrap: break-word;
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 14px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #02542D;
+  }
+  .page .container-26 {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+  }
+  
+  .order{
+    overflow-wrap: break-word;
+    font-family: var(--single-line-body-base-font-family, 'Inter');
+    font-weight: var(--single-line-body-base-font-weight, 400);
+    font-size: var(--single-line-body-base-font-size, 30px);
+    line-height: var(--single-line-body-base-line-height, 1);
+    color: #000000;
+    margin: 25px 0px 0px 140px;
+  }
+  .custom-modal {
+    position: absolute;
+    top: 350px;  /* อยู่กึ่งกลางแนวตั้ง */
+    left: 50%;  /* อยู่กึ่งกลางแนวนอน */
+    transform: translate(-50%, -50%); /* ปรับให้กึ่งกลางพอดี */
+    max-width: 500px;  /* ตั้งขนาดป๊อปอัพ */
+    width: 100%;  /* รองรับการปรับขนาด */
+}
+.custom-modalnew {
+  position: absolute;
+  top: 350px;  /* อยู่กึ่งกลางแนวตั้ง */
+  left: 50%;  /* อยู่กึ่งกลางแนวนอน */
+  transform: translate(-50%, -50%); /* ปรับให้กึ่งกลางพอดี */
+  max-width: 500px;  /* ตั้งขนาดป๊อปอัพ */
+  width: 60%;  /* รองรับการปรับขนาด */
+}
+#writer2 {
+  overflow-wrap: break-word;
+  font-family: var(--body-base-font-family, 'Inter');
+  font-weight: var(--body-base-font-weight, 400);
+  font-size: var(--body-base-font-size, 16px);
+  line-height: var(--body-base-line-height, 1.4);
+  color: #000000;
+  position: absolute; /* หรือ relative, fixed, sticky ขึ้นอยู่กับความต้องการ */
+  top: 120px; /* ระยะห่างจากด้านบนของพื้นที่บรรจุ */
+  left: 199px; /* ระยะห่างจากด้านซ้ายของพื้นที่บรรจุ */
+}
+
+.Mcard {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 15px;
+  border-radius: 10px;
+  width: 230px; /* หรือกำหนดความกว้างที่แน่นอน เช่น 300px */
+  max-width: 280px; /* กำหนดความกว้างสูงสุดเพื่อให้แสดงแบบข้างๆ */
+  height: auto;
+  
+  background-color: #23202094;
+  /* background-color: #ffffff; */
+  /* เพิ่มช่องว่างด้านล่างการ์ด */
+  /* border: 1px solid rgb(89, 0, 255); */
+  margin-bottom: 20px;
+}
+.Mcard:hover{
+  background-color: rgb(34, 33, 33);
+}
+
+#Mcard {
+  height: 283px;
+  width: 193px;
+ 
+  object-fit: cover;
+  border-radius: 10px;
+  /* border: 1px solid red; */
+ 
+}
+#Mcardnew {
+  height: 240px;
+  width: 167px;
+  
+  
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 15px;
+}
+#htailb{
+  font: 17px sans-serif;
+  color: #FFF;
+  height: auto;
+  text-align: center;
+  /* border: 1px solid red; */
+  
+}
+#ieyeb,#iheartb{
+  /* border: 1px solid red; */
+  height: 15px;
+}
+#view_likeb{
+  margin-left: 10px;
+  font: 0.8em sans-serif;
+  padding-right: 10px;
+  color: #8c8888;
+  /* border: 1px solid red; */
+  
+}
+.pb{
+  
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  /* border: 2px solid rgb(186, 186, 186); */
+}
+.card-list {
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px; /* ช่องว่างระหว่างการ์ด */
+  justify-content: center;
+  cursor: pointer;
+  /* border: 2px solid rgb(186, 186, 186); */
+
+}
+.tailbox{
+ padding-top: 10px;
+  height: 100px;
+  display: flex;
+  align-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
+  /* border: 3px solid rgb(186, 186, 186); */
+}
+#icart{
+  color: #FFF;
+  font-size: 16px;
+}
+
+.dropdown-toggle {
+  color: #000;
+}
+
+.tag-1{
+  width: 500px;
+  height: 40px;
+  background-color: #21ED00;
+}

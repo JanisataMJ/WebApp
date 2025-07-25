@@ -1,0 +1,123 @@
+.root{
+    background-color: antiquewhite;
+}
+.g2{
+    background-color: rgba(81, 249, 249, 0.278);
+    border-radius: 20px;
+    height: auto;
+    width: 85%;
+    padding: 30px;
+    border: 1px solid#7f7f82;
+    background-color: #ffffff;
+    margin: 70px 0 10px  ;
+
+}
+.g2_1{
+    /* border: 1px solid black; */
+    display: flex;
+    align-items: center;
+    margin: 0;
+    margin-top: 20px;
+}
+.backicon{
+    padding-right: 4px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    transform: translate(0,-5px);
+    
+}
+.backicon:hover{
+    background-color: #dcd6c75e;
+    
+}
+#iback{
+    width: 25px;
+    height: 25px;
+}
+.cardPayment{
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    border: 1px solid#dcdcdd;
+    background-color: #fafafa;
+    border-radius: 6%;
+    padding: 2px;
+    width: 280px;
+    height: 180px;
+    display: block;
+    box-sizing: border-box;
+    align-items: center;
+    cursor: pointer;
+}
+.cardPayment:hover{
+  border: 1px solid #9c9c9e;
+
+    span{
+       
+        font-size: 18px;
+    }
+    #imgC{
+        width: 72%;
+        padding:0  ;
+       
+    }
+}
+.g2_2{
+    /* border: 1px solid#e23d17; */ 
+   
+    display: flex;  
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    
+    
+}
+.box1{
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    /* border: 1px solid black;   */
+    width: 100%;
+    transform: translate(0,-1px);
+    
+}
+.box2{
+    display: flex;
+    flex-wrap: wrap;justify-content: center;
+      /* border: 1px solid rgb(31, 38, 166);   */
+    width: 100%;
+    height: 100%;
+    
+    
+}
+
+#icon50{
+    height: 25px;
+    padding-right: 8px;
+}
+
+#imgC{
+    width: 70%;
+    padding:0  ;
+   
+}
+.table{
+    width: auto;
+    height: auto;
+    /* border: 2px solid black; */
+}
+
+.large-text-table .ant-table-cell {
+    font-size: 16px; /* Adjust this value as needed */
+}
+
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+}
+

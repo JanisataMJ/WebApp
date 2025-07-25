@@ -1,0 +1,48 @@
+#pic {
+    width: 100%;
+    max-width: 1000px; /* Maximum width to 1000px */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 570px; /* Maximum height to 570px */
+    border-radius: 20px;
+    
+  }
+
+  @media (max-width:  1408px){
+    #pic {
+        width: 100%;
+        max-width: 1300px; /* Maximum width to 1000px */
+        height: auto; /* Maintain aspect ratio */
+        max-height: auto; 
+        border-radius: 20px;
+      }
+
+  }
+  /* Base styles for text */
+#hd {
+    font-size: 2.5rem; /* Default font size for large screens */
+  }
+  
+  #pd {
+    font-size: 1.25rem; /* Default font size for large screens */
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 1408px) {
+    #hd {
+      font-size: 2rem; /* Adjusted font size for smaller screens */
+    }
+  
+    #pd {
+      font-size: 1rem; /* Adjusted font size for smaller screens */
+    }
+  }
+
+  @media (max-width: 768px) {
+    #hd {
+      font-size: 1.5rem; /* Further adjustment for very small screens */
+    }
+  
+    #pd {
+      font-size: 0.875rem; /* Further adjustment for very small screens */
+    }
+  }

@@ -1,0 +1,270 @@
+.root { 
+  background-color: #ffffff;
+}
+
+.layout-bg-Withdraw {
+  width: 80%;
+  max-width: 1200px; /* กำหนดขนาดสูงสุด */
+  height: auto; /* เปลี่ยนเป็น auto เพื่อให้ปรับขนาดตามเนื้อหา */
+  background-color: #ffffff;
+  padding: 30px;
+  margin-top: 160px;
+  margin-bottom: 40px;
+  border-radius: 50px;
+  box-shadow: 10px 10px 0px rgba(226, 226, 226, 1);
+}
+
+/* ปรับขนาดตัวหนังสือและระยะห่าง */
+.work-text-income {
+  font-size: 40px;
+  font-weight: bolder;
+  text-align: center;
+}
+.input-wrapper-dropdownBank{
+  width: 100%; /* ทำให้ครอบคลุมความกว้างของ container */
+  display: flex; /* ใช้ flexbox */
+  justify-content: center; /* จัดให้อยู่ตรงกลางแนวนอน */
+  align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง (ถ้า container มีความสูง) */
+  margin-bottom: 20px;
+}
+
+/* Dropdown Menu */
+.dd {
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  background-color: #ffffff;
+  border:1px solid#000;
+  color: #000000;
+  box-shadow: 0 0.4rem #999999;
+  cursor: pointer;
+  margin-top: 10px;
+  width: auto; /* ปรับให้ขนาดตามเนื้อหา */
+  max-width: 400px; /* จำกัดขนาดสูงสุด */
+}
+
+.work-dropdown-item:hover {
+  background-color: #c78f00;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เพิ่มเงา */
+}
+
+.dd .ant-select-selector {
+  display: flex;
+  align-items: center;
+}
+/* ลบ border รอบ Select */
+/* ลบ border รอบ Select */
+.ant-select-selector {
+  background-color: #ffffff !important; /* พื้นหลังสีเหลือง */
+  color: #000000; /* สีของข้อความ */
+}
+
+.noneshow{
+  border: none;
+}
+
+
+
+
+
+.work-dropdown-item-withdraw img {
+  width: 20px;
+  margin-right: 8px;
+}
+
+
+/* ปรับ input field ให้รองรับทุกขนาดหน้าจอ */
+.input-contanier-amountWithdrawn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-field-amountWithdrawn {
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #000000;
+  width: 100%; /* ปรับให้กว้างเต็ม container */
+  max-width: 500px; /* จำกัดขนาดสูงสุด */
+}
+
+.input-field-amountWithdrawn:focus {
+  background-color: #f1f1f1;
+}
+
+/* จัดการ container ให้รองรับทุกขนาด */
+.bottom-container-withdraw {
+  margin-top: 20px;
+  border: 2px solid #000;
+  padding: 20px;
+  width: 100%; /* ใช้ 100% ของ container */
+  max-width: 1125px; /* จำกัดขนาดสูงสุด */
+  border-radius: 25px;
+}
+
+/* ปรับขนาดปุ่มให้ responsive */
+.button-withdraw-save {
+  background-color: #FFB800;
+  color: #000;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  font-size: 18px;
+  padding: 12px 24px;
+  margin-top: 20px;
+  width: 100%; /* เต็มความกว้างของ container */
+  max-width: 500px; /* จำกัดขนาดสูงสุด */
+}
+
+.button-withdraw-save:hover {
+  background-color: #e6a700;
+}
+
+.withdrawButton-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content button {
+  background-color: #FFB800;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 10px;
+  transition: background-color 0.3s;
+}
+
+.popup-content button:hover {
+  background-color: #e6a700;
+}
+
+.error-message-withdraw {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .layout-bg-Withdraw {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .input-field-amountWithdrawn {
+    width: 100%;
+  }
+
+  .bottom-container-withdraw {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .button-withdraw-save {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+
+/* Submit Button */
+.button-withdraw-save {
+  background-color: #FFB800;
+  color: #000;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  font-size: 18px;
+  padding: 12px 24px;
+  margin-top: 20px;
+  border: none;
+  width: 40%;
+
+}
+
+.button-withdraw-save:hover {
+  background-color: #e6a700;
+}
+
+.withdrawButton-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Slightly less dark for a softer look */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.popup-content button {
+  background-color: #FFB800;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 10px;
+  transition: background-color 0.3s;
+}
+
+.popup-content button:hover {
+  background-color: #e6a700;
+}
+
+.error-message-withdraw{
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.dd{
+  border: none;
+}

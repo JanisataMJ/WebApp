@@ -1,0 +1,40 @@
+.container-saveButton-Novel{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submit-button { /* เปลี่ยนชื่อคลาสตามต้องการ */
+  font-size: 1.5rem;
+  color: #000000;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 2px solid #be8900;
+  background: #FFB800;
+  box-shadow: 3px 3px #be8900;
+  cursor: pointer;
+  margin: 35px 0;
+  font-weight: bold;
+
+}
+
+.submit-button:active {
+  box-shadow: none;
+  transform: translate(3px, 3px);
+}
+.save-message {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.save-message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.save-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}

@@ -1,0 +1,67 @@
+.custum-file-upload {
+  height: 200px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: space-between;
+  gap: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #cacaca;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0px 48px 35px -48px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.custum-file-upload .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .icon svg {
+  height: 100px;
+  fill: rgba(75, 85, 99, 1);
+}
+
+.custum-file-upload .text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .text span {
+  font-weight: 400;
+  color: rgba(75, 85, 99, 1);
+}
+
+.custum-file-upload input {
+  display: none;
+}
+
+
+.input-wrapper-dropdownNovelVisibility{
+  width: 50%;
+  margin: 0 auto; /* จัดให้อยู่ตรงกลางตามแนวนอน */
+  display: flex;
+  justify-content: center; /* แนวนอน */
+} 
+
+.dropdownNovelVisibility {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Noto Sans Thai';
+  border: none;
+  border-radius: 10px;
+  background-color:#FFB800;
+  color: #000000;
+  box-shadow: 0 0.4rem #bc8700;
+  cursor: pointer;
+  margin-top: 10px;
+
+}

@@ -2,12 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <link rel="icon" href="public/HLogo.png" />
+    <title>LOKNIYAI</title>
+    <style>
+      html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%; /* ให้ body เต็มหน้าจอ */
+          overflow: hidden; /* ปิดการเลื่อนของหน้าเว็บ */
+          background-color: #dadada;
+          margin: 0 auto;
+      }   
+
+      #root {
+       display: flex;
+       justify-content: center;
+       align-content: flex-start;
+       flex-wrap: wrap;
+       
+        width: 100%;
+        
+        height: calc(100% ); /* ปรับขนาดให้พอดีกับหน้าจอหลัง topbar */
+        /* background: linear-gradient(to bottom, #AF1111, #B42D2D,#4C0505,#AD4F4F,#440303,#1E0303); */
+        /* background: linear-gradient(to bottom, rgb(92, 251, 0),rgb(40, 17, 193)); */
+       background-color: rgb(21, 20, 19);
+        overflow-y: auto; /* เปิดการเลื่อนเฉพาะใน root */
+      }
+    </style>
   </head>
   <body>
+
     <div id="root"></div>
+   
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

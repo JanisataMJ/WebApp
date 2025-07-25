@@ -1,0 +1,96 @@
+
+.topbar {
+    position: fixed;
+    height: 60px;
+    justify-content: flex-end;
+    width: calc(100% - 10px);
+    z-index: 1000;
+     background: linear-gradient(to right,#000000,#000000,#000000); 
+   
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    top:0px;
+    left: 0;
+  }
+  #HLogo{
+    margin-left: 30px;
+    width: 60px;
+  }#Logo{
+    margin-left: 15px;
+    width: 150px;
+    transform: translate(0,12px);
+  
+    
+  }
+  #profile {
+    width: 47px;
+    position: absolute;
+    right: 60px; /* ระยะห่างจากขอบขวาของ .topbar */
+    top: 50%; /* วางกลางแนวตั้งของ .topbar */
+    transform: translateY(-50%); /* ใช้เพื่อจัดตำแหน่งให้ชัดกลาง */
+    cursor: pointer;
+    }
+    #cointop{
+      width: 27px;
+     
+    }
+    .cointop{
+      /* border: 1px solid #FFFFFF; */
+      height: 60px;
+      width: 80px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      
+    }#cointxt{margin:40px 20px 20px  10px;}
+
+    .wrapcoin{
+      position: absolute;
+      right: 150px; /* ระยะห่างจากขอบขวาของ .topbar */
+      top: 50%; /* วางกลางแนวตั้งของ .topbar */
+      transform: translateY(-50%); /* ใช้เพื่อจัดตำแหน่งให้ชัดกลาง */
+    }
+    .login{
+      position: absolute;
+      right: 100px; /* ระยะห่างจากขอบขวาของ .topbar */
+      top: 50%; /* วางกลางแนวตั้งของ .topbar */
+      transform: translateY(-50%); /* ใช้เพื่อจัดตำแหน่งให้ชัดกลาง */
+    }
+#dropdown-profile {
+      position: absolute;
+      right: -43px; /* ปรับค่าให้เหมาะสม */
+      top: 50%; /* ปรับค่าตามที่ต้องการ */
+      transform: translateY(-50%);
+  }
+.dropdown-menu {
+      width: 190px;
+      z-index: 2000;
+      position: absolute; /* ถ้าไม่ได้กำหนดไว้ */
+      
+     
+}
+.search {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#login{
+  border: 2px solid rgb(124, 122, 122);
+  
+    font-size: 12px;
+    cursor: pointer;
+    background-color: #df052f;
+    color: white;
+    border-radius: 21px;
+}
+#login:hover{
+   background-color: #8d021e;
+}
+#locks{
+  cursor: block;
+}
+#white{
+  color: #ffffff;
+  font-size: 45px;
+}

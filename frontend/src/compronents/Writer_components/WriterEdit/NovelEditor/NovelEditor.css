@@ -1,0 +1,58 @@
+/* NovelEditor.css */
+
+.textEditor {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: white; 
+    justify-content: center;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+.menuBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.menuBar button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0 5px;
+    font-size: 16px; /* ปรับขนาดไอคอนตามต้องการ */
+    color: #333;
+}
+
+.menuBar button:hover {
+    background-color: #f0f0f0;
+}
+
+.menuBar button.is_active {
+    color: #007bff; /* หรือสีอื่นที่คุณต้องการ */
+}
+
+.menuBar .heading3 {
+    font-size: 14px; /* ปรับขนาดไอคอน heading3 ตามต้องการ */
+}
+
+/* ปรับแต่งเพิ่มเติมตามต้องการ */
+.ProseMirror { /* นี่คือ class หลักของ Tiptap editor content */
+    min-height: 300px;
+  border: 2px solid #ccc;
+  line-height: 1.5; /* หรือค่าอื่นที่ต้องการ */
+  padding: 20px;
+  white-space: pre-wrap; /* เพื่อให้จัดการกับช่องว่างและการขึ้นบรรทัดได้อย่างเหมาะสม */
+  overflow-wrap: break-word; /* ป้องกันไม่ให้คำถูกแสดงเกินขอบหน้าต่าง */
+}
+
+.ProseMirror:focus {
+    outline: none; 
+}
+
+.ProseMirror p {
+line-height: 1.5;
+}

@@ -1,0 +1,61 @@
+.container {
+    background-color: white;
+    padding: 3%; 
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%; 
+    max-width: 500px; 
+    margin: 1000px auto; 
+    margin-top: 200px;
+}
+
+.title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1rem; /* Adjust margin-top for better spacing */
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem; /* Increase padding for a better user experience */
+    border: 1px solid #cbd5e0;
+    border-radius: 0.25rem;
+    font-size: 1rem; /* Increase font size */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem; /* Add margin for better spacing */
+}
+
+.button-group button {
+    flex: 1;
+    padding: 0.75rem; /* Increase button padding */
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1rem; /* Make button text more readable */
+}
+
+.button-group .login-btn {
+    background-color: black;
+    color: white;
+}
+
+.button-group .signup-btn {
+    background-color: #e2e8f0;
+    color: black;
+}

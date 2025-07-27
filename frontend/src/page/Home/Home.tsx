@@ -36,15 +36,18 @@ const Home: React.FC = () => {
       <a id='cat1' className='hide'>1</a>
       <CategoryNav />
       <div className='l1'>
+        <div className='l11'>
+            <Slider />
         <div className='l1_1'>
           <div className='l1_1_1'>
             <h2 id='Treding'>แนะนำ
               <img width="20px" style={{ transform: "translate(0, -5px)" }} src="/src/assets/star.png" alt="star" />
             </h2>
-            <Slider />
+            {/*<Slider />*/}
           </div>
-          <Trand />
-          <a id='cat1_2'  className='hide'>1_2</a>
+          {/*<Trand />
+          <a id='cat1_2'  className='hide'>1_2</a>*/}
+        </div>
         </div>
 
         <a id='cat2' className='hide'>2</a>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, Flex } from 'antd';
 import '../Login/Login.css';
 import Headers from '../../../compronents/Pubblic_components/headerselect';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +50,7 @@ const Login: React.FC = () => {
     return (
         <>
             {contextHolder}
-            <Headers />
+            {/*<Headers />*/}
             <div className="container">
                 <h1 className="title">เข้าสู่ระบบ</h1>
                 <form onSubmit={onSubmit}>
@@ -66,6 +67,9 @@ const Login: React.FC = () => {
                         <button type="button" className="signup-btn" onClick={Signup}>สมัครสมาชิก</button>
                     </div>
                 </form>
+                <div>
+                    <button type="button" className='button-link'>Forgot your password?</button>
+                </div>
             </div>
         </>
     );

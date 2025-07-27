@@ -7,7 +7,7 @@
     
   }
 
-  @media (max-width:  1408px){
+  @media (max-width:  1408px){ 
     #pic {
         width: 100%;
         max-width: 1300px; /* Maximum width to 1000px */
@@ -46,3 +46,53 @@
       font-size: 0.875rem; /* Further adjustment for very small screens */
     }
   }
+
+
+
+
+.slider-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #e5e5e5;
+  scroll-snap-type: x mandatory;
+}
+
+.circle-card {
+  flex: 0 0 auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background-color: #c5b3d8;
+  border: 4px solid #7b3c4a;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.icon {
+  font-size: 1.8rem;
+}
+
+.label {
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 0.2rem;
+}
+
+.sub {
+  font-size: 0.9rem;
+  color: #333;
+  margin-top: 0.3rem;
+}

@@ -58,7 +58,7 @@ const CategoryNav: React.FC = () => {
         href='#cat1'
         onClick={() => handleLinkClick('#cat1')}
         style={{
-          color: activeLink === '#cat1' || activeLink === '#cat1_2' ? 'yellow' : '#FFF',
+          color: activeLink === '#cat1' || activeLink === '#cat1_2' ? '#57648E' : '#934A5E',
           fontWeight: activeLink === '#cat1' || activeLink === '#cat1_2' ? 'bold' : 'normal',
         }}
       >
@@ -68,7 +68,7 @@ const CategoryNav: React.FC = () => {
         href='#cat2'
         onClick={() => handleLinkClick('#cat2')}
         style={{
-          color: activeLink === '#cat2' ? 'yellow' : '#FFF',
+          color: activeLink === '#cat2' ? '#57648E' : '#934A5E',
           fontWeight: activeLink === '#cat2' ? 'bold' : 'normal',
         }}
       >
@@ -78,7 +78,7 @@ const CategoryNav: React.FC = () => {
         href='#cat3'
         onClick={() => handleLinkClick('#cat3')}
         style={{
-          color: activeLink === '#cat3' ? 'yellow' : '#FFF',
+          color: activeLink === '#cat3' ? '#57648E' : '#934A5E',
           fontWeight: activeLink === '#cat3' ? 'bold' : 'normal',
         }}
       >
@@ -88,7 +88,7 @@ const CategoryNav: React.FC = () => {
         href='#cat4'
         onClick={() => handleLinkClick('#cat4')}
         style={{
-          color: activeLink === '#cat4' ? 'yellow' : '#FFF',
+          color: activeLink === '#cat4' ? '#57648E' : '#934A5E',
           fontWeight: activeLink === '#cat4' ? 'bold' : 'normal',
         }}
       >
@@ -98,7 +98,7 @@ const CategoryNav: React.FC = () => {
         href='#cat5'
         onClick={() => handleLinkClick('#cat5')}
         style={{
-          color: activeLink === '#cat5' ? 'yellow' : '#FFF',
+          color: activeLink === '#cat5' ? '#57648E' : '#934A5E',
           fontWeight: activeLink === '#cat5' ? 'bold' : 'normal',
         }}
       >
@@ -108,7 +108,7 @@ const CategoryNav: React.FC = () => {
         href='#cat6'
         onClick={() => handleLinkClick('#cat6')}
         style={{
-          color: activeLink === '#cat6' ? 'yellow' : '#FFF',
+          color: activeLink === '#cat6' ? '#57648E' : '#934A5E',
           fontWeight: activeLink === '#cat6' ? 'bold' : 'normal',
         }}
       >

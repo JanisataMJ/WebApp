@@ -89,11 +89,11 @@ type HealthItem = {
 };
 
 const healthData: HealthItem[] = [
-  { icon: "❤️", label: "Heart Rate", value: "138", sub: "70% zone 2", color: "#e74c3c" },
-  { icon: "🔥", label: "Calorie", value: "250 kcal", color: "#f39c12" },
-  { icon: "🩸", label: "SPO2", value: "96%", color: "#3498db" },
-  { icon: "🌙", label: "Sleep", value: "6h 30m", color: "#9b59b6" },
-  { icon: "👣", label: "Steps", value: "10,000", color: "#2ecc71" }
+  { icon: "❤️", label: "Heart Rate", value: "138", sub: "70% zone 2", color: "#934A5E" },
+  { icon: "🔥", label: "Calorie", value: "250 kcal", color: "#934A5E" },
+  { icon: "🩸", label: "SPO2", value: "96%", color: "#934A5E" },
+  { icon: "🌙", label: "Sleep", value: "6h 30m", color: "#934A5E" },
+  { icon: "👣", label: "Steps", value: "10,000", color: "#934A5E" }
 ];
 
 const Slider: React.FC = () => {
@@ -138,7 +138,7 @@ const Slider: React.FC = () => {
                 key={index}
                 onClick={() => handleCardClick(index)}
                 className={`
-                  absolute transition-all duration-500 ease-in-out cursor-pointer
+                  absolute transition-all duration-1000 ease-in-out cursor-pointer
                   rounded-full border-4 flex flex-col items-center justify-center
                   transform hover:scale-105
                   ${position === 'center'
@@ -155,7 +155,7 @@ const Slider: React.FC = () => {
                 }}
               >
                 {/* Icon */}
-                <div className={`text-6xl mb-2 ${position === 'center' ? 'text-6xl' : 'text-4xl'}`}>
+                <div className={`text-6xl mb-2 relative -top-3 ${position === 'center' ? 'text-6xl' : 'text-4xl'}`}>
                   {item.icon}
                 </div>
 
@@ -166,7 +166,7 @@ const Slider: React.FC = () => {
 
                 {/* Value */}
                 <div
-                  className={`font-bold ${position === 'center' ? 'text-6xl mb-2' : 'text-2xl'}`}
+                  className={`font-bold relative top-3 ${position === 'center' ? 'text-6xl mb-2' : 'text-2xl'}`}
                   style={{ color: position === 'center' ? item.color : '#6b7280' }}
                 >
                   {item.value}
@@ -174,7 +174,7 @@ const Slider: React.FC = () => {
 
                 {/* Sub text */}
                 {item.sub && position === 'center' && (
-                  <div className="text-lg text-gray-600">
+                  <div className="text-lg text-gray-600 relative top-3" >
                     {item.sub}
                   </div>
                 )}
@@ -196,12 +196,6 @@ const Slider: React.FC = () => {
               }`}
             />
           ))}
-        </div>
-
-        {/* Swipe Indicators */}
-        <div className="flex justify-between absolute top-1/2 left-4 right-4 pointer-events-none">
-          <div className="text-gray-400 text-2xl">‹</div>
-          <div className="text-gray-400 text-2xl">›</div>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import './Home.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Slider from '../../compronents/Home_components/slideshow';
-import CardList1 from '../../compronents/Home_components/GroupCategory/romantic';
+import CardList1 from '../../page/calendar/calendar';
 import CardList2 from '../../compronents/Home_components/GroupCategory/action';
 import CardList3 from '../../compronents/Home_components/GroupCategory/horror';
 import CardList4 from '../../compronents/Home_components/GroupCategory/fantasy';

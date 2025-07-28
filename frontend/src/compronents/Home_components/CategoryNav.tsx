@@ -72,7 +72,7 @@ const CategoryNav: React.FC = () => {
           fontWeight: activeLink === '#cat2' ? 'bold' : 'normal',
         }}
       >
-        <span id="category">โรแมนติก</span>
+        <span id="category">ปฏิทิน</span>
       </a>
       <a
         href='#cat3'

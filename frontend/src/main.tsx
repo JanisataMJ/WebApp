@@ -37,6 +37,7 @@ const router = createBrowserRouter([
   { path: "/L_Content", element: <L_Content /> },
   { path: "/bookshelf", element: <L_Bookshelf /> },
   { path: "/L_content/:novelId", element: <L_Content />}
+  
 ]);
 
 

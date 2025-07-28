@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.18",
+    "@fullcalendar/interaction": "^6.1.18",
+    "@fullcalendar/list": "^6.1.18",
+    "@fullcalendar/react": "^6.1.18",
     "@popperjs/core": "^2.11.8",
     "@react-icons/all-files": "^4.1.0",
     "@tiptap/extension-text-align": "^2.6.6",
@@ -23,6 +27,7 @@
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "dompurify": "^3.1.6",
+    "lucide-react": "^0.526.0",
     "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",

@@ -1,0 +1,15 @@
+.hide{
+    color: #1e1c1c00;
+    /* color: #ffffff; */
+    transform: translate(0,-500px);
+    text-decoration: none;
+}
+
+.category-tips {
+  position: fixed;
+  left: 0;           /* ← ชิดซ้ายหน้าจอ */
+  top: 60px;
+  z-index: 100;
+  padding: 10px;
+  text-align: left;
+}

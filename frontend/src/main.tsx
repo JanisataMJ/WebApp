@@ -21,6 +21,8 @@ import L_Content from './page/Bookshelf/L_Content';
 import { HistoryProvider } from './compronents/Trasaction_compnents/HistoryContext';
 import { LikeProvider } from './compronents/Book_components/LikeContext';
 import { MusicProvider } from './compronents/song_components/musicprovider';
+import Overview from './page/Overview/Overview';
+import Tips from './page/Tips/Tips'
 
 const router = createBrowserRouter([
   { path: "/Payment", element: <Payment /> },
@@ -36,8 +38,9 @@ const router = createBrowserRouter([
   { path: "/settings", element: <Test /> },
   { path: "/L_Content", element: <L_Content /> },
   { path: "/bookshelf", element: <L_Bookshelf /> },
-  { path: "/L_content/:novelId", element: <L_Content />}
-  
+  { path: "/L_content/:novelId", element: <L_Content />},
+  { path: "/overview", element: <Overview />},
+  { path: "/tips", element: <Tips />}
 ]);
 
 

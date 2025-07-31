@@ -1,0 +1,470 @@
+.category-tips {
+  position: fixed;
+  left: 0;           /* ← ชิดซ้ายหน้าจอ */
+  top: 60px;
+  z-index: 100;
+  padding: 10px;
+  text-align: left;
+}
+
+/* Main Dashboard Container */
+.health-dashboard {
+  min-height: 100vh;
+  width: 1000px;
+  background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
+  padding: 20px;
+  margin-top: 110px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  
+}
+
+.dashboard-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  margin-bottom: 32px;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.header-content h1.dashboard-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.header-content p.dashboard-subtitle {
+  color: #6b7280;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.period-selector {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-selector:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #8b5cf6;
+  border-color: transparent;
+}
+
+.settings-button {
+  padding: 8px;
+  background-color: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.settings-button:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+/* Vital Signs Grid */
+.vital-signs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.vital-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.vital-card:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.vital-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.vital-icon {
+  padding: 12px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+}
+
+.vital-icon.heart-rate {
+  color: #ef4444;
+}
+
+.vital-icon.blood-oxygen {
+  color: #3b82f6;
+}
+
+.vital-icon.temperature {
+  color: #f97316;
+}
+
+.vital-icon.blood-pressure {
+  color: #10b981;
+}
+
+.vital-icon .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-good {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-normal {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.vital-label {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  margin: 0 0 4px 0;
+}
+
+.vital-value {
+  display: flex;
+  align-items: baseline;
+}
+
+.value-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.value-unit {
+  color: #6b7280;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.chart-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.chart-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.chart-icon.heart-rate {
+  color: #ef4444;
+}
+
+.chart-icon.blood-pressure {
+  color: #3b82f6;
+}
+
+.chart-icon.sleep {
+  color: #6366f1;
+}
+
+.trend-icon {
+  width: 20px;
+  height: 20px;
+  color: #10b981;
+}
+
+.chart-container {
+  width: 100%;
+}
+
+/* Bottom Grid */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+}
+
+.sleep-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Activity Card */
+.activity-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.activity-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24px;
+  margin: 0 0 24px 0;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.activity-item.steps {
+  background-color: #faf5ff;
+}
+
+.activity-item.calories {
+  background-color: #ecfeff;
+}
+
+.activity-item.distance {
+  background-color: #ecfdf5;
+}
+
+.activity-item.active-time {
+  background-color: #fffbeb;
+}
+
+.activity-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.steps-dot {
+  background-color: #8b5cf6;
+}
+
+.calories-dot {
+  background-color: #06b6d4;
+}
+
+.distance-dot {
+  background-color: #10b981;
+}
+
+.active-time-dot {
+  background-color: #f59e0b;
+}
+
+.activity-name {
+  color: #374151;
+  font-weight: 500;
+}
+
+.activity-value {
+  font-weight: bold;
+  color: #1f2937;
+}
+
+/* Progress Ring */
+.progress-container {
+  text-align: center;
+}
+
+.progress-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-svg {
+  width: 128px;
+  height: 128px;
+  transform: rotate(-90deg);
+}
+
+.progress-bg {
+  stroke: #e5e7eb;
+}
+
+.progress-fill {
+  stroke: #8b5cf6;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-percentage {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-header {
+    align-items: flex-start;
+  }
+  
+  .header-controls {
+    margin-top: 16px;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .health-dashboard {
+    padding: 12px;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .header-controls {
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  
+  .vital-signs-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .vital-card {
+    padding: 16px;
+  }
+  
+  .charts-grid {
+    gap: 16px;
+  }
+  
+  .chart-card,
+  .sleep-card,
+  .activity-card {
+    padding: 16px;
+  }
+  
+  .bottom-grid {
+    gap: 16px;
+  }
+  
+  .progress-svg {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .progress-percentage {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vital-signs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-title {
+    font-size: 1.5rem !important;
+  }
+  
+  .chart-title {
+    font-size: 1rem !important;
+  }
+}

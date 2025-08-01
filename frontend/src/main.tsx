@@ -7,6 +7,7 @@ import { AuthProvider } from './compronents/Pubblic_components/AuthContextType';
 import { BalanceProvider } from './compronents/Home_components/BalanceContext';
 import Payment from './page/CoinsAndTransaction/CoinsAndTransaction';
 import Home from './page/Home/Home';
+import MoodTracker from './page/Mood/MoodTracker/MoodTracker';
 import Writer from './page/writer/Writer';
 import Writer_edit from './page/writer/Writer_edit';
 import Profile from './page/Profile/profile';
@@ -25,6 +26,7 @@ import { MusicProvider } from './compronents/song_components/musicprovider';
 const router = createBrowserRouter([
   { path: "/Payment", element: <Payment /> },
   { path: "/", element: <Home /> },
+  { path: "/MoodTracker", element: <MoodTracker /> },
   { path: "/profile", element: <Profile /> },
   { path: "/Writer", element: <Writer /> },
   { path: "/Writer_edit", element: <Writer_edit /> },

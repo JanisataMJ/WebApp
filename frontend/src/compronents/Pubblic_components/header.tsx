@@ -103,12 +103,12 @@ const TOP: React.FC = () => {
         <div className="topbar">
             {contextHolder}
             <a href="/"><img id="Logo" src={logo} alt="Logo" /></a>
-            <div className="wrapcoin">
+            {/*<div className="wrapcoin">
                 <div className="cointop">
                     <img id="cointop" src={coinImage} alt="coin" />
                     <span id="cointxt"><Balance /></span>
                 </div>
-            </div>
+            </div>*/}
             <div id='profile'>
                 <Dropdown align="end" onSelect={handleDropdownSelect}>
                     <div className='hindesometing'>

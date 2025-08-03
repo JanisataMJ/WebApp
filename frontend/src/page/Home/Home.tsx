@@ -6,9 +6,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Slider from '../../compronents/Home_components/slideshow';
 import Calendar from '../../page/calendar/calendar';
 import Notification from '../../compronents/Home_components/Notifiation/notice';
-import CardList2 from '../../compronents/Home_components/GroupCategory/action';
+import Graph1 from '../../compronents/Home_components/GroupGraph/temp';
+import Graph2 from '../../compronents/Home_components/GroupGraph/heartrate';
+import Graph3 from '../../compronents/Home_components/GroupGraph/calorie';
+import Graph4 from '../../compronents/Home_components/GroupGraph/spo2';
+import Graph5 from '../../compronents/Home_components/GroupGraph/steps';
+import Graph6 from '../../compronents/Home_components/GroupGraph/sleep';
 import CategoryNav from '../../compronents/Home_components/CategoryNav';
-import Trand from '../../compronents/Home_components/GroupCategory/Trand';
 import SLoader from '../../compronents/Book_components/simpleLoader';
 
 const Home: React.FC = () => {
@@ -41,17 +45,57 @@ const Home: React.FC = () => {
         <a id='cat2' className='hide'>2</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>โรแมนติก</h2>
+            <h2>ปฏิทิน</h2>
           </div>
           <Calendar />
         </div>
 
-        <a id='cat3' className='hide'>3</a>
+        <a id='chart1' className='hide'>4</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>แอ็คชั่น</h2>
+            <h2>Temperature</h2>
           </div>
-          <CardList2 />
+          <Graph1 />
+        </div>
+
+        <a id='chart2' className='hide'>5</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>Heart Rate</h2>
+          </div>
+          <Graph2 />
+        </div>
+
+        <a id='chart3' className='hide'>6</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>Calorie</h2>
+          </div>
+          <Graph3 />
+        </div>
+
+        <a id='chart4' className='hide'>7</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>SPO2</h2>
+          </div>
+          <Graph4 />
+        </div>
+
+        <a id='chart5' className='hide'>8</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>Steps</h2>
+          </div>
+          <Graph5 />
+        </div>
+
+        <a id='chart6' className='hide'>9</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>Sleep</h2>
+          </div>
+          <Graph6 />
         </div>
 
           <Notification />

@@ -296,16 +296,73 @@ const CategoryNav: React.FC = () => {
               >
                 ปฏิทิน
               </a>
+        
+
               <a
-                href="#cat3"
+                href="#chart1"
                 style={{
-                  color: isActive('#cat3') ? '#57648E' : '#934A5E',
-                  fontWeight: isActive('#cat3') ? 'bold' : 'normal',
+                  color: isActive('#chart1') ? '#57648E' : '#934A5E',
+                  fontWeight: isActive('#chart1') ? 'bold' : 'normal',
                   display: 'block',
                   whiteSpace: 'nowrap',
                 }}
               >
-                แอ็คชั่น
+                Temperature
+              </a>
+              <a
+                href="#chart2"
+                style={{
+                  color: isActive('#chart2') ? '#57648E' : '#934A5E',
+                  fontWeight: isActive('#chart2') ? 'bold' : 'normal',
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Heart Rate
+              </a>
+              <a
+                href="#chart3"
+                style={{
+                  color: isActive('#chart3') ? '#57648E' : '#934A5E',
+                  fontWeight: isActive('#chart3') ? 'bold' : 'normal',
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Calorie
+              </a>
+              <a
+                href="#chart4"
+                style={{
+                  color: isActive('#chart4') ? '#57648E' : '#934A5E',
+                  fontWeight: isActive('#chart4') ? 'bold' : 'normal',
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                SPO2
+              </a>
+              <a
+                href="#chart5"
+                style={{
+                  color: isActive('#chart5') ? '#57648E' : '#934A5E',
+                  fontWeight: isActive('#chart5') ? 'bold' : 'normal',
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Steps
+              </a>
+              <a
+                href="#chart6"
+                style={{
+                  color: isActive('#chart6') ? '#57648E' : '#934A5E',
+                  fontWeight: isActive('#chart6') ? 'bold' : 'normal',
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Sleep
               </a>
             </div>
           )}

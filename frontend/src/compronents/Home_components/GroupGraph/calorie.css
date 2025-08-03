@@ -1,0 +1,366 @@
+/* Main container */
+.calorie-container { 
+  width: 100%;
+  padding: 24px;
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header section */
+.header-section-cal {
+  margin-bottom: 32px;
+}
+
+.title-cal {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+/* Stats grid */
+.stats-grid-cal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card-cal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.stat-card-cal:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.stat-value-cal {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.stat-value-cal.total {
+  color: #f59e0b;
+}
+
+.stat-value-cal.avg {
+  color: #3b82f6;
+}
+
+.stat-value-cal.positive {
+  color: #10b981;
+}
+
+.stat-value-cal.negative {
+  color: #ef4444;
+}
+
+.stat-label-cal {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Progress section */
+.progress-section-cal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.progress-header-cal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-label-cal {
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-percentage-cal {
+  font-weight: bold;
+  color: #f59e0b;
+  font-size: 18px;
+}
+
+.progress-bar-cal {
+  width: 100%;
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill-cal {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.progress-info-cal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Charts section */
+.charts-section-cal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-container-cal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.chart-title-cal {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Pie chart specific styles */
+.pie-chart-cal {
+  position: relative;
+}
+
+.pie-legend-cal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.legend-item-cal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color-cal {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text-cal {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Custom tooltip */
+.custom-tooltip-cal {
+  background: white;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+}
+
+.tooltip-time-cal {
+  color: #1f2937;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.tooltip-calories {
+  color: #f59e0b;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Info section */
+.info-section-cal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.info-title-cal {
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.info-list-cal {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.info-list-cal li {
+  margin-bottom: 8px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.info-list-cal li:before {
+  content: "🍎";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .charts-section-cal {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calorie-container {
+    padding: 16px;
+  }
+  
+  .title-cal {
+    font-size: 20px;
+  }
+  
+  .stats-grid-cal {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .stat-value-cal {
+    font-size: 28px;
+  }
+  
+  .chart-container-cal {
+    padding: 16px;
+  }
+  
+  .chart-title-cal {
+    font-size: 16px;
+  }
+  
+  .progress-section-cal {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calorie-container {
+    padding: 12px;
+  }
+  
+  .title-cal {
+    font-size: 18px;
+  }
+  
+  .stat-value-cal {
+    font-size: 24px;
+  }
+  
+  .stat-card-cal {
+    padding: 16px;
+  }
+  
+  .progress-header-cal {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .progress-info-cal {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+  
+  .pie-legend-cal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Animation effects */
+.stat-card-cal,
+.chart-container-cal,
+.progress-section-cal,
+.info-section-cal {
+  transition: all 0.3s ease;
+}
+
+.stat-card-cal:hover,
+.chart-container-cal:hover {
+  transform: translateY(-2px);
+}
+
+/* Focus states for accessibility */
+.stat-card-cal:focus,
+.chart-container-cal:focus {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.progress-fill-cal {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Print styles */
+@media print {
+  .calorie-container {
+    background: white;
+    box-shadow: none;
+  }
+  
+  .stat-card-cal,
+  .chart-container-cal,
+  .progress-section-cal,
+  .info-section-cal {
+    box-shadow: 0 0 0 1px #e5e7eb;
+    break-inside: avoid;
+  }
+  
+  .charts-section-cal {
+    break-inside: avoid;
+  }
+}

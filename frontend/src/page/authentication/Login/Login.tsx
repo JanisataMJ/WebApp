@@ -47,28 +47,37 @@ const Login: React.FC = () => {
     };
 
     return (
-        <>
-            {contextHolder}
-            <Headers />
-            <div className="container">
-                <h1 className="title">เข้าสู่ระบบ</h1>
+
+    <>
+        {contextHolder}
+        <Headers />
+
+        <div className="signin-page-wrapper">
+            <h1 className="signin-title">Sign In</h1>
+
+            <div className="signin-container">
                 <form onSubmit={onSubmit}>
-                    <div className="form-group">
-                        <label>อีเมล</label>
+                    <div className="signin-form-group">
+                        <label>Username</label>
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                     </div>
-                    <div className="form-group">
-                        <label>รหัสผ่าน</label>
+                    <div className="signin-form-group">
+                        <label>Password</label>
                         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
-                    <div className="button-group">
-                        <button type="submit" className="login-btn">เข้าสู่ระบบ</button>
-                        <button type="button" className="signup-btn" onClick={Signup}>สมัครสมาชิก</button>
+                    <div className="signin-button-group">
+                        <button type="botton" className="signup-btn" onClick={Signup} >Sign Up</button>
+                        <button type="submit" className="login-btn" >Sign In</button>
+                    </div>
+                    <div className="signin-forgot-password">
+                        <a href="/forgot-password">Forgot your password?</a>
                     </div>
                 </form>
             </div>
-        </>
-    );
+        </div>
+    </>
+);
+
 };
 
 export default Login;

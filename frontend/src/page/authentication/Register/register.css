@@ -1,17 +1,30 @@
-.container {
-    background-color: white;
-    padding: px;
+.signup-container {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    padding: 0;
     box-shadow: 0 4px 6px rgba(141, 69, 69, 0.1);
     width: 100%;
     max-width: 600px;
     margin: auto;
 }
 
-.title {
+.signup-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* จัดแนวตั้ง */
+    align-items: center;       /* จัดแนวนอน */
+    min-height: 100vh;
+    background-color: #111;
+    padding-top: 60px;
+    width: 100%;               /* <-- สำคัญมาก */
+}
+.signup-title {
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 1.5rem;
+    margin-top: 3rem;
+    margin-bottom: -2rem;
+    color: white;
 }
 
 .form-row {
@@ -42,12 +55,18 @@ input {
     width: 100%;
 }
 
-.submit-btn {
-    width: 100%;
-    background-color: #505f75;
+.signup-submit-btn {
+    width: 20%;
+    background-color: #2F3695;
     color: white;
-    padding: 0.75rem;
+    padding: 0.35rem;
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
+    display: block;
+    margin-top: 0rem;
+    margin-bottom: -1.5rem;
+    margin-left: auto;
+    margin-right: auto;
+
 }

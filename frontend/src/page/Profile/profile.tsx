@@ -30,7 +30,9 @@ const Profile: React.FC = () => {
     return (
         <>
             <Headers />
+
             <div className="profile-container">
+                            <h1 className="profile-title">Profile</h1>
                 <div className="profile-header">
                     {/* Profile Picture */}
                     {users && users.profile ? (

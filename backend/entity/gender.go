@@ -6,7 +6,7 @@ import (
 
 type Gender struct {
 	gorm.Model
-	Name string
+	Gender string
 	
 	User 	[]User 	`gorm:"foreignKey:RoleID"`
 	Admin 	[]Admin `gorm:"foreignKey:RoleID"`

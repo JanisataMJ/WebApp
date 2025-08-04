@@ -1,4 +1,5 @@
 import React from 'react';
+import '../Register/register.css';
 import { Form, Input, Button, Radio, DatePicker, Row, Col, Card, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Headers from '../../../compronents/Pubblic_components/headerselect';
@@ -35,9 +36,10 @@ const Register: React.FC = () => {
         <>
             {contextHolder}
             <Headers />
-            <div className="container">
-                <Card className="card-register" style={{ width: '100%', maxWidth: 600 }}>
-                    <h1 className="title">สมัครสมาชิก</h1>
+            <div className="signup-page-wrapper">
+            <h1 className="signup-title">Sign Up</h1>
+            <div className="signup-container">
+                <Card className="signup-card-register" style={{ width: '100%', maxWidth: 600 }}>
                     <Form
                         name="register"
                         layout="vertical"
@@ -46,7 +48,7 @@ const Register: React.FC = () => {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Form.Item
-                                    label="ชื่อจริง"
+                                    label="First Name"
                                     name="first_name"
                                     rules={[{ required: true, message: 'กรุณากรอกชื่อจริง!' }]}
                                 >
@@ -55,7 +57,7 @@ const Register: React.FC = () => {
                             </Col>
                             <Col span={12}>
                                 <Form.Item
-                                    label="นามสกุล"
+                                    label="Last Name"
                                     name="last_name"
                                     rules={[{ required: true, message: 'กรุณากรอกนามสกุล!' }]}
                                 >
@@ -66,7 +68,7 @@ const Register: React.FC = () => {
                         <Row gutter={12}>
                             <Col span={12}>
                                 <Form.Item
-                                    label="ชื่อผู้ใช้"
+                                    label="Username"
                                     name="user_name"
                                     rules={[{ required: true, message: 'กรุณากรอกชื่อผู้ใช้!' }]}
                                 >
@@ -75,7 +77,7 @@ const Register: React.FC = () => {
                             </Col>
                             <Col span={12}>
                                 <Form.Item
-                                    label="รหัสผ่าน"
+                                    label="Password"
                                     name="password"
                                     rules={[{ required: true, message: 'กรุณากรอกรหัสผ่าน!' }]}
                                 >
@@ -84,7 +86,7 @@ const Register: React.FC = () => {
                             </Col>
                         </Row>
                         <Form.Item
-                            label="อีเมล"
+                            label="Email"
                             name="email"
                             rules={[
                                 { type: 'email', message: 'รูปแบบอีเมลไม่ถูกต้อง!' },
@@ -94,30 +96,30 @@ const Register: React.FC = () => {
                             <Input />
                         </Form.Item>
                         <Form.Item
-                            label="เพศ"
+                            label="Gender"
                             name="gender"
                             rules={[{ required: true, message: 'กรุณาเลือกเพศ!' }]}
                         >
                             <Radio.Group>
-                                <Radio value="ชาย">ชาย</Radio>
-                                <Radio value="หญิง">หญิง</Radio>
-                                <Radio value="ไม่ระบุ">ไม่ระบุ</Radio>
+                                <Radio value="ชาย">Male</Radio>
+                                <Radio value="หญิง">Female</Radio>
                             </Radio.Group>
                         </Form.Item>
                         <Form.Item
-                            label="วันเกิด"
+                            label="Birth Date"
                             name="birth_date"
                             rules={[{ required: true, message: 'กรุณาเลือกวันเกิด!' }]}
                         >
                             <DatePicker style={{ width: '100%' }} />
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" className="submit-btn">
-                                ยืนยันการสมัคร
+                            <Button type="primary" htmlType="submit" className="signup-submit-btn">
+                                Confirm
                             </Button>
                         </Form.Item>
                     </Form>
                 </Card>
+            </div>
             </div>
         </>
     );

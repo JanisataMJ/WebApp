@@ -42,7 +42,14 @@
     transform: scale(1.1);
 }
 
-
+.profile-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: -2rem;
+    margin-bottom: 1rem;
+    margin-left: -80rem;
+    color: white;
+}
 
 .box {
     background-color: #333;

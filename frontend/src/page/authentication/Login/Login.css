@@ -1,32 +1,57 @@
-.container {
+.signin-forgot-password {
+    margin-top: 0.5rem;
+    text-align: left;
+    margin-top: 1rem;
+}
+
+.signin-forgot-password a {
+    color: #000000; 
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.signin-forgot-password a:hover {
+    text-decoration: underline;
+}
+.signin-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 5rem;
+    margin-bottom: -5rem;
+    color: white;
+}
+.signin-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* จัดแนวตั้ง */
+    align-items: center;       /* จัดแนวนอน */
+    min-height: 100vh;
+    background-color: #111;
+    padding-top: 60px;
+    width: 100%;               /* <-- สำคัญมาก */
+}
+.signin-container {
     background-color: white;
-    padding: 3%; 
+    padding: 2%; 
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%; 
-    max-width: 500px; 
-    margin: 1000px auto; 
-    margin-top: 200px;
+    width: 90%; 
+    max-width: 500px; /* เดิม 500px ปรับเป็น 600px */
+    margin: auto;
 }
 
-.title {
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 1rem; /* Adjust margin-top for better spacing */
-}
-
-.form-group {
+.signin-form-group {
     margin-bottom: 1rem;
 }
 
-.form-group label {
+.signin-form-group label {
     display: block;
     color: #4a5568;
     margin-bottom: 0.5rem;
 }
 
-.form-group input {
+.signin-form-group input {
     width: 100%;
     padding: 0.75rem; /* Increase padding for a better user experience */
     border: 1px solid #cbd5e0;
@@ -35,13 +60,13 @@
     box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
-.button-group {
+.signin-button-group {
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem; /* Add margin for better spacing */
 }
 
-.button-group button {
+.signin-button-group button {
     flex: 1;
     padding: 0.75rem; /* Increase button padding */
     border: none;
@@ -50,12 +75,12 @@
     font-size: 1rem; /* Make button text more readable */
 }
 
-.button-group .login-btn {
-    background-color: black;
+.signin-button-group .signup-btn {
+    background-color: #111434;
     color: white;
 }
 
-.button-group .signup-btn {
-    background-color: #e2e8f0;
-    color: black;
+.signin-button-group .login-btn {
+    background-color: #2F3695;
+    color: rgb(255, 255, 255);
 }

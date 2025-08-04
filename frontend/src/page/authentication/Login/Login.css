@@ -1,3 +1,4 @@
+
 .signin-forgot-password {
     margin-top: 0.5rem;
     text-align: left;
@@ -51,6 +52,7 @@
     margin-bottom: 0.5rem;
 }
 
+
 .signin-form-group input {
     width: 100%;
     padding: 0.75rem; /* Increase padding for a better user experience */
@@ -67,6 +69,7 @@
 }
 
 .signin-button-group button {
+
     flex: 1;
     padding: 0.75rem; /* Increase button padding */
     border: none;
@@ -83,4 +86,5 @@
 .signin-button-group .login-btn {
     background-color: #2F3695;
     color: rgb(255, 255, 255);
+
 }

@@ -7,6 +7,7 @@
     max-width: 600px;
     margin: auto;
 }
+
 .signup-page-wrapper {
     display: flex;
     flex-direction: column;
@@ -67,4 +68,5 @@ input {
     margin-bottom: -1.5rem;
     margin-left: auto;
     margin-right: auto;
+
 }

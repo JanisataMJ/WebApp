@@ -36,6 +36,7 @@ const Register: React.FC = () => {
         <>
             {contextHolder}
             <Headers />
+
             <div className="signup-page-wrapper">
             <h1 className="signup-title">Sign Up</h1>
             <div className="signup-container">
@@ -121,6 +122,7 @@ const Register: React.FC = () => {
                 </Card>
             </div>
             </div>
+
         </>
     );
 };

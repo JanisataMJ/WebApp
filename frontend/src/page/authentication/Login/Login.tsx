@@ -47,6 +47,7 @@ const Login: React.FC = () => {
     };
 
     return (
+
     <>
         {contextHolder}
         <Headers />
@@ -76,6 +77,7 @@ const Login: React.FC = () => {
         </div>
     </>
 );
+
 };
 
 export default Login;

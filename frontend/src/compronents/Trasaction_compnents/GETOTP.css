@@ -1,0 +1,24 @@
+.countdown-button {
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #e90c0c;
+ 
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: absolute; /* หรือ 'fixed' ถ้าคุณต้องการให้ปุ่มอยู่ที่ตำแหน่งคงที่บนหน้าจอ */
+  top: 110px; /* ปรับตำแหน่งตามที่ต้องการ */
+  left: 210px; /* ปรับตำแหน่งตามที่ต้องการ */
+  z-index: 1000; /* ค่าที่สูงเพื่อให้ปุ่มอยู่เหนือทุกองค์ประกอบ */
+}
+
+  .countdown-button:disabled {
+    background-color: #ebc8c400;
+    border: 0px solid rgba(173, 168, 158, 0);
+    color: black;
+    padding: 5px 20px;
+    cursor: not-allowed;
+  }
+  

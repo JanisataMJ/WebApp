@@ -1,0 +1,149 @@
+.input-container-nameAndWriterOfNovel {
+  display: flex;
+  gap: 10px;
+  width: 94%;
+}
+
+
+.input-wrapper-name, .input-wrapper-writerName {
+  width: 48%; /* ไม่ต้องกำหนดความกว้าง */
+  margin-bottom: 20px; 
+  
+}
+
+.input-wrapper-name input {
+  background-color: #eee;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: 'Noto Sans Thai';
+  border-radius: 1rem;
+  color: rgb(0, 0, 0);
+  box-shadow: 0 0.4rem #dfd9d9;
+  cursor: pointer;
+}
+
+.input-wrapper-name input:focus {
+  outline-color: lightcoral;
+}
+
+.input-wrapper-writerName input {
+  background-color: #eee;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: 'Noto Sans Thai';
+  border-radius: 1rem;
+  color: rgb(0, 0, 0);
+  box-shadow: 0 0.4rem #dfd9d9;
+  cursor: pointer;
+}
+
+.input-wrapper-writerName input:focus {
+  outline-color: lightcoral;
+}
+
+
+.input-wrapper-descriptionNovel {
+  background-color: #eee;
+  width: 94%;
+  border: none;
+  
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: 'Noto Sans Thai';
+  border-radius: 1rem;
+  color: rgb(0, 0, 0);
+  box-shadow: 0 0.4rem #dfd9d9;
+  cursor: pointer;
+
+  /* Key changes */
+  display: flex;         /* Enable flexbox for the wrapper */
+  align-items: stretch;  /* Make children (textarea) stretch to fill height */
+}
+
+.input-description {
+  width: 100%;
+  height: 100%;         /* Make textarea take full height of its parent */
+  border: none;
+  background-color: #eee;
+  resize: none;        /* Prevent resizing of the textarea */
+}
+
+
+.input-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.input-wrapper-name, .input-wrapper-writerName, .input-wrapper-descriptionNovel {
+  margin-bottom: 20px;
+}
+
+
+.input-descriptionNovelType1 {
+  width: 100%;
+  border: none;
+  background-color: #eee;
+}
+
+.input-wrapper-dropdownNovelType{
+  width: 22%;
+} 
+
+.dropdownNovelType {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Noto Sans Thai';
+  border: none;
+  border-radius: 10px;
+  background-color:#FFB800;
+  color: #000000;
+  box-shadow: 0 0.4rem #bc8700;
+  cursor: pointer;
+}
+
+.dropdownNovelType:focus {
+  outline-color: rgb(0, 255, 81);
+}
+
+.typeAndPriceCover{
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+
+.input-wrapper-Price{
+  width: 25%; /* ไม่ต้องกำหนดความกว้าง */
+  background-color: #eee;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: 'Noto Sans Thai';
+  border-radius: 1rem;
+  color: rgb(0, 0, 0);
+  box-shadow: 0 0.4rem #dfd9d9;
+  cursor: pointer;
+  height: 40px;
+  display: flex;
+  justify-content: center; /*แนวนอน*/
+  align-items: center; /*แนวตั้ง*/
+
+}
+
+
+.input-wrapper-Price input:focus {
+  outline-color: lightcoral;
+}
+
+.inputPrice{
+  border: none;
+  background-color: #eee;
+  width: 100%;
+  height: max-content;
+  
+}

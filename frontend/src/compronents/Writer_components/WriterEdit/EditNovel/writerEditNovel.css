@@ -1,0 +1,74 @@
+.writerEditSection {
+  display: flex;
+  flex-direction: column; /* จัดเรียงในแนวตั้งเป็นหลัก */
+}
+
+.writerEditLeftSection {
+  display: flex;
+  justify-content: center; /* จัดกึ่งกลางแนวนอน */
+  align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+  height: 100%; 
+  flex: 1;
+  width: 30%;
+  height: 100%; 
+}
+
+.writerEditRightSection {
+  flex: 2; 
+  margin-top: 20px;
+}
+
+.novelEditorContainer { 
+  flex: 3; /* หรือค่าที่เหมาะสม */
+  margin-top: 20px;
+}
+
+.container-save-button{
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+
+/* สำหรับหน้าจอขนาดใหญ่ */
+@media (min-width: 1024px) {
+  .writerEditSection {
+    flex-direction: row; /* เปลี่ยนเป็นแนวนอนเมื่อขนาดจอใหญ่ */
+  }
+
+  .writerEditLeftSection, 
+  .writerEditRightSection, 
+  .novelEditorContainer {
+    flex: 1; /* ปรับขนาดให้เท่ากันเมื่อเป็นแนวนอน */
+  }
+}
+
+/* สำหรับหน้าจอขนาดกลาง */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .writerEditSection {
+    flex-direction: column;
+  }
+  .writerEditLeftSection, .writerEditRightSection {
+    flex: 1;
+  }
+}
+
+/* สำหรับหน้าจอขนาดเล็ก */
+@media (max-width: 767px) {
+  .writerEditSection {
+    flex-direction: column;
+  }
+  .writerEditLeftSection, .writerEditRightSection {
+    flex: 1;
+  }
+}
+
+
+
+
+
+
+
+
+
+

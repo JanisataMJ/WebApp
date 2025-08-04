@@ -1,0 +1,196 @@
+.MyNovel {
+  display: flex;
+  gap: 10px;
+  row-gap: 10px;
+  column-gap: 10px;
+  justify-content: flex-start;
+  padding: 20px 0;
+  width: 100%;
+  margin-top: 20px ;
+  /* border: 1px solid #FFB800; */
+  flex-direction: column;
+}
+
+.MyNovel-item {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  background-color: #262626; /* Darker background for items */
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Adjust shadow */
+  overflow: hidden; /* Hide overflowing content */
+  justify-content: flex-start; /* Align items to the left */
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 0 px;
+  border: 1px solid #e0e0e0   ;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* เพิ่ม transition */
+}
+.MyNovel-item:hover {
+  transform: scale(1.03); /* ขยายขนาดเมื่อ hover */
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3); /* เพิ่มเงาเมื่อ hover */
+}
+
+/* Image styling */
+.MyNovel-image {
+  width: 120px; 
+  height: 180px; 
+  object-fit: cover;
+  border-radius: 10px; /* Rounded left corners */
+  margin: 10px 20px 10px 10px;
+}
+
+.MyNovel-image-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.MyNovel-visibility-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(255,184,0, 0.7);
+  color: rgb(0, 0, 0);
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+
+
+
+.MyNovel-details {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  padding: 30px 15px; /* ลด padding ด้านบนและล่าง */
+  line-height: 1.2;    /* ลดระยะห่างระหว่างบรรทัด */
+  position: relative;
+
+}
+
+.MyNovel-title {
+  font-size: 1.1em; 
+  margin-bottom: 3px; /* ลดระยะห่างด้านล่าง */
+  margin-top: -20px;
+  color: #e0e0e0;
+  font-weight: bold;
+  font-family: 'Noto Sans Thai';
+}
+
+.MyNovel-author {
+  font-size: 0.9em;
+  color: #ccc; 
+  margin-bottom: 3px; /* ลดระยะห่างด้านล่าง */
+  font-family: 'Noto Sans Thai';
+}
+
+.MyNovel-stats {
+  display: flex;
+align-items: center; 
+gap: 15px;
+font-size: 0.9em;
+color: #8c8c8c; 
+margin-bottom: 5px;
+font-family: 'Noto Sans Thai';
+}
+
+.MyNovel-stats span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.MyNovel-description {
+  font-family: 'Noto Sans Thai';
+  padding-top: 10px;
+  font-size: 0.9em;
+  color: #ccc; 
+  margin-bottom: 15px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  width: auto;
+  height: auto;
+  white-space: pre-line; /* จะเก็บการขึ้นบรรทัดใหม่จาก HTML */
+}
+
+/* Button styling */
+.MyNovel-button-container {
+  margin-top: auto; 
+  text-align: right; /* Align button to the right */
+}
+
+.MyNovel-list-container { /* Replace with the actual class name of the parent */
+  padding: 0; /* Remove any padding from the parent */
+  margin: 0; /* Remove any margin from the parent */
+}
+
+.MyNovel-type{
+  background-color: hsl(5, 100%, 68%); /* สีชมพูอ่อน */
+  color: #ffffff; /* สีแดงเข้ม */
+  padding-inline: 5px;
+  padding-block: 2px;
+  border: none ;
+  border-radius: 10px ;
+}
+
+.MyNovel-rate{
+  background-color: #fc74f5 ;
+  color: #ffffff ; 
+  font-size: larg ;
+  font-weight: bold; 
+  text-align: center;
+  margin-left: 10px;
+  padding-inline: 5px;
+  padding-block: 2px;
+  border: none ;
+  border-radius: 10px ;
+}
+
+.MyNovel-hashtag{
+  background-color: #85a1ff ;
+  color: #ffffff ; 
+  margin-left: 10px;
+  padding-inline: 5px;
+  padding-block: 2px;
+  border: none ;
+  border-radius: 10px ;
+}
+
+.MyNovel-tags {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* หรือค่าอื่นที่เหมาะสม เช่น 3px หรือ 8px */
+  font-size: larger ;
+  font-weight: bold; 
+  text-align: center;
+  border: none ;
+  border-radius: 10px ;
+  font-family:  'Noto Sans Thai';
+}
+
+.MyNovel-edit-button, .MyNovel-finish-button {
+  background-color: #FFB800;
+  color: black;
+  border: none;
+  padding: 0px 5px;  /* ลด padding ลง */
+  border-radius:20px;
+  cursor: pointer;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+}
+
+.MyNovel-edit-button {
+  right: 20px;
+}
+.MyNovel-edit-button:hover, .MyNovel-finish-button:hover  {
+  background-color: #857808;
+}
+
+.MyNovel-finish-button {
+  font-family: 'Noto Sans Thai';
+  left: 10px;
+}

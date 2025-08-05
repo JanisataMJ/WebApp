@@ -24,7 +24,7 @@
 }
 @media (min-width: 720px) {
     .l1 {
-        margin-top: 120px
+        margin-top: 110px
     }
 }
 
@@ -156,17 +156,23 @@
 .l1_2{
     display: flex;
     flex-wrap: wrap;
-    /* border: 1px solid red; */
     height: auto;
     width: auto;
-    margin: 130px 80px 0;
-    
+    margin: 100px 80px 0; 
 }
 .headder{
     color: #57648E;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
+.headder h2 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+  margin-bottom: 10px;
+}
+
 .category a{
     text-decoration: none;
     color: #ffffff;

@@ -64,7 +64,7 @@ const Overview = () => {
       <div className='category-tips'><CategoryNav /></div>
       <div className="health-dashboard">
       {/* Header */}
-      <div className="dashboard-container">
+      <div className="dashboard-container"> 
         <div className="dashboard-header">
           <div className="header-content">
             <h1 className="dashboard-title">Health Dashboard</h1>

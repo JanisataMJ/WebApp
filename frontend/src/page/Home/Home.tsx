@@ -12,7 +12,7 @@ import Graph3 from '../../compronents/Home_components/GroupGraph/calorie';
 import Graph4 from '../../compronents/Home_components/GroupGraph/spo2';
 import Graph5 from '../../compronents/Home_components/GroupGraph/steps';
 import Graph6 from '../../compronents/Home_components/GroupGraph/sleep';
-import CategoryNav from '../../compronents/Home_components/CategoryNav';
+import Navbar from '../../compronents/Home_components/Navbar';
 import SLoader from '../../compronents/Book_components/simpleLoader';
 
 const Home: React.FC = () => {
@@ -36,7 +36,7 @@ const Home: React.FC = () => {
     <MusicProvider>
       <Headers />
       <a id='cat1' className='hide'>1</a>
-      <CategoryNav />
+      <Navbar />
       <div className='l1'>
         <div className='l11'>
           <Slider />

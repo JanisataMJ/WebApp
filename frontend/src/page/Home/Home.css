@@ -19,7 +19,7 @@
     margin-top: 160px;
     border-radius: 10px;
     background-color: #E5E5E5;
-    width: auto;
+    width: 100vw;
     height: auto;
 }
 @media (min-width: 720px) {
@@ -30,7 +30,7 @@
 
 .l11 {
   padding: 20px;
-  background: #fff0ff;
+  background: #C2B4D7;
   width: 100vw;
 }
 

@@ -6,7 +6,7 @@ import { Activity, Heart, Droplets, Thermometer, Moon, TrendingUp, Calendar, Use
 import "./Overview.css";
 import { Form, Input, Modal, message } from "antd";
 import Headers from '../../compronents/Pubblic_components/headerselect';
-import CategoryNav from '../../compronents/Home_components/CategoryNav';
+import CategoryNav from '../../compronents/Home_components/Navbar';
 import Notification from '../../compronents/Home_components/Notifiation/notice';
 
 const Overview = () => {

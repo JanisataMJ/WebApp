@@ -1,10 +1,3 @@
-.hide{
-    color: #1e1c1c00;
-    /* color: #ffffff; */
-    transform: translate(0,-500px);
-    text-decoration: none;
-}
-
 .category-tips {
   position: fixed;
   left: 0;           /* ← ชิดซ้ายหน้าจอ */
@@ -14,6 +7,7 @@
   text-align: left;
 }
 
+<<<<<<< HEAD
 .search-bar {
   background: #fff;
   position: relative;
@@ -81,4 +75,15 @@
   .articles-grid {
     grid-template-columns: 1fr 1fr 1fr;
   }
+=======
+.tips-dashboard {
+  min-height: 100vh;
+  width: 1000px;
+  background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
+  padding: 20px;
+  margin-top: 110px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+
+>>>>>>> mj
 }

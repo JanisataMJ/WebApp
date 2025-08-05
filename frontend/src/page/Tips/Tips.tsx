@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Search, BookOpen, Clock, User, Heart, Share2, MessageCircle, ChevronLeft, Filter, TrendingUp, Calendar } from 'lucide-react';
 import Headers from '../../compronents/Pubblic_components/headerselect';
+<<<<<<< HEAD
 import CategoryNav from '../../compronents/Home_components/CategoryNav';
 import './Tips.css';
+=======
+import CategoryNav from '../../compronents/Home_components/Navbar';
+import Notification from '../../compronents/Home_components/Notifiation/notice';
+>>>>>>> mj
 
 const Tips = () => {
   type Article = {
@@ -205,6 +210,7 @@ const Tips = () => {
   return (
     <div><Headers />
       <div className='category-tips'><CategoryNav /></div>
+<<<<<<< HEAD
       <div className="health-dashboard">
     <div className="min-h-screen bg-transparent">
       {/* Header Section */}
@@ -336,6 +342,10 @@ const Tips = () => {
           </div>
         )}
       </div>
+=======
+      <div className="tips-dashboard"></div>
+      <Notification />
+>>>>>>> mj
     </div>
     </div>
   </div>

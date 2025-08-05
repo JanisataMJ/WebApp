@@ -1,0 +1,519 @@
+/* steps.css */
+
+/* Main container */
+.steps-container {
+  width: 100%;
+  padding: 24px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 20%, #dbeafe 40%, #e0e7ff 60%, #f3e8ff 80%, #fdf4ff 100%);
+  border-radius: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.steps-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%233b82f6" fill-opacity="0.03"><path d="M30 15c-8.284 0-15 6.716-15 15s6.716 15 15 15 15-6.716 15-15-6.716-15-15-15zm0 2c7.18 0 13 5.82 13 13s-5.82 13-13 13-13-5.82-13-13 5.82-13 13-13z"/></g></g></svg>');
+  pointer-events: none;
+}
+
+.steps-container::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 100%);
+  animation: float 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-30px, -30px) rotate(120deg); }
+  67% { transform: translate(30px, -20px) rotate(240deg); }
+}
+
+/* Header section */
+.header-section-step {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 32px;
+}
+
+.title-step {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 24px;
+  line-height: 1.3;
+  text-align: center;
+  background: linear-gradient(135deg, #3b82f6, #10b981, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Steps Stats Grid */
+.steps-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.steps-stat-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.steps-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+  pointer-events: none;
+}
+
+.steps-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.steps-stat-card.total {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.steps-stat-card.distance {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.steps-stat-card.calories {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.steps-stat-card.active {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.stat-icon-step {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.stat-value-step {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.stat-label-step {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Progress Section */
+.progress-section-step {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.progress-title-step {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.progress-container-step {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.radial-progress-step {
+  flex: 0 0 200px;
+}
+
+.radial-text-step {
+  font-family: inherit;
+}
+
+.progress-info-step {
+  flex: 1;
+}
+
+.progress-status-step {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 50px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.progress-details-step {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.progress-details-step p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* Charts Section */
+.steps-charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.chart-container-step {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.chart-container-step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+}
+
+.chart-title-step {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Bottom Charts Section */
+.bottom-charts-section-step {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.pie-chart-step {
+  text-align: center;
+}
+
+.pie-legend-step {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.legend-item-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.legend-color-step {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text-step {
+  font-weight: 500;
+}
+
+/* Achievements */
+.achievements-container-step {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.achievements-grid-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievement-item-step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.achievement-item-step.completed {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.achievement-item-step.pending {
+  background: rgba(100, 116, 139, 0.05);
+  border-color: rgba(100, 116, 139, 0.2);
+}
+
+.achievement-icon-step {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.achievement-content-step {
+  flex: 1;
+}
+
+.achievement-content-step h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.achievement-content-step p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 4px 0;
+}
+
+.achievement-status-step {
+  font-size: 12px;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.achievement-item-step.pending .achievement-status-step {
+  color: #64748b;
+}
+
+/* Health Tips Section */
+.health-tips-section-step {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.tips-title-step {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tips-grid-step {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.tip-card-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.tip-card-step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.tip-icon-step {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  flex-shrink: 0;
+}
+
+.tip-content-step h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.tip-content-step p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Tooltip Styles */
+.steps-tooltip-step {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  font-size: 12px;
+  color: #1e293b;
+}
+
+.tooltip-time-step {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+
+.tooltip-steps {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.tooltip-intensity-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.intensity-indicator-step {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tooltip-calories-step,
+.tooltip-distance-step {
+  margin: 2px 0;
+  color: #64748b;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .steps-charts-section,
+  .bottom-charts-section-step {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-container-step {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .radial-progress-step {
+    flex: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .steps-container {
+    padding: 16px;
+  }
+  
+  .steps-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tips-grid-step {
+    grid-template-columns: 1fr;
+  }
+  
+  .title-step {
+    font-size: 24px;
+  }
+  
+  .achievements-grid-step {
+    gap: 8px;
+  }
+  
+  .achievement-item-step {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .steps-stats-grid {
+    grid-template-columns: 1fr;
+  } 
+  
+  .progress-section-step,
+  .health-tips-section-step {
+    padding: 16px;
+  }
+  
+  .chart-container-step {
+    padding: 16px;
+  }
+}

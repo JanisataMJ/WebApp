@@ -6,7 +6,11 @@ import CategoryNav from '../../compronents/Home_components/CategoryNav';
 import './Tips.css';
 =======
 import CategoryNav from '../../compronents/Home_components/Navbar';
+<<<<<<< HEAD
 import Notification from '../../compronents/Home_components/Notifiation/notice';
+>>>>>>> mj
+=======
+import './Tips.css';
 >>>>>>> mj
 
 const Tips = () => {
@@ -211,6 +215,9 @@ const Tips = () => {
     <div><Headers />
       <div className='category-tips'><CategoryNav /></div>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> mj
       <div className="health-dashboard">
     <div className="min-h-screen bg-transparent">
       {/* Header Section */}
@@ -342,9 +349,12 @@ const Tips = () => {
           </div>
         )}
       </div>
+<<<<<<< HEAD
 =======
       <div className="tips-dashboard"></div>
       <Notification />
+>>>>>>> mj
+=======
 >>>>>>> mj
     </div>
     </div>

@@ -42,14 +42,6 @@ const Home: React.FC = () => {
           <Slider />
         </div>
 
-        <a id='cat2' className='hide'>2</a>
-        <div className='l1_2'>
-          <div className='headder'>
-            <h2>ปฏิทิน</h2>
-          </div>
-          <Calendar />
-        </div>
-
         <a id='chart1' className='hide'>4</a>
         <div className='l1_2'>
           <div className='headder'>

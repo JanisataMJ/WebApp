@@ -287,6 +287,13 @@ const Navbar: React.FC = () => {
         </div>
 
         <Link
+          to="/calendar"
+          className={`nav-link ${isActive('/calendar') ? 'active' : ''}`}
+        >
+          <span>MOOD</span>
+        </Link>
+
+        <Link
           to="/overview"
           className={`nav-link ${isActive('/overview') ? 'active' : ''}`}
         >

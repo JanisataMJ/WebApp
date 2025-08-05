@@ -22,7 +22,9 @@ import { HistoryProvider } from './compronents/Trasaction_compnents/HistoryConte
 import { LikeProvider } from './compronents/Book_components/LikeContext';
 import { MusicProvider } from './compronents/song_components/musicprovider';
 import Overview from './page/Overview/Overview';
-import Tips from './page/Tips/Tips'
+import Tips from './page/Tips/Tips';
+import Calendar from './page/calendar/calendar';
+import MoodTracker from './page/Mood/MoodTracker';
 
 const router = createBrowserRouter([
   { path: "/Payment", element: <Payment /> },
@@ -40,7 +42,9 @@ const router = createBrowserRouter([
   { path: "/bookshelf", element: <L_Bookshelf /> },
   { path: "/L_content/:novelId", element: <L_Content />},
   { path: "/overview", element: <Overview />},
-  { path: "/tips", element: <Tips />}
+  { path: "/tips", element: <Tips />},
+  { path: "/calendar", element: <Calendar />},
+  { path: "/moodtracker", element: <MoodTracker />},
 ]);
 
 

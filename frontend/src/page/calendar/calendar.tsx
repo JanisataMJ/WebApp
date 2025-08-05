@@ -52,35 +52,6 @@ const Calendar = () => {
     <div className="healthy-calendar">
       <Headers />
       <CategoryNav />
-      {/* Header */}
-      {/*<div className="header">
-        <div className="header-content">
-          <div className="logo-section">
-            <div className="logo-container">
-              <div className="logo-icon"></div>
-            </div>
-            <h1 className="app-title">HEALTHY</h1>
-          </div>
-          <div className="user-section">
-            <span className="user-name">Jane Doe</span>
-            <div className="user-avatar">
-              <span className="user-initials">JD</span>
-            </div>
-          </div>
-        </div>
-      </div>*/}
-
-      {/* Navigation */}
-      {/*<div className="navigation">
-        <div className="nav-content">
-          <nav className="nav-menu">
-            <a href="#" className="nav-item active">NOW</a>
-            <a href="#" className="nav-item">MOOD</a>
-            <a href="#" className="nav-item">OVERVIEW</a>
-            <a href="#" className="nav-item">HEALTHY TIPS</a>
-          </nav>
-        </div>
-      </div>*/}
 
       {/* Calendar */}
       <div className="calendar-container">

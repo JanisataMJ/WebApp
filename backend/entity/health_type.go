@@ -6,7 +6,7 @@ import (
 
 type HealthType struct {
 	gorm.Model
-	Type uint
+	Type string
 	
 	Notification []Notification `gorm:"foreignKey:HealthTypeID"`
 }

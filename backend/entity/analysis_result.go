@@ -8,7 +8,7 @@ import (
 type AnalysisResult struct {
 	gorm.Model
 	Timestamp 		time.Time
-	AnalysisType 	float64
+	AnalysisType 	string
 	Value 			float64
 	SumText 		string
 
@@ -16,5 +16,5 @@ type AnalysisResult struct {
 	User   			*User `gorm:"foreignKey: UserID"`
 
 	// Many-to-Many
-	AnalysisResults []AnalysisResult `gorm:"many2many:HealthDataAnalysis;"`
+	HealthDataList []HealthData `gorm:"many2many:HealthDataAnalysis;"`
 }

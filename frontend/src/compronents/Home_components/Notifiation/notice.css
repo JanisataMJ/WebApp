@@ -42,7 +42,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 40;
+  z-index: 100;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,26 +51,41 @@
 
 /* Modal Container */
 .modal-noti {
-  position: relative;
-  background: linear-gradient(to top, #C2B4D7, #E5E5E5);
-  padding: 24px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 900px;
-  height: 500px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  animation: modal-appear 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  max-height: 80vh; /* จำกัดความสูงของ modal */
+  width: 90%;
+  max-width: 900px;
+  background: linear-gradient(to top, #C2B4D7, #E5E5E5);
+  border-radius: 12px;
+  padding: 24px;
+  overflow: hidden; /* ซ่อนส่วนล้น */
+  position: relative;
 }
 
 /* Modal Body */
 .modal-body-noti {
-  text-align: center;
-  flex-grow: 1;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #C2B4D7 transparent;
 }
+
+/* สำหรับ Chrome/Edge/Safari */
+.modal-body-noti::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body-noti::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body-noti::-webkit-scrollbar-thumb {
+  background-color: #C2B4D7;
+  border-radius: 3px;
+}
+
 
 .modal-title {
   font-size: 2rem;
@@ -93,6 +108,7 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 16px;
+  margin-bottom: 16px;
   transition: all 0.3s ease;
 }
 
@@ -100,30 +116,87 @@
 .title-row-noti {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: center; /* ให้ทุกอย่างอยู่กลางแนวแกนขวาง (แนวตั้ง) */
+  gap: 12px; /* ลดช่องว่างถ้าต้องการ */
 }
 
+/*.title-left-noti {
+  flex-grow: 1; /* ให้ title ขยายเต็มที่ */
+  /*min-width: 0; /* ช่วยให้ข้อความตัดได้เมื่อยาวเกิน */
+  /*white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}*/
 .title-left-noti {
   display: flex;
   align-items: center;
+  gap: 12px; /* ช่องว่างระหว่าง title กับ health type */
+  flex-grow: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.health-type {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* สีตามระดับสุขภาพ */
+.health-type-safe {
+  color: #22c55e; /* เขียว */
+  background-color: #d1fae5;
+}
+
+.health-type-warning {
+  color: #ca8a04; /* เหลืองเข้ม */
+  background-color: #fef3c7;
+}
+
+.health-type-danger {
+  color: #dc2626; /* แดง */
+  background-color: #fecaca;
 }
 
 .title-right-noti {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px; /* ช่องว่างระหว่างวันที่กับปุ่มลูกศร */
+  flex-shrink: 0; /* ป้องกันให้ไม่ย่อเกินไป */
 }
 
-/* DateTime Display */
 .datetime-container {
-  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
 }
 
-.date-display {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  line-height: 1.2;
+
+.status-display {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+  color: #6b7280; /* สีเทา */
+}
+
+.status-unread {
+  font-weight: 700; /* ตัวหนา */
+  color: #000000;   /* ดำ */
+}
+
+.status-readed {
+  font-weight: 400; /* ตัวบาง */
+  color: #6b7280;   /* เทา */
+}
+
+.status-archived {
+  font-weight: 700; /* ตัวหนา */
+  color: #9ca3af;   /* เทาเข้มกว่าปกติ */
 }
 
 .time-display {

@@ -7,9 +7,12 @@ import (
 
 type SmartwatchDevice struct {
 	gorm.Model
-	Name 			string 
-	Picture 		string
-	ReceivedDate 	time.Time
+	Name 			string
+	SerialNumber 	string
+	ModelSmartwatch string
+	ModelNumber 	string
+	Brand 			string
+	StartDate 		time.Time
 
 	UserID 			uint
 	User   			*User `gorm:"foreignKey: UserID"`

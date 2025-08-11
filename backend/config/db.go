@@ -36,6 +36,9 @@ func SetupDatabase() {
        &entity.Notification{},
        &entity.HealthType{},
        &entity.NotificationStatus{},
+       &entity.AnalysisResult{},
+       &entity.HealthData{},
+       &entity.SmartwatchDevice{},
    )
 
 
@@ -49,17 +52,28 @@ func SetupDatabase() {
 
    BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 
-   User := &entity.User{
+   User1 := &entity.User{
        FirstName: "Software",
        LastName:  "Analysis",
        Email:     "sa@gmail.com",
        Password:  hashedPassword,
-       Birthdate:  BirthDay,
+       Birthdate: BirthDay,
        GenderID:  1,
    }
-
-   db.FirstOrCreate(User, &entity.User{
+   db.FirstOrCreate(User1, &entity.User{
        Email: "sa@gmail.com",
+   })
+
+   User2 := &entity.User{
+       FirstName: "Web",
+       LastName:  "App",
+       Email:     "webapp@gmail.com",
+       Password:  hashedPassword,
+       Birthdate: BirthDay,
+       GenderID:  2,
+   }
+   db.FirstOrCreate(User2, &entity.User{
+       Email: "webapp@gmail.com",
    })
 
    
@@ -131,7 +145,7 @@ func SetupDatabase() {
 		Timestamp:           time.Now().Add(-200 * time.Hour),
         Title:               "Title 2",
 		Message:             "Normal heart rate.",
-		UserID:              1,
+		UserID:              2,
 		HealthTypeID:        htSafe.ID,
 		NotificationStatusID: statusRead.ID,
 	}
@@ -149,7 +163,7 @@ func SetupDatabase() {
 		Timestamp:           time.Now().Add(-24 * time.Hour),
         Title:               "Title 4",
 		Message:             "Detected a decreased heart rate.",
-		UserID:              1,
+		UserID:              2,
 		HealthTypeID:        htDanger.ID,
 		NotificationStatusID: statusUnread.ID,
 	}
@@ -167,7 +181,7 @@ func SetupDatabase() {
 		Timestamp:           time.Now(),
         Title:               "Title 6",
 		Message:             "Detected a decreased heart rate.",
-		UserID:              1,
+		UserID:              2,
 		HealthTypeID:        htDanger.ID,
 		NotificationStatusID: statusUnread.ID,
 	}
@@ -178,4 +192,78 @@ func SetupDatabase() {
     db.Create(&noti4)
     db.Create(&noti5)
     db.Create(&noti6)
+
+
+    //SmartwatchDevice
+    smartwatch1 := entity.SmartwatchDevice{
+		Name:               "Samsung 1",
+        SerialNumber:       "R7AY700V13B",
+		ModelSmartwatch:    "Galaxy Fit3 (EEDD)",
+		ModelNumber:        "SM-R390",
+		Brand:              "SAMSUNG",
+		StartDate:          time.Now(),
+        UserID:             1,
+	}
+
+    smartwatch2 := entity.SmartwatchDevice{
+		Name:               "Oppo 1",
+        SerialNumber:       "A1AA100A10A",
+		ModelSmartwatch:    "Oppo band",
+		ModelNumber:        "PO-A110",
+		Brand:              "OPPO",
+		StartDate:          time.Now(),
+        UserID:             2,
+	}
+
+	db.Create(&smartwatch1)
+    db.Create(&smartwatch2)
+
+
+    //HealthData
+    healthData1 := entity.HealthData{
+		Timestamp:      time.Now(),
+        Bpm:            79,
+		Steps:          10000,
+		SleepHours:     10.00,
+		CaloriesBurned: 250,
+		Spo2:           97.0,
+        BodyTemp:       37.5,
+        UserID:         1,
+	}
+
+    healthData2 := entity.HealthData{
+		Timestamp:      time.Now(),
+        Bpm:            72,
+		Steps:          5000,
+		SleepHours:     8.00,
+		CaloriesBurned: 100,
+		Spo2:           98.0,
+        BodyTemp:       36.5,
+        UserID:         2,
+	}
+
+	db.Create(&healthData1)
+    db.Create(&healthData2)
+
+
+    //AnalysisResult
+    analysisResult1 := entity.AnalysisResult{
+		Timestamp:      time.Now(),
+        AnalysisType:   "79",
+		Value:          100,
+		SumText:        "Healthy abcdefghijklmnopqrstuvwxyz",
+        UserID:         1,
+	}
+
+    analysisResult2 := entity.AnalysisResult{
+		Timestamp:      time.Now(),
+        AnalysisType:   "79",
+		Value:          100,
+		SumText:        "Warning, You should abcdefghijklmnopqrstuvwxyz",
+        UserID:         1,
+	}
+
+    db.Create(&analysisResult1)
+    db.Create(&analysisResult2)
+    
 }

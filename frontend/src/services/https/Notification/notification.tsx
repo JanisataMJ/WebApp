@@ -51,7 +51,7 @@ export const createNotification = async (
 ): Promise<NotificationInterface> => {
   try {
     const requestOptions = postRequestOptions(noti);
-    const response = await fetch(`${apiUrl}/notifications`, requestOptions);
+    const response = await fetch(`${apiUrl}/create-notification`, requestOptions);
     if (!response.ok) {
       throw new Error("Error creating notification");
     }
@@ -62,14 +62,3 @@ export const createNotification = async (
     throw new Error("Error creating notification: " + (error as Error).message);
   }
 };
-
-
-// DELETE Notification by ID
-/*export const deleteNotification = async (notiId: number): Promise<void> => {
-  try {
-    const requestOptions = getRequestOptions();
-    await axios.delete(`${apiUrl}/notifications/${notiId}`, requestOptions);
-  } catch (error) {
-    throw new Error("Error deleting notification: " + (error as Error).message);
-  }
-};*/

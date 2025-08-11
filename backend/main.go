@@ -8,8 +8,11 @@ import (
 	"github.com/JanisataMJ/WebApp/config"
 
 	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
+	"github.com/JanisataMJ/WebApp/controller/analysisResult"
 	"github.com/JanisataMJ/WebApp/controller/gender"
+	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/notification"
+	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
 
@@ -53,6 +56,18 @@ func main() {
         //Notification Route
         router.POST("/create-notification/:id", notification.CreateNotification)
         router.GET("/notification/:id", notification.GetNotificationsByUserID)
+
+        //AnalysisResult Route
+        router.GET("/list-analysisResult", analysisResult.ListAnalysisResults)
+        router.GET("/analysisResult/:id", analysisResult.GetAnalysisResult)
+
+        //HealthData Route
+        router.GET("/list-healthData", healthData.ListHealthData)
+        router.GET("/healthData/:id", healthData.GetHealthData)
+
+        //SmartwatchDevice Route
+        router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
+        router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
 
    }
 

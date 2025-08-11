@@ -8,7 +8,7 @@ import (
 type HealthData struct {
 	gorm.Model
 	Timestamp 		time.Time
-	Bpm 			float64
+	Bpm 			uint
 	Steps 			uint
 	SleepHours 		float64
 	CaloriesBurned 	float64

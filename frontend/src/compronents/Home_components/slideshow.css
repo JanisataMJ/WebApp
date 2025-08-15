@@ -38,7 +38,7 @@
 }
 
 .slider-title {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: #1f2937;
   margin-bottom: 16px;
@@ -55,7 +55,7 @@
 }
 
 .date {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 700;
   color: #374151;
   margin-bottom: 4px;
@@ -64,7 +64,7 @@
 }
 
 .time {
-  font-size: 16px;
+  font-size: 12px;
   color: #6b7280;
   font-weight: 500;
 }
@@ -73,7 +73,7 @@
 .cards-container {
   position: relative;
   width: 100%;
-  height: 350px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -319,11 +319,11 @@
   position: absolute !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  width: 56px !important;
-  height: 56px !important;
+  width: 40px !important;
+  height: 40px !important;
   border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.95) !important;
-  border: 3px solid #8b5cf6 !important;
+  border: 2px solid #8b5cf6 !important;
   color: #8b5cf6 !important;
   display: flex !important;
   align-items: center !important;
@@ -331,24 +331,22 @@
   cursor: pointer !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 40 !important;
-  font-size: 22px !important;
+  font-size: 12px !important;
   backdrop-filter: blur(10px) !important;
   box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3) !important;
 }
 
 .nav-arrow:hover {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%) !important;
-  color: white !important;
   transform: translateY(-50%) scale(1.1) !important;
   box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4) !important;
 }
 
 .nav-arrow-left {
-  left: -90px !important;
+  left: -20px !important;
 }
 
 .nav-arrow-right {
-  right: -90px !important;
+  right: -20px !important;
 }
 
 /* Responsive Design */
@@ -381,17 +379,17 @@
   }
   
   .nav-arrow-left {
-    left: -70px !important;
+    left: -20px !important;
   }
   
   .nav-arrow-right {
-    right: -70px !important;
+    right: -20px !important;
   }
 }
 
 @media (max-width: 1024px) {
   .cards-container {
-    height: 300px;
+    height: 250px;
   }
   
   .card-center {
@@ -439,11 +437,11 @@
   }
   
   .slider-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
   
   .cards-container {
-    height: 250px;
+    height: 200px;
   }
   
   .card-center {
@@ -500,11 +498,11 @@
   }
   
   .slider-title {
-    font-size: 1.75rem;
+    font-size: 1rem;
   }
   
   .cards-container {
-    height: 200px;
+    height: 150px;
   }
   
   .card-center {

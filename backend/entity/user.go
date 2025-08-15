@@ -16,10 +16,10 @@ type User struct {
 	Phonenumber	string
 	Picture		string
 	Height		float64
-	weight		float64
-	bust		float64
-	waist		float64
-	hip			float64
+	Weight		float64
+	Bust		float64
+	Waist		float64
+	Hip			float64
 
 	RoleID 		uint
 	Role   		*Role `gorm:"foreignKey: RoleID" `

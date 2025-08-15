@@ -31,6 +31,7 @@ func SetupDatabase() {
 
    db.AutoMigrate(
        &entity.User{},
+       &entity.Role{},
        &entity.Gender{},
        &entity.MoodData{},
        &entity.Notification{},
@@ -48,33 +49,73 @@ func SetupDatabase() {
    db.FirstOrCreate(&GenderMale, &entity.Gender{Gender: "Male"})
    db.FirstOrCreate(&GenderFemale, &entity.Gender{Gender: "Female"})
 
+    AdminRole := entity.Role{Name: "Admin"}
+    UserRole := entity.Role{Name: "User"}
+
+    db.FirstOrCreate(&AdminRole, &entity.Role{Name: "Admin"})
+	db.FirstOrCreate(&UserRole, &entity.Role{Name: "User"})
+
    hashedPassword, _ := HashPassword("123456")
 
    BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 
    User1 := &entity.User{
-       FirstName: "Software",
-       LastName:  "Analysis",
-       Email:     "sa@gmail.com",
-       Password:  hashedPassword,
-       Birthdate: BirthDay,
-       GenderID:  1,
+        Username:       "User1",
+        Password:       hashedPassword,
+        Email:          "sa@gmail.com",
+        FirstName:      "Software",
+        LastName:       "Analysis",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0866666666",
+        Picture:        "photo",
+        Height:         166,
+        Weight:         55,
+        Bust:           33,
+        Waist:          25,
+        Hip:            37,
+        RoleID:         1,
+        GenderID:       1,
    }
-   db.FirstOrCreate(User1, &entity.User{
-       Email: "sa@gmail.com",
-   })
+   db.FirstOrCreate(User1, &entity.User{Email: "sa@gmail.com"})
 
    User2 := &entity.User{
-       FirstName: "Web",
-       LastName:  "App",
-       Email:     "webapp@gmail.com",
-       Password:  hashedPassword,
-       Birthdate: BirthDay,
-       GenderID:  2,
+        Username:       "User2",
+        Password:       hashedPassword,
+        Email:          "webapp@gmail.com",
+        FirstName:      "Web",
+        LastName:       "App",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0866666666",
+        Picture:        "photo",
+        Height:         166,
+        Weight:         55,
+        Bust:           33,
+        Waist:          25,
+        Hip:            37,
+        RoleID:         1,
+        GenderID:       2,
    }
-   db.FirstOrCreate(User2, &entity.User{
-       Email: "webapp@gmail.com",
-   })
+   db.FirstOrCreate(User2, &entity.User{Email: "webapp@gmail.com",})
+
+   Admin1 := &entity.User{
+        Username:       "Admin1",
+        Password:       hashedPassword,
+        Email:          "admin1@gmail.com",
+        FirstName:      "Admin",
+        LastName:       "Admin",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0899999999",
+        Picture:        "photo",
+        Height:         166,
+        Weight:         55,
+        Bust:           33,
+        Waist:          25,
+        Hip:            37,
+        RoleID:         1,
+        GenderID:       2,
+   }
+   db.FirstOrCreate(Admin1, &entity.User{Email: "admin1@gmail.com",})
+
 
    
    initialCalendars := []entity.MoodData{

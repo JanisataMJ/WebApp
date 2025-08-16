@@ -90,12 +90,12 @@ const EditProfile: React.FC = () => {
                         email: userData.Email,
                         gender: userData.GenderID === 1 ? 'ชาย' : userData.GenderID === 2 ? 'หญิง' : 'อื่น',
                         birth_date: userData.Birthdate ? dayjs(userData.Birthdate) : null,
-                        weight: userData.weight,
-                        height: userData.height,
+                        weight: userData.Weight,
+                        height: userData.Height,
                         phonenumber: userData.Phonenumber || '',
-                        bust: userData.bust || null,
-                        waist: userData.waist || null,
-                        hip: userData.hip || null,
+                        bust: userData.Bust || null,
+                        waist: userData.Waist || null,
+                        hip: userData.Hip || null,
                         old_password: '',
                         new_password: '',
                     });
@@ -265,7 +265,7 @@ const EditProfile: React.FC = () => {
                     >
                         <ArrowLeftOutlined />
                     </button>
-                    <h1 className="profile-title">แก้ไขโปรไฟล์</h1>
+                    <h1 className="editprofile-title">แก้ไขโปรไฟล์</h1>
                 </div>
 
                 {/* Main Content */}
@@ -389,7 +389,10 @@ const EditProfile: React.FC = () => {
                                                 name="phonenumber"
                                                 rules={[{ required: true, message: 'กรุณากรอกเบอร์โทร' }]}
                                             >
-                                                <Input placeholder="กรอกเบอร์โทร" />
+                                                <Input
+                                                    placeholder="กรอกเบอร์โทร"
+                                                    style={{ width: '100%' , height: '50px' }}   // ✅ บังคับให้เต็มเหมือนช่องอื่น
+                                                />
                                             </Form.Item>
                                         </div>
                                     </div>
@@ -398,22 +401,8 @@ const EditProfile: React.FC = () => {
                                             <label>น้ำหนัก</label>
                                             <Form.Item
                                                 name="weight"
-                                                rules={[
-                                                    { required: true, message: 'กรุณากรอกน้ำหนัก' },
-                                                    {
-                                                        validator: (_, value) => {
-                                                            if (value === undefined) return Promise.resolve();
-                                                            if (value < 20 || value > 300) {
-                                                                return Promise.reject(new Error('น้ำหนักต้องอยู่ระหว่าง 20-300 กิโลกรัม'));
-                                                            }
-                                                            return Promise.resolve();
-                                                        },
-                                                    },
-                                                ]}
                                             >
                                                 <InputNumber
-                                                    min={20}
-                                                    max={300}
                                                     placeholder="กก."
                                                     style={{ width: '100%' }}
                                                 />
@@ -423,62 +412,49 @@ const EditProfile: React.FC = () => {
                                             <label>ส่วนสูง</label>
                                             <Form.Item
                                                 name="height"
-                                                rules={[
-                                                    { required: true, message: 'กรุณากรอกส่วนสูง' },
-                                                    {
-                                                        validator: (_, value) => {
-                                                            if (value === undefined) return Promise.resolve();
-                                                            if (value < 100 || value > 250) {
-                                                                return Promise.reject(new Error('ส่วนสูงต้องอยู่ระหว่าง 100-250 เซนติเมตร'));
-                                                            }
-                                                            return Promise.resolve();
-                                                        },
-                                                    },
-                                                ]}
                                             >
                                                 <InputNumber
-                                                    min={100}
-                                                    max={250}
+ 
                                                     placeholder="ซม."
                                                     style={{ width: '100%' }}
                                                 />
                                             </Form.Item>
                                         </div>
                                     </div>
-                                        <div className="form-row">
-                                            <div className="form-group">
-                                                <label>รอบอก</label>
-                                                <Form.Item
-                                                    name="bust"
-                                                    rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
-                                                >
-                                                    <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
-                                                </Form.Item>
-                                            </div>
-
-                                            <div className="form-group">
-                                                <label>รอบเอว</label>
-                                                <Form.Item
-                                                    name="waist"
-                                                    rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
-                                                >
-                                                    <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
-                                                </Form.Item>
-                                            </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>รอบอก</label>
+                                            <Form.Item
+                                                name="bust"
+                                                rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
+                                            >
+                                                <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
+                                            </Form.Item>
                                         </div>
-                                        <div className="form-row">
-                                            <div className="form-group">
-                                                <label>รอบสะโพก</label>
-                                                <Form.Item
-                                                    name="hip"
-                                                    rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
-                                                >
-                                                    <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
-                                                </Form.Item>
-                                            </div>
+
+                                        <div className="form-group">
+                                            <label>รอบเอว</label>
+                                            <Form.Item
+                                                name="waist"
+                                                rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
+                                            >
+                                                <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
+                                            </Form.Item>
                                         </div>
                                     </div>
-                                
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>รอบสะโพก</label>
+                                            <Form.Item
+                                                name="hip"
+                                                rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
+                                            >
+                                                <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
+                                            </Form.Item>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Account Info Section */}
                                 <div className="account-section">
                                     <div className="form-row">

@@ -41,7 +41,7 @@ const Profile: React.FC = () => {
                 ? 'ชาย'
                 : userData.GenderID === 2
                   ? 'หญิง'
-                  : 'อื่น',
+                  : 'ไม่ระบุ',
             birth_date: userData.Birthdate,
             weight: userData.Weight,
             height: userData.Height,

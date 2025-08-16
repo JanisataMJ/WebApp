@@ -81,6 +81,7 @@ const Register: React.FC = () => {
                                     label="Password"
                                     name="password"
                                     rules={[{ required: true, message: 'กรุณากรอกรหัสผ่าน!' }]}
+
                                 >
                                     <Input.Password />
                                 </Form.Item>

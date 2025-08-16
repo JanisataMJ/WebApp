@@ -15,7 +15,7 @@
 }
 
 /* Profile Title Section */
-.profile-title-section {
+.editprofile-title-section {
   display: flex;
   align-items: center;
   padding: 1.5rem 2rem;
@@ -440,7 +440,7 @@
 }
 
 @media (max-width: 768px) {
-  .profile-title-section {
+  .editprofile-title-section {
     padding: 1rem;
   }
   
@@ -490,7 +490,7 @@
 }
 
 @media (max-width: 480px) {
-  .profile-title-section {
+  .editprofile-title-section {
     padding: 0.75rem;
   }
   

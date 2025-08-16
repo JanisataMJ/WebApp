@@ -88,7 +88,7 @@ const EditProfile: React.FC = () => {
                         first_name: userData.FirstName,
                         last_name: userData.LastName,
                         email: userData.Email,
-                        gender: userData.GenderID === 1 ? 'ชาย' : userData.GenderID === 2 ? 'หญิง' : 'อื่น',
+                        gender: userData.GenderID === 1 ? 'ชาย' : userData.GenderID === 2 ? 'หญิง' : 'ไม่ระบุ',
                         birth_date: userData.Birthdate ? dayjs(userData.Birthdate) : null,
                         weight: userData.Weight,
                         height: userData.Height,
@@ -256,7 +256,7 @@ const EditProfile: React.FC = () => {
                 {contextHolder}
 
                 {/* Profile Title Section */}
-                <div className="profile-title-section">
+                <div className="editprofile-title-section">
                     <button
                         className="back-button"
                         onClick={() => navigate('/profile')}

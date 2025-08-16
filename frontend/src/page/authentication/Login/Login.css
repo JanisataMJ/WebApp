@@ -24,6 +24,7 @@
 }
 .signin-page-wrapper {
     display: flex;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     flex-direction: column;
     justify-content: center;   /* จัดแนวตั้ง */
     align-items: center;       /* จัดแนวนอน */

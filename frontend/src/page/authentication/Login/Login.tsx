@@ -58,7 +58,7 @@ const Login: React.FC = () => {
             <div className="signin-container">
                 <form onSubmit={onSubmit}>
                     <div className="signin-form-group">
-                        <label>Username</label>
+                        <label>Email</label>
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                     </div>
                     <div className="signin-form-group">
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
                         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
                     <div className="signin-button-group">
-                        <button type="botton" className="signup-btn" onClick={Signup} >Sign Up</button>
+                        <button type="button" className="signup-btn" onClick={Signup} >Sign Up</button>
                         <button type="submit" className="login-btn" >Sign In</button>
                     </div>
                     <div className="signin-forgot-password">

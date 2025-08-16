@@ -1,7 +1,7 @@
 .signup-container {
     background-color: #ffffff;
     border-radius: 0.5rem;
-    padding: 0;
+    
     box-shadow: 0 4px 6px rgba(141, 69, 69, 0.1);
     width: 100%;
     max-width: 600px;
@@ -10,14 +10,15 @@
 
 .signup-page-wrapper {
     display: flex;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     flex-direction: column;
-    justify-content: center;   /* จัดแนวตั้ง */
-    align-items: center;       /* จัดแนวนอน */
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
-    background-color: #111;
     padding-top: 60px;
-    width: 100%;               /* <-- สำคัญมาก */
+    width: 100%;
 }
+
 .signup-title {
     text-align: center;
     font-size: 2rem;
@@ -43,12 +44,18 @@
     font-size: 0.9rem;
 }
 
-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
+/* ครอบจักรวาลสำหรับ input ของ HTML และ Ant Design */
+input,
+.ant-input,
+.ant-input-affix-wrapper {
+    height: 47px;       /* ความสูงเท่ากัน */
+    padding: 0 10px;    /* เว้นขอบซ้ายขวา */
     font-size: 1rem;
+    margin-bottom: 10px;
+    line-height: 40px;  /* จัดข้อความตรงกลาง */
+    border-radius: 0.25rem;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
 .full-width {
@@ -64,9 +71,5 @@ input {
     border-radius: 0.25rem;
     cursor: pointer;
     display: block;
-    margin-top: 0rem;
-    margin-bottom: -1.5rem;
-    margin-left: auto;
-    margin-right: auto;
-
+    margin: 1rem auto -0.2rem auto;
 }

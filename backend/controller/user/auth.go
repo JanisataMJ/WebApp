@@ -1,28 +1,23 @@
 package users
 
-
 import (
+	"errors"
 
-   "errors"
+	"net/http"
 
-   "net/http"
+	"time"
 
-   "time"
+	"github.com/gin-gonic/gin"
 
+	"golang.org/x/crypto/bcrypt"
 
-   "github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
-   "golang.org/x/crypto/bcrypt"
+	"github.com/JanisataMJ/WebApp/config"
 
-   "gorm.io/gorm"
+	"github.com/JanisataMJ/WebApp/entity"
 
-
-   "github.com/JanisataMJ/WebApp/config"
-
-   "github.com/JanisataMJ/WebApp/entity"
-
-   "github.com/JanisataMJ/WebApp/services"
-
+	"github.com/JanisataMJ/WebApp/services"
 )
 
 
@@ -39,19 +34,16 @@ type (
 
    signUp struct {
 
-       FirstName string    `json:"first_name"`
+    
+    Username  string    `json:"username"`   // เพิ่ม username
+    FirstName string    `json:"firstName"`
+    LastName  string    `json:"lastName"`
+    Email     string    `json:"email"`
+    Password  string    `json:"password"`
+    Birthdate time.Time `json:"birthdate"`
+    GenderID  uint      `json:"genderID"`
 
-       LastName  string    `json:"last_name"`
 
-       Email     string    `json:"email"`
-
-       Age       uint8     `json:"age"`
-
-       Password  string    `json:"password"`
-
-       BirthDay  time.Time `json:"birthday"`
-
-       GenderID  uint      `json:"gender_id"`
 
    }
 
@@ -112,21 +104,16 @@ func SignUp(c *gin.Context) {
 
    // Create a new user
 
-   user := entity.User{
+user := entity.User{
+    Username:  payload.Username,
+    FirstName: payload.FirstName,
+    LastName:  payload.LastName,
+    Email:     payload.Email,
+    Password:  hashedPassword,
+    Birthdate: payload.Birthdate,
+    GenderID:  payload.GenderID,
+}
 
-       FirstName: payload.FirstName,
-
-       LastName:  payload.LastName,
-
-       Email:     payload.Email,
-
-       Password:  hashedPassword,
-
-       Birthdate:  payload.BirthDay,
-
-       GenderID:  payload.GenderID,
-
-   }
 
 
    // Save the user to the database

@@ -5,7 +5,7 @@ import { PlusOutlined, ArrowLeftOutlined, UserOutlined } from '@ant-design/icons
 import { useNavigate } from 'react-router-dom';
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import { UsersInterface } from '../../interface/profile_interface/IProfile';
-import { GetUsersById, UpdateUsersById } from '../../services/https/User/user';
+import { GetUsersById } from '../../services/https/User/user';
 import dayjs from 'dayjs';
 import type { UploadFile, UploadProps } from 'antd';
 import './editProfile.css';
@@ -39,7 +39,6 @@ const EditProfile: React.FC = () => {
     const [initialLoading, setInitialLoading] = useState(true);
     const [profileDeleted, setProfileDeleted] = useState(false);
 
-    // ฟังก์ชันแปลงไฟล์เป็น Base64
     const getBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -49,29 +48,27 @@ const EditProfile: React.FC = () => {
         });
     };
 
-    // ตรวจสอบรูปแบบไฟล์
     const beforeUpload = (file: File) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
         if (!isJpgOrPng) {
-            messageApi.error('คุณสามารถอัปโหลดไฟล์ JPG/PNG เท่านั้น!');
+            messageApi.error('You can only upload JPG/PNG files!');
             return false;
         }
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isLt2M) {
-            messageApi.error('ขนาดไฟล์ต้องไม่เกิน 2MB!');
+            messageApi.error('File size must be smaller than 2MB!');
             return false;
         }
-        return false; // ไม่อัปโหลดทันที รอให้ผู้ใช้กด Submit
+        return false;
     };
 
-    // โหลดข้อมูลผู้ใช้
     useEffect(() => {
         const fetchUser = async () => {
             const id = localStorage.getItem('id');
             if (!id) {
-                messageApi.error('ไม่พบ ID ของผู้ใช้');
+                messageApi.error('User ID not found');
                 navigate('/profile');
-                setInitialLoading(false); // หยุด spinner แม้ไม่มี id
+                setInitialLoading(false);
                 return;
             }
 
@@ -82,25 +79,21 @@ const EditProfile: React.FC = () => {
                 if (res?.data) {
                     const userData = res.data;
 
-                    // กำหนดค่าให้ฟอร์ม
                     form.setFieldsValue({
-                        user_name: userData.Username,
-                        first_name: userData.FirstName,
-                        last_name: userData.LastName,
-                        email: userData.Email,
-                        gender: userData.GenderID === 1 ? 'ชาย' : userData.GenderID === 2 ? 'หญิง' : 'ไม่ระบุ',
-                        birth_date: userData.Birthdate ? dayjs(userData.Birthdate) : null,
-                        weight: userData.Weight,
-                        height: userData.Height,
-                        phonenumber: userData.Phonenumber || '',
-                        bust: userData.Bust || null,
-                        waist: userData.Waist || null,
-                        hip: userData.Hip || null,
-                        old_password: '',
-                        new_password: '',
+                        user_name: userData.username,
+                        first_name: userData.firstName,
+                        last_name: userData.lastName,
+                        email: userData.email,
+                        gender: userData.genderID === 1 ? 'Male' : userData.genderID === 2 ? 'Female' : 'Unspecified',
+                        birth_date: userData.birthdate ? dayjs(userData.birthdate) : null,
+                        weight: userData.weight ?? undefined,
+                        height: userData.height ?? undefined,
+                        phonenumber: userData.phonenumber ?? '',
+                        bust: userData.bust ?? undefined,
+                        waist: userData.waist ?? undefined,
+                        hip: userData.hip ?? undefined,
                     });
 
-                    // ตั้งค่ารูปโปรไฟล์ถ้ามี
                     if (userData.Picture) {
                         setFileList([{
                             uid: '-1',
@@ -110,26 +103,24 @@ const EditProfile: React.FC = () => {
                         }]);
                     }
                 } else {
-                    messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
+                    messageApi.error('Failed to fetch user data');
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                messageApi.error('เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้');
+                messageApi.error('An error occurred while fetching user data');
             } finally {
-                setInitialLoading(false); // หยุด spinner ทุกกรณี
+                setInitialLoading(false);
             }
         };
 
         fetchUser();
     }, [form, messageApi, navigate]);
 
-    // จัดการเปลี่ยนแปลงไฟล์อัปโหลด
     const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
         setFileList(newFileList);
         setProfileDeleted(newFileList.length === 0);
     };
 
-    // ดูตัวอย่างภาพ
     const onPreview = async (file: UploadFile) => {
         let src = file.url as string;
         if (!src) {
@@ -145,13 +136,12 @@ const EditProfile: React.FC = () => {
         imgWindow?.document.write(image.outerHTML);
     };
 
-    // ส่งข้อมูลฟอร์ม
     const onFinish = async (values: FormData) => {
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("id");
 
         if (!token || !userId) {
-            messageApi.error("ไม่พบ token หรือ user ID กรุณาเข้าสู่ระบบใหม่");
+            messageApi.error("Token or User ID not found, please log in again");
             return;
         }
 
@@ -163,13 +153,12 @@ const EditProfile: React.FC = () => {
                 base64Image = await getBase64(fileList[0].originFileObj as File);
             }
 
-            // แก้ไข payload ให้ตรงกับ backend
             const data = {
                 Username: values.user_name,
                 FirstName: values.first_name,
                 LastName: values.last_name,
                 Email: values.email,
-                GenderID: values.gender === 'ชาย' ? 1 : values.gender === 'หญิง' ? 2 : 3,
+                GenderID: values.gender === 'Male' ? 1 : values.gender === 'Female' ? 2 : 3,
                 Birthdate: values.birth_date ? values.birth_date.toISOString() : null,
                 weight: values.weight,
                 height: values.height,
@@ -182,9 +171,7 @@ const EditProfile: React.FC = () => {
                 NewPassword: values.new_password || undefined,
             };
 
-
-
-            console.log("📦 Payload ก่อนส่ง:", data);
+            console.log("📦 Payload:", data);
 
             const res = await axios.put(`http://localhost:8000/user/${userId}`, data, {
                 headers: {
@@ -193,41 +180,38 @@ const EditProfile: React.FC = () => {
                 },
             });
 
-            console.log("✅ ตอบกลับสำเร็จ:", res.data);
-            messageApi.success("บันทึกข้อมูลสำเร็จ");
+            console.log("✅ Response:", res.data);
+            messageApi.success("Profile updated successfully");
 
             setTimeout(() => {
                 navigate('/profile');
             }, 1500);
 
         } catch (err: any) {
-            console.error("❌ เกิดข้อผิดพลาด:", err.response?.data || err.message);
+            console.error("❌ Error:", err.response?.data || err.message);
             if (err.response?.status === 401) {
-                messageApi.error("หมดอายุการเข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
+                messageApi.error("Session expired, please log in again");
                 localStorage.removeItem('token');
                 localStorage.removeItem('id');
                 navigate('/login');
             } else if (err.response?.status === 400) {
-                messageApi.error("ข้อมูลที่ส่งไม่ถูกต้อง");
+                messageApi.error("Invalid data submitted");
             } else {
-                messageApi.error("ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่");
+                messageApi.error("Failed to save data, please try again");
             }
         } finally {
             setLoading(false);
         }
     };
 
-
-
-    // ตรวจสอบข้อมูลฟอร์ม
     const validateMessages = {
-        required: '${label} จำเป็นต้องกรอก!',
+        required: '${label} is required!',
         types: {
-            email: 'รูปแบบอีเมลไม่ถูกต้อง!',
-            number: 'จำเป็นต้องเป็นตัวเลข!',
+            email: 'Invalid email format!',
+            number: 'Must be a number!',
         },
         number: {
-            range: '${label} ต้องอยู่ระหว่าง ${min} และ ${max}',
+            range: '${label} must be between ${min} and ${max}',
         },
     };
 
@@ -235,15 +219,8 @@ const EditProfile: React.FC = () => {
         return (
             <>
                 <Headers />
-                <div className="edit-profile-wrapper">
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '50vh'
-                    }}>
-                        <Spin size="large" />
-                    </div>
+                <div className="edit-profile-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                    <Spin size="large" />
                 </div>
             </>
         );
@@ -255,22 +232,19 @@ const EditProfile: React.FC = () => {
             <div className="edit-profile-wrapper">
                 {contextHolder}
 
-                {/* Profile Title Section */}
                 <div className="editprofile-title-section">
                     <button
                         className="back-button"
                         onClick={() => navigate('/profile')}
                         type="button"
-                        aria-label="ย้อนกลับ"
+                        aria-label="Go Back"
                     >
                         <ArrowLeftOutlined />
                     </button>
-                    <h1 className="editprofile-title">แก้ไขโปรไฟล์</h1>
+                    <h1 className="editprofile-title">Edit Profile</h1>
                 </div>
 
-                {/* Main Content */}
                 <div className="edit-profile-content">
-                    {/* Profile Image Section */}
                     <div className="profile-image-section">
                         <div className="profile-upload-container">
                             <Upload
@@ -286,18 +260,16 @@ const EditProfile: React.FC = () => {
                                 {fileList.length < 1 && (
                                     <div className="upload-placeholder">
                                         <PlusOutlined />
-                                        <div style={{ marginTop: 8 }}>อัปโหลดรูป</div>
+                                        <div style={{ marginTop: 8 }}>Upload</div>
                                     </div>
                                 )}
                             </Upload>
                         </div>
                     </div>
 
-                    {/* Form Section */}
                     <div className="form-section">
                         <div className="form-card">
-                            <h2 className="form-title">ข้อมูลส่วนตัว</h2>
-
+                            <h2 className="form-title">Personal Information</h2>
                             <Form
                                 form={form}
                                 layout="vertical"
@@ -306,179 +278,139 @@ const EditProfile: React.FC = () => {
                                 validateMessages={validateMessages}
                                 scrollToFirstError
                             >
-                                {/* Personal Info Grid */}
                                 <div className="form-grid">
+                                    {/* Name */}
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>ชื่อจริง</label>
+                                            <label>First Name</label>
                                             <Form.Item
                                                 name="first_name"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'กรุณากรอกชื่อจริง' },
-                                                    { min: 2, message: 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร' }
+                                                    { required: true, message: 'Please enter your first name' },
+                                                    { min: 2, message: 'First name must be at least 2 characters' }
                                                 ]}
                                             >
-                                                <Input
-                                                    className="form-input"
-                                                    placeholder="กรอกชื่อจริง"
-                                                    maxLength={50}
-                                                />
+                                                <Input className="form-input" placeholder="Enter first name" maxLength={50} />
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>นามสกุล</label>
+                                            <label>Last Name</label>
                                             <Form.Item
                                                 name="last_name"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'กรุณากรอกนามสกุล' },
-                                                    { min: 2, message: 'นามสกุลต้องมีอย่างน้อย 2 ตัวอักษร' }
+                                                    { required: true, message: 'Please enter your last name' },
+                                                    { min: 2, message: 'Last name must be at least 2 characters' }
                                                 ]}
                                             >
-                                                <Input
-                                                    className="form-input"
-                                                    placeholder="กรอกนามสกุล"
-                                                    maxLength={50}
-                                                />
+                                                <Input className="form-input" placeholder="Enter last name" maxLength={50} />
                                             </Form.Item>
                                         </div>
                                     </div>
 
+                                    {/* Gender & Birthday */}
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>เพศ</label>
+                                            <label>Gender</label>
                                             <Form.Item
                                                 name="gender"
                                                 className="form-item"
-                                                rules={[{ required: true, message: 'กรุณาเลือกเพศ' }]}
+                                                rules={[{ required: true, message: 'Please select gender' }]}
                                             >
-                                                <Select
-                                                    placeholder="เลือกเพศ"
-
-                                                    allowClear
-                                                >
-                                                    <Option value="ชาย">ชาย</Option>
-                                                    <Option value="หญิง">หญิง</Option>
-                                                    <Option value="ไม่ระบุ">ไม่ระบุ</Option>
+                                                <Select placeholder="Select gender" allowClear>
+                                                    <Option value="Male">Male</Option>
+                                                    <Option value="Female">Female</Option>
+                                                    <Option value="Unspecified">Unspecified</Option>
                                                 </Select>
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>วันเกิด</label>
+                                            <label>Birthday</label>
                                             <Form.Item
                                                 name="birth_date"
                                                 className="form-item"
-                                                rules={[{ required: true, message: 'กรุณาเลือกวันเกิด' }]}
+                                                rules={[{ required: true, message: 'Please select your birthday' }]}
                                             >
                                                 <DatePicker
                                                     className="form-input"
-                                                    placeholder="เลือกวันเกิด"
+                                                    placeholder="Select birthday"
                                                     format="DD/MM/YYYY"
-                                                    disabledDate={(current) => {
-                                                        return current && current > dayjs().endOf('day');
-                                                    }}
+                                                    disabledDate={(current) => current && current > dayjs().endOf('day')}
                                                 />
                                             </Form.Item>
                                         </div>
                                     </div>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>เบอร์โทร</label>
-                                            <Form.Item
-                                                name="phonenumber"
-                                                rules={[{ required: true, message: 'กรุณากรอกเบอร์โทร' }]}
-                                            >
-                                                <Input
-                                                    placeholder="กรอกเบอร์โทร"
-                                                    style={{ width: '100%' , height: '50px' }}   // ✅ บังคับให้เต็มเหมือนช่องอื่น
-                                                />
-                                            </Form.Item>
-                                        </div>
-                                    </div>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>น้ำหนัก</label>
-                                            <Form.Item
-                                                name="weight"
-                                            >
-                                                <InputNumber
-                                                    placeholder="กก."
-                                                    style={{ width: '100%' }}
-                                                />
-                                            </Form.Item>
-                                        </div>
-                                        <div className="form-group">
-                                            <label>ส่วนสูง</label>
-                                            <Form.Item
-                                                name="height"
-                                            >
-                                                <InputNumber
- 
-                                                    placeholder="ซม."
-                                                    style={{ width: '100%' }}
-                                                />
-                                            </Form.Item>
-                                        </div>
-                                    </div>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>รอบอก</label>
-                                            <Form.Item
-                                                name="bust"
-                                                rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
-                                            >
-                                                <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
-                                            </Form.Item>
-                                        </div>
 
+                                    {/* Phone */}
+                                    <div className="form-row">
                                         <div className="form-group">
-                                            <label>รอบเอว</label>
-                                            <Form.Item
-                                                name="waist"
-                                                rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
-                                            >
-                                                <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
+                                            <label>Phone Number</label>
+                                            <Form.Item name="phonenumber">
+                                                <Input placeholder="Enter phone number" style={{ width: '100%', height: '50px' }} />
+                                            </Form.Item>
+                                        </div>
+                                    </div>
+
+                                    {/* Body Measurements */}
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Weight</label>
+                                            <Form.Item name="weight">
+                                                <InputNumber placeholder="kg" style={{ width: '100%' }} />
+                                            </Form.Item>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Height</label>
+                                            <Form.Item name="height">
+                                                <InputNumber placeholder="cm" style={{ width: '100%' }} />
                                             </Form.Item>
                                         </div>
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>รอบสะโพก</label>
-                                            <Form.Item
-                                                name="hip"
-                                                rules={[{ type: 'number', message: 'กรุณากรอกตัวเลข' }]}
-                                            >
-                                                <InputNumber min={0} placeholder="ซม." style={{ width: '100%' }} />
+                                            <label>Bust</label>
+                                            <Form.Item name="bust" rules={[{ type: 'number', message: 'Please enter a number' }]}>
+                                                <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
+                                            </Form.Item>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Waist</label>
+                                            <Form.Item name="waist" rules={[{ type: 'number', message: 'Please enter a number' }]}>
+                                                <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
+                                            </Form.Item>
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Hip</label>
+                                            <Form.Item name="hip" rules={[{ type: 'number', message: 'Please enter a number' }]}>
+                                                <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
                                             </Form.Item>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Account Info Section */}
+                                {/* Account Info */}
                                 <div className="account-section">
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>ชื่อผู้ใช้</label>
+                                            <label>Username</label>
                                             <Form.Item
                                                 name="user_name"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'กรุณากรอกชื่อผู้ใช้' },
-                                                    { min: 3, message: 'ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร' },
-                                                    { max: 20, message: 'ชื่อผู้ใช้ต้องไม่เกิน 20 ตัวอักษร' },
-                                                    { pattern: /^[a-zA-Z0-9_]+$/, message: 'ชื่อผู้ใช้ต้องประกอบด้วยตัวอักษร ตัวเลข และ _ เท่านั้น' }
+                                                    { required: true, message: 'Please enter a username' },
+                                                    { min: 3, message: 'Username must be at least 3 characters' },
+                                                    { max: 20, message: 'Username cannot exceed 20 characters' },
+                                                    { pattern: /^[a-zA-Z0-9_]+$/, message: 'Username can only contain letters, numbers, and _' }
                                                 ]}
                                             >
-                                                <Input
-                                                    className="form-input"
-                                                    placeholder="กรอกชื่อผู้ใช้"
-                                                    prefix={<UserOutlined />}
-                                                />
+                                                <Input className="form-input" placeholder="Enter username" prefix={<UserOutlined />} />
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>รหัสผ่านเก่า</label>
+                                            <label>Old Password</label>
                                             <Form.Item
                                                 name="old_password"
                                                 className="form-item"
@@ -487,44 +419,37 @@ const EditProfile: React.FC = () => {
                                                         validator(_, value) {
                                                             const newPassword = getFieldValue('new_password');
                                                             if (newPassword && !value) {
-                                                                return Promise.reject(new Error('กรุณากรอกรหัสผ่านเก่าเพื่อเปลี่ยนรหัสผ่าน'));
+                                                                return Promise.reject(new Error('Please enter old password to change password'));
                                                             }
                                                             return Promise.resolve();
                                                         },
                                                     }),
                                                 ]}
                                             >
-                                                <Input.Password
-                                                    className="form-input"
-                                                    placeholder="กรอกรหัสผ่านเก่า (ถ้าต้องการเปลี่ยน)"
-                                                />
+                                                <Input.Password className="form-input" placeholder="Enter old password (if changing)" />
                                             </Form.Item>
                                         </div>
                                     </div>
 
                                     <div className="form-row">
                                         <div className="form-group full-width">
-                                            <label>อีเมล</label>
+                                            <label>Email</label>
                                             <Form.Item
                                                 name="email"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'กรุณากรอกอีเมล' },
-                                                    { type: 'email', message: 'รูปแบบอีเมลไม่ถูกต้อง' }
+                                                    { required: true, message: 'Please enter email' },
+                                                    { type: 'email', message: 'Invalid email format' }
                                                 ]}
                                             >
-                                                <Input
-                                                    className="form-input"
-                                                    placeholder="กรอกอีเมล"
-                                                    type="email"
-                                                />
+                                                <Input className="form-input" placeholder="Enter email" type="email" />
                                             </Form.Item>
                                         </div>
                                     </div>
 
                                     <div className="form-row">
                                         <div className="form-group full-width">
-                                            <label>รหัสผ่านใหม่</label>
+                                            <label>New Password</label>
                                             <Form.Item
                                                 name="new_password"
                                                 className="form-item"
@@ -532,26 +457,22 @@ const EditProfile: React.FC = () => {
                                                     ({ getFieldValue }) => ({
                                                         validator(_, value) {
                                                             if (value && value.length < 6) {
-                                                                return Promise.reject(new Error('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'));
+                                                                return Promise.reject(new Error('Password must be at least 6 characters'));
                                                             }
                                                             if (value && !getFieldValue('old_password')) {
-                                                                return Promise.reject(new Error('กรุณากรอกรหัสผ่านเก่าก่อน'));
+                                                                return Promise.reject(new Error('Please enter old password first'));
                                                             }
                                                             return Promise.resolve();
                                                         },
                                                     }),
                                                 ]}
                                             >
-                                                <Input.Password
-                                                    className="form-input"
-                                                    placeholder="กรอกรหัสผ่านใหม่ (ถ้าต้องการเปลี่ยน)"
-                                                />
+                                                <Input.Password className="form-input" placeholder="Enter new password (if changing)" />
                                             </Form.Item>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Submit Button */}
                                 <div className="submit-section">
                                     <Button
                                         type="primary"
@@ -561,7 +482,7 @@ const EditProfile: React.FC = () => {
                                         disabled={loading}
                                         size="large"
                                     >
-                                        {loading ? 'กำลังบันทึก...' : 'บันทึกข้อมูล'}
+                                        {loading ? 'Saving...' : 'Save'}
                                     </Button>
                                 </div>
                             </Form>

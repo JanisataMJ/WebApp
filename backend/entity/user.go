@@ -7,25 +7,25 @@ import (
 
 type User struct {
 	gorm.Model
-	Username    string
-	Password    string
-	Email       string
-	FirstName   string
-	LastName    string
-	Birthdate   time.Time
-	Phonenumber string
-	Picture     string
-	Height      float64
-	Weight      float64
-	Bust        float64
-	Waist       float64
-	Hip         float64
+	Username    string    `json:"username"`
+	Password    string    `json:"password"`
+	Email       string    `json:"email"`
+	FirstName   string    `json:"firstName"`
+	LastName    string    `json:"lastName"`
+	Birthdate   time.Time `json:"birthdate"`
+	Phonenumber string    `json:"phonenumber"`
+	Picture     string    `json:"picture"`
+	Height      float64   `json:"height"`
+	Weight      float64   `json:"weight"`
+	Bust        float64   `json:"bust"`
+	Waist       float64   `json:"waist"`
+	Hip         float64   `json:"hip"`
 
-	RoleID uint
-	Role   *Role `gorm:"foreignKey: RoleID" `
+	RoleID uint  `json:"RoleID"`
+	Role   *Role `gorm:"foreignKey:RoleID"`
 
-	GenderID uint
-	Gender   *Gender `gorm:"foreignKey: GenderID"`
+	GenderID uint    `json:"genderID"`
+	Gender   *Gender `gorm:"foreignKey:GenderID"`
 
 	AnalysisResult   []AnalysisResult  `gorm:"foreignKey:UserID"`
 	HealthData       []HealthData      `gorm:"foreignKey:UserID"`

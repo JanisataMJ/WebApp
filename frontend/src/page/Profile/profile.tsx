@@ -17,7 +17,7 @@ const Profile: React.FC = () => {
     const fetchUser = async () => {
       const id = localStorage.getItem('id');
       if (!id) {
-        messageApi.error('ไม่พบ ID ของผู้ใช้');
+        messageApi.error('User ID not found');
         navigate('/');
         setLoading(false);
         return;
@@ -32,31 +32,32 @@ const Profile: React.FC = () => {
           console.log('User data:', userData);
 
           setUsers({
-            user_name: userData.Username,
-            first_name: userData.FirstName,
-            last_name: userData.LastName,
-            email: userData.Email,
-            gender:
-              userData.GenderID === 1
-                ? 'ชาย'
-                : userData.GenderID === 2
-                  ? 'หญิง'
-                  : 'ไม่ระบุ',
-            birth_date: userData.Birthdate,
-            weight: userData.Weight,
-            height: userData.Height,
-            bust: userData.Bust,
-            waist: userData.Waist,
-            hip: userData.Hip,
-            phone: userData.Phonenumber,
-            profile: userData.Picture,
+            user_name: userData.username || '-', 
+            first_name: userData.firstName || '-', 
+            last_name: userData.lastName || '-',
+            email: userData.email || '-',
+            gender: userData.Gender?.Gender 
+              ? userData.Gender.Gender
+              : userData.genderID === 1
+                ? 'Male'
+                : userData.genderID === 2
+                  ? 'Female'
+                  : 'Not specified',
+            birth_date: userData.birthdate ? dayjs(userData.birthdate).toDate() : null,
+            weight: userData.weight || null,
+            height: userData.height || null,
+            bust: userData.bust || null,
+            waist: userData.waist || null,
+            hip: userData.hip || null,
+            phone: userData.phonenumber || '-',
+            profile: userData.picture || '', 
           });
         } else {
-          messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
+          messageApi.error('Unable to fetch user data');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        messageApi.error('เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้');
+        messageApi.error('An error occurred while fetching user data');
       } finally {
         setLoading(false);
       }
@@ -70,67 +71,68 @@ const Profile: React.FC = () => {
       {contextHolder}
       <Headers />
       <div className="profile-container">
-        <h1 className="profile-title">ข้อมูลโปรไฟล์</h1>
+        <h1 className="profile-title">Profile Information</h1>
 
         {loading ? (
           <Spin />
         ) : (
           <div className="profile-box">
             <Link to="/editProfile" className="editProfile">
-              แก้ไข
+              Edit
             </Link>
 
             <div className="profile-header">
               {users?.profile ? (
                 <img src={users.profile} alt="Profile" className="profile-picture" />
               ) : (
-                <div className="no-profile-picture">ไม่มีรูปประจำตัว</div>
+                <div className="no-profile-picture">No profile picture</div>
               )}
               <h2 style={{ color: 'black' }}>
-                {users?.user_name || 'ไม่พบชื่อผู้ใช้'}
+                {users?.user_name || 'Username not found'}
               </h2>
-
             </div>
 
             <div className="profile-content">
               <div className="item">
-                <span className="label">ชื่อ-นามสกุล</span>
+                <span className="label">Full Name</span>
                 <span className="value">{users ? `${users.first_name} ${users.last_name}` : '-'}</span>
 
-                <span className="label">อีเมล</span>
+                <span className="label">Email</span>
                 <span className="value">{users?.email || '-'}</span>
               </div>
 
               <div className="item">
-                <span className="label">เพศ</span>
+                <span className="label">Gender</span>
                 <span className="value">{users?.gender || '-'}</span>
 
-                <span className="label">วันเกิด</span>
-                <span className="value">{users?.birth_date ? dayjs(users.birth_date).format('DD/MM/YYYY') : '-'}</span>
+                <span className="label">Birth Date</span>
+                <span className="value">
+                  {users?.birth_date ? dayjs(users.birth_date).format('DD/MM/YYYY') : '-'}
+                </span>
               </div>
 
               <div className="item">
-                <span className="label">เบอร์โทร</span>
+                <span className="label">Phone</span>
                 <span className="value">{users?.phone || '-'}</span>
 
-                <span className="label">น้ำหนัก</span>
-                <span className="value">{users?.weight !== null ? `${users.weight} กก.` : 'ยังไม่ได้ระบุ'}</span>
+                <span className="label">Weight</span>
+                <span className="value">{users?.weight ? `${users.weight} kg` : 'Not specified'}</span>
               </div>
 
               <div className="item">
-                <span className="label">ส่วนสูง</span>
-                <span className="value">{users?.height !== null ? `${users.height} ซม.` : 'ยังไม่ได้ระบุ'}</span>
+                <span className="label">Height</span>
+                <span className="value">{users?.height ? `${users.height} cm` : 'Not specified'}</span>
 
-                <span className="label">รอบอก</span>
-                <span className="value">{users?.bust !== null ? `${users.bust} ซม.` : 'ยังไม่ได้ระบุ'}</span>
+                <span className="label">Bust</span>
+                <span className="value">{users?.bust ? `${users.bust} cm` : 'Not specified'}</span>
               </div>
 
               <div className="item">
-                <span className="label">รอบเอว</span>
-                <span className="value">{users?.waist !== null ? `${users.waist} ซม.` : 'ยังไม่ได้ระบุ'}</span>
+                <span className="label">Waist</span>
+                <span className="value">{users?.waist ? `${users.waist} cm` : 'Not specified'}</span>
 
-                <span className="label">รอบสะโพก</span>
-                <span className="value">{users?.hip !== null ? `${users.hip} ซม.` : 'ยังไม่ได้ระบุ'}</span>
+                <span className="label">Hip</span>
+                <span className="value">{users?.hip ? `${users.hip} cm` : 'Not specified'}</span>
               </div>
             </div>
           </div>

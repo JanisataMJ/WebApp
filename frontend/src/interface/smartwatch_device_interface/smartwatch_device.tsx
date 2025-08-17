@@ -5,6 +5,5 @@ export interface SmartwatchDeviceInterface {
     ModelSmartwatch:    string;   
     ModelNumber:        string;
 	Brand:              string;
-	StartDate:          string ;    
     UserID?:            number;      
 }

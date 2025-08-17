@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AnalysisResultInterface } from "../../../interface/analysis_result_interface/analysis_result";
+import { HealthAnalysisInterface } from "../../../interface/health_analysis_interface/health_analysis";
 
 const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
 const getRequestOptions = () => {
@@ -15,32 +15,31 @@ const getRequestOptions = () => {
 
 
 
-
-export const getAnalysisResult = async (): Promise<AnalysisResultInterface[]> => {
+export const getHealthAnalysis = async (): Promise<HealthAnalysisInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
-    const response = await axios.get<AnalysisResultInterface[]>(
-      `${apiUrl}/list-analysisResult`,
+    const response = await axios.get<HealthAnalysisInterface[]>(
+      `${apiUrl}/list-healthAnalysis`,
       requestOptions
     );
     return response.data;
   } catch (error) {
-    throw new Error("Error fetching analysis results: " + (error as Error).message);
+    throw new Error("Error fetching health analysis: " + (error as Error).message);
   }
 };
 
 
-export const getAnalysisResultByUserID = async (
+export const getHealthAnalysisByUserID = async (
   userId: number
-): Promise<AnalysisResultInterface[]> => {
+): Promise<HealthAnalysisInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
-    const response = await axios.get<AnalysisResultInterface[]>(
-      `${apiUrl}/analysisResult/${userId}`,
+    const response = await axios.get<HealthAnalysisInterface[]>(
+      `${apiUrl}/healthAnalysis/${userId}`,
       requestOptions
     );
     return response.data;
   } catch (error) {
-    throw new Error("Error fetching analysis results: " + (error as Error).message);
+    throw new Error("Error fetching health analysis: " + (error as Error).message);
   }
 };

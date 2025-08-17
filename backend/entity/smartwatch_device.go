@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"time"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +11,6 @@ type SmartwatchDevice struct {
 	ModelSmartwatch string
 	ModelNumber 	string
 	Brand 			string
-	StartDate 		time.Time
 
 	UserID 			uint
 	User   			*User `gorm:"foreignKey: UserID"`

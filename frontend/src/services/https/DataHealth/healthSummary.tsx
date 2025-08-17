@@ -1,5 +1,5 @@
 import axios from "axios";
-import { HealthDataInterface } from "../../../interface/health_data_interface/health_data";
+import { HealthSummaryInterface } from "../../../interface/health_summary_interface/health_summary";
 
 const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
 const getRequestOptions = () => {
@@ -15,33 +15,31 @@ const getRequestOptions = () => {
 
 
 
-
-export const getHealthData = async (): Promise<HealthDataInterface[]> => {
+export const getHealthAnalysis = async (): Promise<HealthSummaryInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
-    const response = await axios.get<HealthDataInterface[]>(
-      `${apiUrl}/list-healthData`,
+    const response = await axios.get<HealthSummaryInterface[]>(
+      `${apiUrl}/list-healthSummary`,
       requestOptions
     );
     return response.data;
   } catch (error) {
-    throw new Error("Error fetching health data: " + (error as Error).message);
+    throw new Error("Error fetching health summary: " + (error as Error).message);
   }
 };
 
 
-
-export const getHealthDataByUserID = async (
+export const getHealthAnalysisByUserID = async (
   userId: number
-): Promise<HealthDataInterface[]> => {
+): Promise<HealthSummaryInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
-    const response = await axios.get<HealthDataInterface[]>(
-      `${apiUrl}/healthData/${userId}`,
+    const response = await axios.get<HealthSummaryInterface[]>(
+      `${apiUrl}/healthSummary/${userId}`,
       requestOptions
     );
     return response.data;
   } catch (error) {
-    throw new Error("Error fetching health data: " + (error as Error).message);
+    throw new Error("Error fetching health summary: " + (error as Error).message);
   }
 };

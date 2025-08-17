@@ -3,7 +3,6 @@ package smartwatchDevice
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/JanisataMJ/WebApp/config"
@@ -18,7 +17,6 @@ func CreateSmartwatchDevice(c *gin.Context) {
 		ModelSmartwatch string    `json:"model_smartwatch"`
 		ModelNumber     string    `json:"model_number"`
 		Brand           string    `json:"brand"`
-		StartDate       time.Time `json:"start_date"`
 		UserID          uint      `json:"user_id" binding:"required"`
 	}
 
@@ -33,7 +31,6 @@ func CreateSmartwatchDevice(c *gin.Context) {
 		ModelSmartwatch: input.ModelSmartwatch,
 		ModelNumber:     input.ModelNumber,
 		Brand:           input.Brand,
-		StartDate:       input.StartDate,
 		UserID:          input.UserID,
 	}
 

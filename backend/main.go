@@ -8,8 +8,9 @@ import (
 	"github.com/JanisataMJ/WebApp/config"
 
 	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
-	"github.com/JanisataMJ/WebApp/controller/analysisResult"
-	"github.com/JanisataMJ/WebApp/controller/gender"
+    "github.com/JanisataMJ/WebApp/controller/gender"
+	"github.com/JanisataMJ/WebApp/controller/healthSummary"
+    "github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
@@ -57,9 +58,13 @@ func main() {
         router.POST("/create-notification/:id", notification.CreateNotification)
         router.GET("/notification/:id", notification.GetNotificationsByUserID)
 
-        //AnalysisResult Route
-        router.GET("/list-analysisResult", analysisResult.ListAnalysisResults)
-        router.GET("/analysisResult/:id", analysisResult.GetAnalysisResult)
+        //healthSummary Route
+        router.GET("/list-healthSummary", healthSummary.ListHealthSummary)
+        router.GET("/healthSummary/:id", healthSummary.GetHealthSummary)
+
+        //healthAnalysis Route
+        router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
+        router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
 
         //HealthData Route
         router.GET("/list-healthData", healthData.ListHealthData)

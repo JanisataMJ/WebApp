@@ -35,9 +35,12 @@ func SetupDatabase() {
        &entity.Gender{},
        &entity.MoodData{},
        &entity.Notification{},
+       &entity.Trends{},
        &entity.HealthType{},
        &entity.NotificationStatus{},
-       &entity.AnalysisResult{},
+       &entity.HealthAnalysis{},
+       &entity.RiskLevel{},
+       &entity.HealthSummary{},
        &entity.HealthData{},
        &entity.SmartwatchDevice{},
    )
@@ -172,69 +175,6 @@ func SetupDatabase() {
     htDanger = healthTypes[2]
 
 
-    // Notifications
-	noti1 := entity.Notification{
-		Timestamp:           time.Now().Add(-300 * time.Hour),
-        Title:               "Title 1",
-		Message:             "High blood pressure detected!",
-		UserID:              1,
-		HealthTypeID:        htWarning.ID,
-		NotificationStatusID: statusArchived.ID,
-	}
-
-	noti2 := entity.Notification{
-		Timestamp:           time.Now().Add(-200 * time.Hour),
-        Title:               "Title 2",
-		Message:             "Normal heart rate.",
-		UserID:              2,
-		HealthTypeID:        htSafe.ID,
-		NotificationStatusID: statusRead.ID,
-	}
-
-    noti3 := entity.Notification{
-		Timestamp:           time.Now().Add(-30 * time.Hour),
-        Title:               "Title 3",
-		Message:             "Detected a decreased heart rate.",
-		UserID:              1,
-		HealthTypeID:        htDanger.ID,
-		NotificationStatusID: statusRead.ID,
-	}
-
-    noti4 := entity.Notification{
-		Timestamp:           time.Now().Add(-24 * time.Hour),
-        Title:               "Title 4",
-		Message:             "Detected a decreased heart rate.",
-		UserID:              2,
-		HealthTypeID:        htDanger.ID,
-		NotificationStatusID: statusUnread.ID,
-	}
-
-    noti5 := entity.Notification{
-		Timestamp:           time.Now().Add(-12 * time.Hour),
-        Title:               "Title 5",
-		Message:             "Detected a decreased heart rate.",
-		UserID:              1,
-		HealthTypeID:        htDanger.ID,
-		NotificationStatusID: statusUnread.ID,
-	}
-
-    noti6 := entity.Notification{
-		Timestamp:           time.Now(),
-        Title:               "Title 6",
-		Message:             "Detected a decreased heart rate.",
-		UserID:              2,
-		HealthTypeID:        htDanger.ID,
-		NotificationStatusID: statusUnread.ID,
-	}
-
-	db.Create(&noti1)
-	db.Create(&noti2)
-    db.Create(&noti3)
-    db.Create(&noti4)
-    db.Create(&noti5)
-    db.Create(&noti6)
-
-
     //SmartwatchDevice
     smartwatch1 := entity.SmartwatchDevice{
 		Name:               "Samsung 1",
@@ -242,7 +182,6 @@ func SetupDatabase() {
 		ModelSmartwatch:    "Galaxy Fit3 (EEDD)",
 		ModelNumber:        "SM-R390",
 		Brand:              "SAMSUNG",
-		StartDate:          time.Now(),
         UserID:             1,
 	}
 
@@ -252,7 +191,6 @@ func SetupDatabase() {
 		ModelSmartwatch:    "Oppo band",
 		ModelNumber:        "PO-A110",
 		Brand:              "OPPO",
-		StartDate:          time.Now(),
         UserID:             2,
 	}
 
@@ -268,7 +206,7 @@ func SetupDatabase() {
 		SleepHours:     10.00,
 		CaloriesBurned: 250,
 		Spo2:           97.0,
-        BodyTemp:       37.5,
+        BodyTemp:       38.0,
         UserID:         1,
 	}
 
@@ -287,24 +225,191 @@ func SetupDatabase() {
     db.Create(&healthData2)
 
 
-    //AnalysisResult
-    analysisResult1 := entity.AnalysisResult{
-		Timestamp:      time.Now(),
-        AnalysisType:   "79",
-		Value:          100,
-		SumText:        "Healthy abcdefghijklmnopqrstuvwxyz",
-        UserID:         1,
+    // RiskLevel
+    var lGood, lNormal, lBad entity.RiskLevel
+    Rlevels := []entity.RiskLevel{
+        {Rlevel: "Good"},
+        {Rlevel: "Normal"},
+        {Rlevel: "Bad"},
+    }
+
+    for i, level := range Rlevels {
+        db.FirstOrCreate(&Rlevels[i], entity.RiskLevel{Rlevel: level.Rlevel})
+    }
+
+    lGood = Rlevels[0]
+    lNormal = Rlevels[1]
+    lBad = Rlevels[2]
+
+
+
+    //HealthAnalysis
+    healthAnalysis1 := entity.HealthAnalysis{
+        Category:           "Body Temperature",
+        Value:              "38.0°C",
+        Interpretation:     "High Fever",
+        Suggestion:         "ควรพักผ่อนและดื่มน้ำ หรือ พบแพทย์",
+        HealthDataID:       1,
+        RiskLevelID:       lBad.ID, 
 	}
 
-    analysisResult2 := entity.AnalysisResult{
-		Timestamp:      time.Now(),
-        AnalysisType:   "79",
-		Value:          100,
-		SumText:        "Warning, You should abcdefghijklmnopqrstuvwxyz",
-        UserID:         1,
+    healthAnalysis2 := entity.HealthAnalysis{
+        Category:           "Heart Rate",
+        Value:              "79",
+        Interpretation:     "Normal",
+        Suggestion:         "อยู่ในเกณฑ์ที่ดี",
+        HealthDataID:       1,
+        RiskLevelID:       lNormal.ID, 
 	}
 
-    db.Create(&analysisResult1)
-    db.Create(&analysisResult2)
+    healthAnalysis3 := entity.HealthAnalysis{
+        Category:           "Steps",
+        Value:              "10,000 Steps",
+        Interpretation:     "10,000 steps completed",
+        Suggestion:         "วันนี้คุณทำได้ดีมาก",
+        HealthDataID:       1,
+        RiskLevelID:       lGood.ID, 
+	}
+
+    db.Create(&healthAnalysis1)
+    db.Create(&healthAnalysis2)
+    db.Create(&healthAnalysis3)
+
+
+
+    //Trends
+    var trend1, trend2, trend3 entity.Trends
+    trend := []entity.Trends{
+        {Trend: "Improving"},
+        {Trend: "Stable"},
+        {Trend: "Worsening"},
+    }
+    for i, ttrend := range trend {
+        db.FirstOrCreate(&trend[i], entity.Trends{Trend: ttrend.Trend})
+    }
+
+    trend1 = trend[0]
+    trend2 = trend[1]
+    trend3 = trend[2]
+
+    //HealthSummary
+    healthSum1 := entity.HealthSummary{
+		PeriodStart:    time.Now().Add(-300 * time.Hour), 
+        PeriodEnd:      time.Now(), 
+        AvgBpm:         79.0,
+        MinBpm:         75, 
+        MaxBpm:         81,
+        AvgSteps:       7999.0, 
+        TotalSteps:     15000, 
+        AvgSleep:       6.0,
+        AvgCalories:    500.0,
+        AvgSpo2:        94.0,
+        AvgBodyTemp:    37.0,
+        MinBodyTemp:    36.0, 
+        MaxBodyTemp:    37.5, 
+        UserID:         1,	
+	}
+
+    healthSum2 := entity.HealthSummary{
+		PeriodStart:    time.Now().Add(-500 * time.Hour), 
+        PeriodEnd:      time.Now(), 
+        AvgBpm:         79.0,
+        MinBpm:         75, 
+        MaxBpm:         81,
+        AvgSteps:       7999.0, 
+        TotalSteps:     15000, 
+        AvgSleep:       6.0,
+        AvgCalories:    500.0,
+        AvgSpo2:        94.0,
+        AvgBodyTemp:    37.0,
+        MinBodyTemp:    36.0, 
+        MaxBodyTemp:    37.5, 
+        UserID:         2,	
+	}
+
+	db.Create(&healthSum1)
+	db.Create(&healthSum2)
+
+
+    
+    // Notifications
+	noti1 := entity.Notification{
+		Timestamp:              time.Now().Add(-300 * time.Hour),
+        Title:                  "Title 1",
+		Message:                "High blood pressure detected!",
+		UserID:                 1,
+		HealthTypeID:           htWarning.ID,
+		NotificationStatusID:   statusArchived.ID,
+        HealthSummaryID:        1,
+        HealthAnalysisID:       1,
+        TrendsID:               trend1.ID,
+	}
+
+	noti2 := entity.Notification{
+		Timestamp:              time.Now().Add(-200 * time.Hour),
+        Title:                  "Title 2",
+		Message:                "Normal heart rate.",
+		UserID:                 2,
+		HealthTypeID:           htSafe.ID,
+		NotificationStatusID:   statusRead.ID,
+        HealthSummaryID:        1,
+        HealthAnalysisID:       1,
+        TrendsID:               trend2.ID,
+	}
+
+    noti3 := entity.Notification{
+		Timestamp:               time.Now().Add(-30 * time.Hour),
+        Title:                  "Title 3",
+		Message:                "Detected a decreased heart rate.",
+		UserID:                 1,
+		HealthTypeID:           htDanger.ID,
+		NotificationStatusID:   statusRead.ID,
+        HealthSummaryID:        1,
+        HealthAnalysisID:       1,
+        TrendsID:               trend3.ID,
+	}
+
+    noti4 := entity.Notification{
+		Timestamp:              time.Now().Add(-24 * time.Hour),
+        Title:                  "Title 4",
+		Message:                "Detected a decreased heart rate.",
+		UserID:                 2,
+		HealthTypeID:           htDanger.ID,
+		NotificationStatusID:   statusUnread.ID,
+        HealthSummaryID:        1,
+        HealthAnalysisID:       1,
+        TrendsID:               trend1.ID,
+	}
+
+    noti5 := entity.Notification{
+		Timestamp:              time.Now().Add(-12 * time.Hour),
+        Title:                  "Title 5",
+		Message:                "Detected a decreased heart rate.",
+		UserID:                 1,
+		HealthTypeID:           htDanger.ID,
+		NotificationStatusID:   statusUnread.ID,
+        HealthSummaryID:        1,
+        HealthAnalysisID:       1,
+        TrendsID:               trend2.ID,
+	}
+
+    noti6 := entity.Notification{
+		Timestamp:              time.Now(),
+        Title:                  "Title 6",
+		Message:                "Detected a decreased heart rate.",
+		UserID:                 2,
+		HealthTypeID:           htDanger.ID,
+		NotificationStatusID:   statusUnread.ID,
+        HealthSummaryID:        1,
+        HealthAnalysisID:       1,
+        TrendsID:               trend3.ID,
+	}
+
+	db.Create(&noti1)
+	db.Create(&noti2)
+    db.Create(&noti3)
+    db.Create(&noti4)
+    db.Create(&noti5)
+    db.Create(&noti6)
     
 }

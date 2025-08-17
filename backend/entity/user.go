@@ -27,7 +27,7 @@ type User struct {
 	GenderID 	uint
 	Gender   	*Gender `gorm:"foreignKey: GenderID"`
 
-	AnalysisResult		[]AnalysisResult 	`gorm:"foreignKey:UserID"`
+	HealthSummary		[]HealthSummary 	`gorm:"foreignKey:UserID"`
 	HealthData 			[]HealthData 		`gorm:"foreignKey:UserID"`
 	SmartwatchDevice 	*SmartwatchDevice 	`gorm:"foreignKey:UserID"`
 	MoodData 			[]MoodData 			`gorm:"foreignKey:UserID"`

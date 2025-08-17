@@ -8,5 +8,4 @@ export interface HealthDataInterface {
     Spo2:           number;
     BodyTemp:       number;
     UserID?:        number;  
-    
 }

@@ -319,7 +319,6 @@ const EditProfile: React.FC = () => {
                                                 <Select placeholder="Select gender" allowClear>
                                                     <Option value="Male">Male</Option>
                                                     <Option value="Female">Female</Option>
-                                                    <Option value="Unspecified">Unspecified</Option>
                                                 </Select>
                                             </Form.Item>
                                         </div>

@@ -7,12 +7,7 @@ import CategoryNavWriter from '../../compronents/Writer_components/CatogoryNavWr
 import WithdrawConfirm from '../../compronents/Writer_components/withdraw/WithdrawConfirmPopup';
 import SuccessPopup from '../../compronents/Writer_components/withdraw/SuccessPopup_withdraw';
 import { GetUsersById, updateIncomeReduce } from '../../services/https/User/user';
-import { CreateTransaction } from '../../services/https/Transaction/transaction';
 
-import scbLogo from '../../assets/scb-logo.png';
-import bblLogo from '../../assets/bbl-logo.png';
-import kbankLogo from '../../assets/kbank-logo.png';
-import ktbLogo from '../../assets/ktb-logo.png';
 
 const Withdraw: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false); 

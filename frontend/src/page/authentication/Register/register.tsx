@@ -111,7 +111,6 @@ const Register: React.FC = () => {
                 <Radio.Group>
                   <Radio value={1}>Male</Radio>
                   <Radio value={2}>Female</Radio>
-                  <Radio value={3}>Prefer not to say</Radio>
                 </Radio.Group>
               </Form.Item>
 

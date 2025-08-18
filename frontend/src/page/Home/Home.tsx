@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { MusicProvider } from '../../compronents/song_components/musicprovider';
 import './Home.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -33,7 +32,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <MusicProvider>
+    <>
       <Headers />
       <a id='cat1' className='hide'>1</a>
       <Navbar />
@@ -92,7 +91,7 @@ const Home: React.FC = () => {
 
           <Notification />
       </div>
-    </MusicProvider>
+    </>
   );
 };
 

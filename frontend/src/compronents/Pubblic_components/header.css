@@ -14,9 +14,12 @@
     margin-left: 30px;
     width: 60px;
   }#Logo{
-    margin-left: 15px;
-    width: 150px;
+    margin-left: 30px;
+    width: 50px;
+    height: 50px;
+    margin-top: -7px;
     transform: translate(0,12px);
+    border-radius: 50%;
   
     
   }

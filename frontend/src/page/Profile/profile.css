@@ -1,134 +1,118 @@
 .profile-container {
-    background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
-    padding: 0;
-    color: white;
-    width: 100vw;
-    height: 100vh;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  color: #fff;
+  box-sizing: border-box;
 }
 
-.no-profile-picture {
-    font-size: 16px;
-    color: #aaa;
-    top: 10px; /* Align to the top of the box */
-    left: 10px; /* Align to the left of the box */
-    margin: 0; /* No extra margin */
-    padding: 0; /* No padding around the text */
-    text-align: left; /* Align the text to the left */
+.profile-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  text-align: center;
+  color: #fff;
+}
+
+.profile-box {
+  background-color: #fefefe;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  margin-top: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .profile-picture {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    overflow: hidden;
-    background-color: #444;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #444;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+  transition: transform 0.3s ease;
 }
 
 .profile-picture:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
-
-
-.box {
-    background-color: #333;
-    padding: 40px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 700px;
-    height: auto;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    box-sizing: border-box;
-    margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.box:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
-@media (min-width: 768px) {
-    .box {
-        padding: 40px;
-        max-width: 700px;
-    }
-}
-
-.item {
-    margin: 10px 0;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.5s forwards;
-}
-
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.item:nth-child(1) {
-    animation-delay: 0.2s;
-}
-
-.item:nth-child(2) {
-    animation-delay: 0.4s;
-}
-
-.item:nth-child(3) {
-    animation-delay: 0.6s;
-}
-
-.item:nth-child(4) {
-    animation-delay: 0.8s;
-}
-
-.item:nth-child(5) {
-    animation-delay: 1s;
-}
-
-.label {
-    color: #f7f7f7;
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 5px;
-}
-
-.value {
-    color: #ddd;
-    font-size: 16px;
-    margin-left: 10px;
+.no-profile-picture {
+  color: #aaa;
+  font-size: 16px;
+  margin-bottom: 15px;
 }
 
 .editProfile {
-    color: rgb(43, 43, 219);
-    text-decoration: none;
-    position: absolute;
-    top: -30px; /* ปรับระยะห่างจากด้านบน */
-    right: 10px;
-    z-index: 10;
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.editProfile:hover {
+  color: #1e70bf;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.column {
+  display: flex;
+  width: 48%; /* กำหนดความกว้างแต่ละคอลัมน์ */
+  justify-content: space-between;
+}
+
+.label {
+  font-weight: bold;
+  color: #000000;
+  font-size: 16px;
+  width: 120px; /* กำหนดความกว้างเท่ากันทุก label */
 }
 
 
+.value {
+  color: #000000;
+  font-size: 16px;
+  flex: 1;
+  text-align: left; /* หรือ right ตามต้องการ */
+}
 
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

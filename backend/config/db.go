@@ -56,6 +56,7 @@ func SetupDatabase() {
        Password:  hashedPassword,
        Birthdate:  BirthDay,
        GenderID:  1,
+	   Picture: "",
    }
 
    db.FirstOrCreate(User, &entity.User{

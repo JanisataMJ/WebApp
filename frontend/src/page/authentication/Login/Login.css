@@ -1,33 +1,60 @@
-.container {
-    background-color: white;
-    padding: 3rem; 
-    border-radius: 3rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 550px; 
-    margin: 100px auto; 
-    margin-top: 150px;
+
+.signin-forgot-password {
+    margin-top: 0.5rem;
+    text-align: left;
+    margin-top: 1rem;
 }
 
-.title {
+.signin-forgot-password a {
+    color: #000000; 
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.signin-forgot-password a:hover {
+    text-decoration: underline;
+}
+.signin-title {
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: bold;
-    margin-top: 1rem; /* Adjust margin-top for better spacing */
-    color:#57648E
+    margin-top: 5rem;
+    margin-bottom: -5rem;
+    color: white;
+}
+.signin-page-wrapper {
+    display: flex;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    flex-direction: column;
+    justify-content: center;   /* จัดแนวตั้ง */
+    align-items: center;       /* จัดแนวนอน */
+    min-height: 100vh;
+    background-color: #111;
+    padding-top: 60px;
+    width: 100%;               /* <-- สำคัญมาก */
+}
+.signin-container {
+    background-color: white;
+    padding: 2%; 
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%; 
+    max-width: 500px; /* เดิม 500px ปรับเป็น 600px */
+    margin: auto;
 }
 
-.form-group {
+.signin-form-group {
     margin-bottom: 1rem;
 }
 
-.form-group label {
+.signin-form-group label {
     display: block;
     color: #4a5568;
     margin-bottom: 0.5rem;
 }
 
-.form-group input {
+
+.signin-form-group input {
     width: 100%;
     padding: 0.75rem; /* Increase padding for a better user experience */
     border: 1px solid #cbd5e0;
@@ -36,13 +63,14 @@
     box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
-.button-group {
+.signin-button-group {
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem; /* Add margin for better spacing */
 }
 
-.button-group button {
+.signin-button-group button {
+
     flex: 1;
     padding: 0.75rem; /* Increase button padding */
     border: none;
@@ -51,8 +79,8 @@
     font-size: 1rem; /* Make button text more readable */
 }
 
-/*.button-group .login-btn {
-    background-color: #934A5E;
+.signin-button-group .signup-btn {
+    background-color: #111434;
     color: white;
 }*/
 
@@ -67,58 +95,8 @@
     transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-/* เมื่อเอาเม้าส์ไปชี้ */
-.button-group .login-btn:hover {
-    background-color: #7c3d50; /* สีเข้มขึ้น */
-}
+.signin-button-group .login-btn {
+    background-color: #2F3695;
+    color: rgb(255, 255, 255);
 
-/* เมื่อถูกกด */
-.button-group .login-btn:active {
-    background-color: #662d3d;
-    transform: scale(0.97); /* ย่อปุ่มเล็กลงเล็กน้อยตอนกด */
-}
-
-
-/*.button-group .signup-btn {
-    background-color: #E5E5E5;
-    color: black;
-}*/
-
-.button-group .signup-btn {
-    background-color: #E5E5E5;
-    color: black;
-    border: none;
-    padding: 0.5rem 1.25rem;
-    font-size: 1rem;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-/* เมื่อเอาเม้าส์ไปชี้ */
-.button-group .signup-btn:hover {
-    background-color: #d4d4d4; /* เทาเข้มขึ้น */
-}
-
-/* เมื่อถูกกด */
-.button-group .signup-btn:active {
-    background-color: #bfbfbf; /* เทาเข้มขึ้นอีก */
-    transform: scale(0.97);
-}
-
-.button-link {
-    background-color: transparent;  /* ไม่มีพื้นหลัง */
-    color: #837dff;                 /* สีลิงก์ เช่น สี Indigo */
-    border: none;                   /* ไม่มีเส้นขอบ */
-    padding: 0;
-    margin-top: 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    text-decoration: underline;     /* ใต้เส้นเหมือนลิงก์ */
-    transition: color 0.2s ease;
-}
-
-.button-link:hover {
-    background-color: transparent;
-    color: #2a1ed5;                 /* สีเข้มขึ้นเมื่อ hover */
 }

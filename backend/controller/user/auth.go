@@ -1,23 +1,16 @@
 package users
 
 import (
-	"errors"
+   "errors"
+   "net/http"
+   "time"
 
-	"net/http"
-
-	"time"
-
-	"github.com/gin-gonic/gin"
-
-	"golang.org/x/crypto/bcrypt"
-
-	"gorm.io/gorm"
-
-	"github.com/JanisataMJ/WebApp/config"
-
-	"github.com/JanisataMJ/WebApp/entity"
-
-	"github.com/JanisataMJ/WebApp/services"
+   "github.com/gin-gonic/gin"
+   "golang.org/x/crypto/bcrypt"
+   "gorm.io/gorm"
+   "github.com/JanisataMJ/WebApp/config"
+   "github.com/JanisataMJ/WebApp/entity"
+   "github.com/JanisataMJ/WebApp/services"
 )
 
 

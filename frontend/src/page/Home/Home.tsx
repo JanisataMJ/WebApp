@@ -4,13 +4,15 @@ import './Home.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Slider from '../../compronents/Home_components/slideshow';
-import CardList1 from '../../compronents/Home_components/GroupCategory/romantic';
-import CardList2 from '../../compronents/Home_components/GroupCategory/action';
-import CardList3 from '../../compronents/Home_components/GroupCategory/horror';
-import CardList4 from '../../compronents/Home_components/GroupCategory/fantasy';
-import CardList5 from '../../compronents/Home_components/GroupCategory/comedy';
-import CategoryNav from '../../compronents/Home_components/CategoryNav';
-import Trand from '../../compronents/Home_components/GroupCategory/Trand';
+import Calendar from '../../page/calendar/calendar';
+import Notification from '../../compronents/Home_components/Notifiation/notice';
+import Graph1 from '../../compronents/Home_components/GroupGraph/temp';
+import Graph2 from '../../compronents/Home_components/GroupGraph/heartrate';
+import Graph3 from '../../compronents/Home_components/GroupGraph/calorie';
+import Graph4 from '../../compronents/Home_components/GroupGraph/spo2';
+import Graph5 from '../../compronents/Home_components/GroupGraph/steps';
+import Graph6 from '../../compronents/Home_components/GroupGraph/sleep';
+import Navbar from '../../compronents/Home_components/Navbar';
 import SLoader from '../../compronents/Book_components/simpleLoader';
 
 const Home: React.FC = () => {
@@ -34,58 +36,61 @@ const Home: React.FC = () => {
     <MusicProvider>
       <Headers />
       <a id='cat1' className='hide'>1</a>
-      <CategoryNav />
+      <Navbar />
       <div className='l1'>
-        <div className='l1_1'>
-          <div className='l1_1_1'>
-            <h2 id='Treding'>แนะนำ
-              <img width="20px" style={{ transform: "translate(0, -5px)" }} src="/src/assets/star.png" alt="star" />
-            </h2>
-            <Slider />
-          </div>
-          <Trand />
-          <a id='cat1_2'  className='hide'>1_2</a>
+        <div className='l11'>
+          <Slider />
         </div>
 
-        <a id='cat2' className='hide'>2</a>
+        <a id='chart1' className='hide'>4</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>โรแมนติก</h2>
+            <h2>Temperature</h2>
           </div>
-          <CardList1 />
+          <Graph1 />
         </div>
 
-        <a id='cat3' className='hide'>3</a>
+        <a id='chart2' className='hide'>5</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>แอ็คชั่น</h2>
+            <h2>Heart Rate</h2>
           </div>
-          <CardList2 />
+          <Graph2 />
         </div>
 
-        <a id='cat4' className='hide'>4</a>
+        <a id='chart3' className='hide'>6</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>สยองขวัญ</h2>
+            <h2>Calorie</h2>
           </div>
-          <CardList3 />
+          <Graph3 />
         </div>
 
-        <a id='cat5' className='hide'>5</a>
+        <a id='chart4' className='hide'>7</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>แฟนตาซี</h2>
+            <h2>SPO2</h2>
           </div>
-          <CardList4 />
+          <Graph4 />
         </div>
 
-        <a id='cat6' className='hide'>6</a>
+        <a id='chart5' className='hide'>8</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>คอมเมดี้</h2>
+            <h2>Steps</h2>
           </div>
-          <CardList5 />
+          <Graph5 />
         </div>
+
+        <a id='chart6' className='hide'>9</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>Sleep</h2>
+          </div>
+          <Graph6 />
+        </div>
+
+          <Notification />
       </div>
     </MusicProvider>
   );

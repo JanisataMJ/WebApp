@@ -1,0 +1,84 @@
+.hide{
+    color: #1e1c1c00;
+    /* color: #ffffff; */
+    transform: translate(0,-500px);
+    text-decoration: none;
+}
+
+.category-tips {
+  position: fixed;
+  left: 0;           /* ← ชิดซ้ายหน้าจอ */
+  top: 60px;
+  z-index: 100;
+  padding: 10px;
+  text-align: left;
+}
+
+.search-bar {
+  background: #fff;
+  position: relative;
+  margin-bottom: 0.75rem;
+  padding-inline: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 3px 3px 3px rgba(0,0,0,0.08);
+}
+
+.search-bar input {
+  width: 100%;
+  padding-right: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border: 1px solid #7392cf;
+  border-radius: 0.5rem;
+  outline: none;
+}
+
+.search-bar input:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.search-bar .search-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.article-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  cursor: pointer;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  /* group effect สามารถใช้ .article-card:hover กับลูกได้ */
+}
+.article-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transition: transform 0.3s;
+  transform: scale(1.05);
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .articles-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .articles-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}

@@ -1,0 +1,334 @@
+/* Floating Button */
+.floating-button {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  height: 64px;
+  width: 64px;
+  background: linear-gradient(135deg, #a855f7, #ec4899, #4338ca);
+  color: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  border: none;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.floating-button:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.floating-button:active {
+  transform: scale(0.95);
+}
+
+.icon-noti {
+  color: white;
+  font-size: 24px;
+}
+
+/* Modal Overlay */
+.modal-overlay-noti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fade-in 0.3s ease;
+}
+
+/* Modal Container */
+.modal-noti {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh; /* จำกัดความสูงของ modal */
+  width: 90%;
+  max-width: 900px;
+  background: linear-gradient(to top, #C2B4D7, #E5E5E5);
+  border-radius: 12px;
+  padding: 24px;
+  overflow: hidden; /* ซ่อนส่วนล้น */
+  position: relative;
+}
+
+/* Modal Body */
+.modal-body-noti {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #C2B4D7 transparent;
+}
+
+/* สำหรับ Chrome/Edge/Safari */
+.modal-body-noti::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body-noti::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body-noti::-webkit-scrollbar-thumb {
+  background-color: #C2B4D7;
+  border-radius: 3px;
+}
+
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #934A5E;
+  margin-bottom: 8px;
+}
+
+.modal-subtitle {
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+/* Content Box */
+.text-box-noti {
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+/* Title Row */
+.title-row-noti {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* ให้ทุกอย่างอยู่กลางแนวแกนขวาง (แนวตั้ง) */
+  gap: 12px; /* ลดช่องว่างถ้าต้องการ */
+}
+
+/*.title-left-noti {
+  flex-grow: 1; /* ให้ title ขยายเต็มที่ */
+  /*min-width: 0; /* ช่วยให้ข้อความตัดได้เมื่อยาวเกิน */
+  /*white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}*/
+.title-left-noti {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* ช่องว่างระหว่าง title กับ health type */
+  flex-grow: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.health-type {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* สีตามระดับสุขภาพ */
+.health-type-safe {
+  color: #22c55e; /* เขียว */
+  background-color: #d1fae5;
+}
+
+.health-type-warning {
+  color: #ca8a04; /* เหลืองเข้ม */
+  background-color: #fef3c7;
+}
+
+.health-type-danger {
+  color: #dc2626; /* แดง */
+  background-color: #fecaca;
+}
+
+.title-right-noti {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* ช่องว่างระหว่างวันที่กับปุ่มลูกศร */
+  flex-shrink: 0; /* ป้องกันให้ไม่ย่อเกินไป */
+}
+
+.datetime-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+
+.status-display {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+  color: #6b7280; /* สีเทา */
+}
+
+.status-unread {
+  font-weight: 700; /* ตัวหนา */
+  color: #000000;   /* ดำ */
+}
+
+.status-readed {
+  font-weight: 400; /* ตัวบาง */
+  color: #6b7280;   /* เทา */
+}
+
+.status-archived {
+  font-weight: 700; /* ตัวหนา */
+  color: #9ca3af;   /* เทาเข้มกว่าปกติ */
+}
+
+.time-display {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+/* Title */
+.title-noti {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #57648E;
+}
+
+/* Toggle Button */
+.toggle-button-noti {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #dc2626;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-button-noti:hover {
+  background-color: #f3e8ff;
+  transform: scale(1.1);
+}
+
+/* Detail Container */
+.detail-container {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+  animation: slide-down 0.3s ease;
+}
+
+.detail-noti {
+  text-align: left;
+  line-height: 1.6;
+  color: #374151;
+  margin: 0;
+}
+
+/* Close Button */
+.close-noti {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: transparent;
+  color: #ef4444;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-noti:hover {
+  background-color: #f3e8ff;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-noti {
+    width: 95%;
+    height: 400px;
+    padding: 16px;
+  }
+  
+  .text-box-noti {
+    padding: 12px;
+  }
+  
+  .title-row-noti {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .title-right-noti {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .floating-button {
+    bottom: 20px;
+    right: 20px;
+    height: 56px;
+    width: 56px;
+  }
+}

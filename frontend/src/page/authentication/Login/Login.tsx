@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, Flex } from 'antd';
 import '../Login/Login.css';
 import Headers from '../../../compronents/Pubblic_components/headerselect';
 import { useNavigate } from 'react-router-dom';
@@ -70,6 +71,9 @@ const Login: React.FC = () => {
                         <button type="submit" className="login-btn" >Sign In</button>
                     </div>
                 </form>
+                <div>
+                    <button type="button" className='button-link'>Forgot your password?</button>
+                </div>
             </div>
         </div>
     </>

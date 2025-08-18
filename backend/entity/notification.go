@@ -8,6 +8,7 @@ import (
 type Notification struct {
 	gorm.Model
 	Timestamp	time.Time
+	Title		string
 	Message 	string 
 
 	UserID 			uint
@@ -16,6 +17,6 @@ type Notification struct {
 	HealthTypeID 	uint
 	HealthType   	*HealthType `gorm:"foreignKey: HealthTypeID"`
 
-	NotificatonStatusID 	uint
-	NotificatonStatus   	*NotificatonStatus `gorm:"foreignKey: NotificatonStatusID"`
+	NotificationStatusID 	uint
+	NotificationStatus   	*NotificationStatus `gorm:"foreignKey: NotificationStatusID"`
 }

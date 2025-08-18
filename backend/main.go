@@ -9,6 +9,7 @@ import (
 
 	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
 	"github.com/JanisataMJ/WebApp/controller/gender"
+	"github.com/JanisataMJ/WebApp/controller/notification"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
 
@@ -20,33 +21,21 @@ const PORT = "8000"
 
 
 func main() {
-
-
    // open connection database
-
    config.ConnectionDB()
 
-
    // Generate databases
-
    config.SetupDatabase()
-
 
    r := gin.Default()
 
-
    r.Use(CORSMiddleware())
 
-
    // Auth Route
-
    r.POST("/signup", users.SignUp)
-
    r.POST("/signin", users.SignIn)
 
-
    router := r.Group("/")
-
    {
        router.Use(middlewares.Authorizes())
 
@@ -56,14 +45,16 @@ func main() {
        router.GET("/user/:id", users.Get)
        router.DELETE("/user/:id", users.Delete)
 
-       //Calendar Routes
+       //Calendar Route
 		router.GET("/calendar", calendar.ListCalendar)
 		router.POST("/create-calendar", calendar.CreateCalendar)
 		router.DELETE("/delete-calendar/:id", calendar.DeleteCalendar)
 
+        //Notification Route
+        router.POST("/create-notification/:id", notification.CreateNotification)
+        router.GET("/notification/:id", notification.GetNotificationsByUserID)
 
    }
-
 
    r.GET("/genders", genders.GetAll)
 
@@ -71,13 +62,8 @@ func main() {
        c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
    })
 
-
    // Run the server
-
-
    r.Run("localhost:" + PORT)
-
-
 }
 
 
@@ -94,7 +80,6 @@ func CORSMiddleware() gin.HandlerFunc {
            c.AbortWithStatus(204)
            return
        }
-
        c.Next()
    }
 }

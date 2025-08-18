@@ -79,9 +79,25 @@
     font-size: 1rem; /* Make button text more readable */
 }
 
+<<<<<<< HEAD
 .signin-button-group .signup-btn {
     background-color: #111434;
+=======
+/*.button-group .login-btn {
+    background-color: #934A5E;
+>>>>>>> 6fa14df4bd7e3d8a617e17bea59cfa82f331392e
     color: white;
+}*/
+
+.button-group .login-btn {
+    background-color: #934A5E;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 .signin-button-group .login-btn {

@@ -19,5 +19,5 @@ type HealthData struct {
 	User   			*User `gorm:"foreignKey: UserID"`
 
 	// Many-to-Many
-	HealthData []HealthData `gorm:"many2many:HealthDataAnalysis;"`
+	AnalysisResults []AnalysisResult `gorm:"many2many:HealthDataAnalysis;"`
 }

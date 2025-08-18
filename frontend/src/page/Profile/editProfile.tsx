@@ -94,12 +94,12 @@ const EditProfile: React.FC = () => {
                         hip: userData.hip ?? undefined,
                     });
 
-                    if (userData.Picture) {
+                    if (userData.picture) {
                         setFileList([{
                             uid: '-1',
                             name: 'profile.png',
                             status: 'done',
-                            url: userData.Picture,
+                            url: userData.picture,
                         }]);
                     }
                 } else {
@@ -167,8 +167,6 @@ const EditProfile: React.FC = () => {
                 waist: values.waist,
                 hip: values.hip,
                 Picture: base64Image || (profileDeleted ? null : undefined),
-                OldPassword: values.old_password || undefined,
-                NewPassword: values.new_password || undefined,
             };
 
             console.log("📦 Payload:", data);
@@ -409,26 +407,6 @@ const EditProfile: React.FC = () => {
                                                 <Input className="form-input" placeholder="Enter username" prefix={<UserOutlined />} />
                                             </Form.Item>
                                         </div>
-                                        <div className="form-group">
-                                            <label>Old Password</label>
-                                            <Form.Item
-                                                name="old_password"
-                                                className="form-item"
-                                                rules={[
-                                                    ({ getFieldValue }) => ({
-                                                        validator(_, value) {
-                                                            const newPassword = getFieldValue('new_password');
-                                                            if (newPassword && !value) {
-                                                                return Promise.reject(new Error('Please enter old password to change password'));
-                                                            }
-                                                            return Promise.resolve();
-                                                        },
-                                                    }),
-                                                ]}
-                                            >
-                                                <Input.Password className="form-input" placeholder="Enter old password (if changing)" />
-                                            </Form.Item>
-                                        </div>
                                     </div>
 
                                     <div className="form-row">
@@ -447,30 +425,7 @@ const EditProfile: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="form-row">
-                                        <div className="form-group full-width">
-                                            <label>New Password</label>
-                                            <Form.Item
-                                                name="new_password"
-                                                className="form-item"
-                                                rules={[
-                                                    ({ getFieldValue }) => ({
-                                                        validator(_, value) {
-                                                            if (value && value.length < 6) {
-                                                                return Promise.reject(new Error('Password must be at least 6 characters'));
-                                                            }
-                                                            if (value && !getFieldValue('old_password')) {
-                                                                return Promise.reject(new Error('Please enter old password first'));
-                                                            }
-                                                            return Promise.resolve();
-                                                        },
-                                                    }),
-                                                ]}
-                                            >
-                                                <Input.Password className="form-input" placeholder="Enter new password (if changing)" />
-                                            </Form.Item>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
 
                                 <div className="submit-section">

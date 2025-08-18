@@ -69,9 +69,6 @@ const Login: React.FC = () => {
                         <button type="button" className="signup-btn" onClick={Signup} >Sign Up</button>
                         <button type="submit" className="login-btn" >Sign In</button>
                     </div>
-                    <div className="signin-forgot-password">
-                        <a href="/forgot-password">Forgot your password?</a>
-                    </div>
                 </form>
             </div>
         </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Card from '../crad';
 import { GetPublicNovels } from '../../../services/https/Novel/novel';
 import { IGroupCard } from '../../../interface/home_interface/IGroupCard';
-import SLoader from '../../Book_components/simpleLoader';
+import SLoader from '../../Loading_components/simpleLoader';
 
 
 const CardList2: React.FC = () => {

@@ -14,17 +14,38 @@ import (
 	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
+    "github.com/JanisataMJ/WebApp/services"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
 
 	"github.com/JanisataMJ/WebApp/middlewares"
+
+    "log"
+    "os"
+    "github.com/joho/godotenv"
 )
 
 
 const PORT = "8000"
 
+func init() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+}
+
 
 func main() {
+    emailUser := os.Getenv("EMAIL_USER")
+    emailPass := os.Getenv("EMAIL_PASS")
+    smtpHost := os.Getenv("SMTP_HOST")
+    smtpPort := os.Getenv("SMTP_PORT")
+
+    log.Println("Email User:", emailUser)
+    log.Println("Email Pass:", emailPass) // แค่ทดสอบ (จริง ๆ ไม่ควร log password)
+    log.Println("SMTP Host:", smtpHost, "Port:", smtpPort)
+
    // open connection database
    config.ConnectionDB()
 
@@ -57,6 +78,10 @@ func main() {
         //Notification Route
         router.POST("/create-notification/:id", notification.CreateNotification)
         router.GET("/notification/:id", notification.GetNotificationsByUserID)
+        router.POST("/send-notifications", func(c *gin.Context) {
+            go services.SendPendingNotifications()
+            c.JSON(200, gin.H{"message": "Notifications sending started"})
+        })
 
         //healthSummary Route
         router.GET("/list-healthSummary", healthSummary.ListHealthSummary)

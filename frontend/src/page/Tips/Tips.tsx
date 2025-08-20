@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, BookOpen, Clock, User, Heart, Share2, MessageCircle, ChevronLeft, Filter, TrendingUp, Calendar } from 'lucide-react';
 import Headers from '../../compronents/Pubblic_components/headerselect';
-import CategoryNav from '../../compronents/Home_components/Navbar';
 import './Tips.css';
 
 const Tips = () => {
@@ -119,7 +118,6 @@ const Tips = () => {
   if (selectedArticle) {
     return (
       <div><Headers />
-        <div className='category-tips'><CategoryNav /></div>
         <div className="health-dashboard">
       <div className="min-h-screen bg-transparent">
         {/* Article Header */}
@@ -204,7 +202,6 @@ const Tips = () => {
 
   return (
     <div><Headers />
-      <div className='category-tips'><CategoryNav /></div>
       <div className="health-dashboard">
     <div className="min-h-screen bg-transparent">
       {/* Header Section */}

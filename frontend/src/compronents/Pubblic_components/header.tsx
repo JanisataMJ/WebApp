@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';   
 import './header.css';
-import { Dropdown, Image, Modal, Button } from 'react-bootstrap';
+import { Dropdown, Image, Modal } from 'react-bootstrap';
 import { message, theme } from 'antd';  
 import logo from '../../assets/Logo.jpg';
 import { GetUsersById, UpdateStatusWriterById } from '../../services/https/User/user';
 import { UsersInterface } from '../../interface/profile_interface/IProfile';
 import { IoPersonCircleOutline } from "react-icons/io5";
+import Navbar from '../../compronents/Home_components/Navbar';
 
 const TOP: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
@@ -21,7 +22,7 @@ const TOP: React.FC = () => {
                 const userId = localStorage.getItem('id');
                 if (userId) {
                     const userData = await GetUsersById(userId);
-                    setUser(userData.data); // Set user data
+                    setUser(userData.data);
                     if (userData.status === 200) {
                         setIsWriter(userData.data.writer);
                     }
@@ -56,14 +57,9 @@ const TOP: React.FC = () => {
         try {
             const userId = localStorage.getItem('id');
             if (userId) {
-                // อัปเดตสถานะนักเขียนในฐานข้อมูล
                 await UpdateStatusWriterById(String(userId), { writer: true });
-                
-                // อัปเดตสถานะใน localStorage และ state
                 localStorage.setItem('isWriter', 'true');
                 setIsWriter(true);
-
-                // เปลี่ยนเส้นทางไปยังหน้า writer
                 window.location.href = '/writer';
             }
         } catch (error) {
@@ -98,66 +94,70 @@ const TOP: React.FC = () => {
     };
 
     return (
-        <div className="topbar">
-            {contextHolder}
-            <a href="/"><img id="Logo" src={logo} alt="Logo" /></a>
-            {/*<div className="wrapcoin">
-                <div className="cointop">
-                    <img id="cointop" src={coinImage} alt="coin" />
-                    <span id="cointxt"><Balance /></span>
-                </div>
-            </div>*/}
-            <div id='profile'>
-                <Dropdown align="end" onSelect={handleDropdownSelect}>
-                    <div className='hindesometing'>
-                        <Dropdown.Toggle variant="light" id="dropdown-profile" as="div">
+        <>
+            <div className="topbar">
+                {contextHolder}
+                
+                {/* Logo */}
+                <a href="/">
+                    <img id="Logo" src={logo} alt="Logo" />
+                </a>
+                
+                {/* Navbar ที่อยู่ใน topbar */}
+                <Navbar />
+                
+                {/* Profile dropdown */}
+                <div id='profile'>
+                    <Dropdown align="end" onSelect={handleDropdownSelect}>
+                        <Dropdown.Toggle variant="light" id="dropdown-profile" as="div" className="hindesometing">
                             {users?.profile ? (
-                            <Image
-                              src={users.profile}
-                              roundedCircle
-                              alt="profile"
-                              style={{ width: '45px', height: '45px' }}
-                            />
+                                <Image
+                                    src={users.profile}
+                                    roundedCircle
+                                    alt="profile"
+                                    style={{ width: '45px', height: '45px', objectFit: 'cover' }}
+                                />
                             ) : (
-                              <IoPersonCircleOutline size={45} color="#aaa" />
-                            )}
+                                <IoPersonCircleOutline size={45} color="#fff" />
+                            )} 
                         </Dropdown.Toggle>
-                    </div>
-                    <Dropdown.Menu>
-                        <Dropdown.Item href="/profile">โปรไฟล์ของฉัน</Dropdown.Item>
-                        <Dropdown.Item eventKey="writer">งานเขียน</Dropdown.Item> {/* เพิ่มงานเขียนกลับมา */}
-                        <Dropdown.Item href="/bookshelf">ชั้นหนังสือ</Dropdown.Item>
-                        <Dropdown.Item href="/Payment">เหรียญ & ประวัติธุรกรรม</Dropdown.Item>
-                        <Dropdown.Item href="/settings">ตั้งค่า</Dropdown.Item>
-                        <Dropdown.Item onClick={Logout}>ออกจากระบบ</Dropdown.Item>
-                    </Dropdown.Menu> 
-                </Dropdown>
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="/profile">โปรไฟล์ของฉัน</Dropdown.Item>
+                            <Dropdown.Item eventKey="writer">งานเขียน</Dropdown.Item>
+                            <Dropdown.Item href="/bookshelf">ชั้นหนังสือ</Dropdown.Item>
+                            <Dropdown.Item href="/Payment">เหรียญ & ประวัติธุรกรรม</Dropdown.Item>
+                            <Dropdown.Item href="/settings">ตั้งค่า</Dropdown.Item>
+                            <Dropdown.Item onClick={Logout}>ออกจากระบบ</Dropdown.Item>
+                        </Dropdown.Menu> 
+                    </Dropdown>
+                </div>
             </div>
 
-        
+            {/* Modal */}
             <Modal show={showModal} onHide={handleCloseModal} className="custom-modal">
                 <div className='modal-contentnew2 custom-modalnew'>
                     <div className='confirmation-message'>
                         <div onClick={handleCloseModal}>
                             <img className="cancle3" src="./src/assets/no.png" alt="cancel" />
                         </div>
-                        <div style={{ transform: 'translate(-50px, -40px)' ,width:'300%'}}>
-                        <img className="ready" src="./src/assets/error.png" alt="submit" />
-                        <span className='text2'><b>คุณต้องเป็นนักเขียนก่อน</b></span>
+                        <div style={{ transform: 'translate(-50px, -40px)', width: '300%' }}>
+                            <img className="ready" src="./src/assets/error.png" alt="submit" />
+                            <span className='text2'><b>คุณต้องเป็นนักเขียนก่อน</b></span>
                         </div>
                         <span className="text-1">
-                            <span id='ready2'style={{ transform: 'translate(-20px, 0)' }}>สมัครเข้าร่วมเป็นนักเขียน</span>
+                            <span id='ready2' style={{ transform: 'translate(-20px, 0)' }}>
+                                สมัครเข้าร่วมเป็นนักเขียน
+                            </span>
                         </span>
                         <div>
-                     
-                            <span id='buttonin'  onClick={handleWriterClick} style={{cursor:'pointer'}}>
+                            <span id='buttonin' onClick={handleWriterClick} style={{ cursor: 'pointer' }}>
                                 <span id='button3'>&nbsp;&nbsp;&nbsp;&nbsp;สมัคร</span>
                             </span>
                         </div>
                     </div>
                 </div>
             </Modal>
-        </div>
+        </>
     );
 };
 

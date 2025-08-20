@@ -18,13 +18,13 @@ import Calendar from './page/calendar/calendar';
 import MoodTracker from './page/Mood/MoodTracker';
 
 const router = createBrowserRouter([
-  { path: "/", element: <Home /> },
+  { path: "/home", element: <Home /> },
   { path: "/profile", element: <Profile /> },
   // { path: "/Writer", element: <Writer /> },
   // { path: "/Writer_edit", element: <Writer_edit /> },
   { path: "/editProfile", element: <EditProfile /> },
   { path: "/Income", element: <Income /> },
-  { path: "/login", element: <Login /> },
+  { path: "/", element: <Login /> },
   { path: "/register", element: <Register /> },
   { path: "/overview", element: <Overview />},
   { path: "/tips", element: <Tips />},

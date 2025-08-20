@@ -100,6 +100,27 @@ func SetupDatabase() {
    }
    db.FirstOrCreate(User2, &entity.User{Email: "webapp@gmail.com",})
 
+
+   UserEmail := &entity.User{
+        Username:       "UserRealEmail",
+        Password:       hashedPassword,
+        Email:          "usercpe21@gmail.com",
+        FirstName:      "Web",
+        LastName:       "App",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0866666666",
+        Picture:        "photo",
+        Height:         166,
+        Weight:         55,
+        Bust:           33,
+        Waist:          25,
+        Hip:            37,
+        RoleID:         1,
+        GenderID:       2,
+   }
+   db.FirstOrCreate(UserEmail, &entity.User{Email: "usercpe21@gmail.com",})
+
+
    Admin1 := &entity.User{
         Username:       "Admin1",
         Password:       hashedPassword,
@@ -123,13 +144,13 @@ func SetupDatabase() {
    
    initialCalendars := []entity.MoodData{
 		{
-            UserID: 1,
+            UserID:     1,
 			Title:      "Animal Feeding",
 			CalendarDate:  time.Date(2024, 12, 20, 8, 0, 0, 0, time.UTC),
 			AllDay:     true,
 		},
 		{
-            UserID: 1,
+            UserID:     1,
 			Title:      "Health Checkup",
 			CalendarDate:  time.Date(2024, 12, 22, 10, 0, 0, 0, time.UTC),
 			AllDay:     true,
@@ -182,7 +203,7 @@ func SetupDatabase() {
 		ModelSmartwatch:    "Galaxy Fit3 (EEDD)",
 		ModelNumber:        "SM-R390",
 		Brand:              "SAMSUNG",
-        UserID:             1,
+        UserID:             3,
 	}
 
     smartwatch2 := entity.SmartwatchDevice{
@@ -207,7 +228,7 @@ func SetupDatabase() {
 		CaloriesBurned: 250,
 		Spo2:           97.0,
         BodyTemp:       38.0,
-        UserID:         1,
+        UserID:         3,
 	}
 
     healthData2 := entity.HealthData{
@@ -307,7 +328,7 @@ func SetupDatabase() {
         AvgBodyTemp:    37.0,
         MinBodyTemp:    36.0, 
         MaxBodyTemp:    37.5, 
-        UserID:         1,	
+        UserID:         3,	
 	}
 
     healthSum2 := entity.HealthSummary{
@@ -337,7 +358,7 @@ func SetupDatabase() {
 		Timestamp:              time.Now().Add(-300 * time.Hour),
         Title:                  "Title 1",
 		Message:                "High blood pressure detected!",
-		UserID:                 1,
+		UserID:                 3,
 		HealthTypeID:           htWarning.ID,
 		NotificationStatusID:   statusArchived.ID,
         HealthSummaryID:        1,
@@ -361,7 +382,7 @@ func SetupDatabase() {
 		Timestamp:               time.Now().Add(-30 * time.Hour),
         Title:                  "Title 3",
 		Message:                "Detected a decreased heart rate.",
-		UserID:                 1,
+		UserID:                 3,
 		HealthTypeID:           htDanger.ID,
 		NotificationStatusID:   statusRead.ID,
         HealthSummaryID:        1,
@@ -385,7 +406,7 @@ func SetupDatabase() {
 		Timestamp:              time.Now().Add(-12 * time.Hour),
         Title:                  "Title 5",
 		Message:                "Detected a decreased heart rate.",
-		UserID:                 1,
+		UserID:                 3,
 		HealthTypeID:           htDanger.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthSummaryID:        1,

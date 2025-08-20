@@ -1,13 +1,38 @@
 package notification
 
 import (
+	"log"
 	"net/http"
 	"time"
+	"fmt"
 
 	"github.com/JanisataMJ/WebApp/config"
 	"github.com/JanisataMJ/WebApp/entity"
+	"github.com/JanisataMJ/WebApp/utils"
 	"github.com/gin-gonic/gin"
 )
+
+func SendNotificationEmail(notificationID uint) error {
+    var notif entity.Notification
+
+    // ดึง Notification พร้อม User
+    if err := config.DB().Preload("User").First(&notif, notificationID).Error; err != nil {
+        return err
+    }
+
+    if notif.User == nil {
+        return fmt.Errorf("user not found")
+    }
+
+    // ส่ง email
+    if err := utils.SendEmail(notif.User.Email, notif.Title, notif.Message); err != nil {
+        log.Println("Failed to send email:", err)
+        return err
+    }
+
+    log.Println("Email sent to:", notif.User.Email)
+    return nil
+}
 
 func CreateNotification(c *gin.Context) {
 	var input struct {

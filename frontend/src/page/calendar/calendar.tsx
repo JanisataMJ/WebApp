@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './calendar.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
-import CategoryNav from '../../compronents/Home_components/Navbar';
 
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date()); // Current date
@@ -51,8 +50,6 @@ const Calendar = () => {
   return (
     <div className="healthy-calendar">
       <Headers />
-      <CategoryNav />
-
       {/* Calendar */}
       <div className="calendar-container">
         <div className="calendar-wrapper">

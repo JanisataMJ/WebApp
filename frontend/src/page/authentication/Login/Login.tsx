@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { SignIn } from '../../../services/https/User/user';
 import { message } from 'antd'; // ใช้ message จาก Ant Design เพื่อแสดงผล
 import { SignInInterface } from '../../../interface/user_interface/IUser';
+import logo from '../../../assets/Logo.jpg';
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -34,7 +35,7 @@ const Login: React.FC = () => {
                 localStorage.setItem("id", res.data.id);
 
                 setTimeout(() => {
-                    navigate('/');
+                    navigate('/home');
                     setTimeout(() => {
                         window.location.reload(); // รีโหลดหน้าเว็บหลังจากที่นำทางเสร็จ
                     }, 500); // รอให้หน้าเว็บเปลี่ยนก่อน
@@ -51,9 +52,12 @@ const Login: React.FC = () => {
 
     <>
         {contextHolder}
-        <Headers />
-
+        {/*<Headers />*/}
+        
         <div className="signin-page-wrapper">
+            <div>
+                <img id="Logo" src={logo} alt="Logo" style={{ width: "120px", height: "120px"}}/>
+            </div>
             <h1 className="signin-title">Sign In</h1>
 
             <div className="signin-container">

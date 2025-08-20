@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './header.css';
 import { Dropdown, Image, Modal, Button } from 'react-bootstrap';
 import { IoPersonCircleOutline } from "react-icons/io5";
+import logo from '../../assets/Logo.jpg';
 
 const TOP2: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
@@ -17,27 +18,29 @@ const TOP2: React.FC = () => {
 
     return (
         <div className="topbar">
-            <a href='/'><img id="Logo" src="/src/assets/Logo.png" alt="Logo" /></a>
+            <a href='/home'><img id="Logo" src={logo} alt="Logo" /></a>
 
-            <div className="login">
-                <Button id='login' href="/login">เข้าสู่ระบบ</Button>
-            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "auto" }}>
+                <div className="login">
+                    <Button id='login' href="/">เข้าสู่ระบบ</Button>
+                </div>
 
-            <div id='profile'>
-                <Dropdown align="end">
-                    <Dropdown.Toggle variant="light" id="dropdown-profile" as="div">
-                        <IoPersonCircleOutline id='white' />
-                    </Dropdown.Toggle>
+                <div id='profile'>
+                    <Dropdown align="end"> 
+                        <Dropdown.Toggle variant="light" id="dropdown-profile" as="div" >
+                            <IoPersonCircleOutline size={45} color="#fff" />
+                        </Dropdown.Toggle>
 
-                    <Dropdown.Menu id='locks'>
-                        <Dropdown.Item id='locks' onClick={handleWriterClick}>โปรไฟล์ของฉัน</Dropdown.Item>
-                        <Dropdown.Item id='locks' onClick={handleWriterClick}>งานเขียน</Dropdown.Item>
-                        <Dropdown.Item onClick={handleWriterClick}>ชั้นหนังสือ</Dropdown.Item>
-                        <Dropdown.Item id='locks' href="/Payment">เหรียญ & ประวัติธุรกรรม</Dropdown.Item>
-                        <Dropdown.Item id='locks' href="/settings">ตั้งค่า</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-            </div>
+                        <Dropdown.Menu id='locks'>
+                            <Dropdown.Item id='locks' onClick={handleWriterClick}>โปรไฟล์ของฉัน</Dropdown.Item>
+                            <Dropdown.Item id='locks' onClick={handleWriterClick}>งานเขียน</Dropdown.Item>
+                            <Dropdown.Item onClick={handleWriterClick}>ชั้นหนังสือ</Dropdown.Item>
+                            <Dropdown.Item id='locks' href="/Payment">เหรียญ & ประวัติธุรกรรม</Dropdown.Item>
+                            <Dropdown.Item id='locks' href="/settings">ตั้งค่า</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+             </div>
 
             {/* Modal for login */}
             <Modal show={showModal} onHide={handleCloseModal} className="custom-modal">

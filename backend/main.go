@@ -8,19 +8,44 @@ import (
 	"github.com/JanisataMJ/WebApp/config"
 
 	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
-	"github.com/JanisataMJ/WebApp/controller/gender"
+    "github.com/JanisataMJ/WebApp/controller/gender"
+	"github.com/JanisataMJ/WebApp/controller/healthSummary"
+    "github.com/JanisataMJ/WebApp/controller/healthAnalysis"
+	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/notification"
+	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
+    "github.com/JanisataMJ/WebApp/services"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
 
 	"github.com/JanisataMJ/WebApp/middlewares"
+
+    "log"
+    "os"
+    "github.com/joho/godotenv"
 )
 
 
 const PORT = "8000"
 
+func init() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+}
+
 
 func main() {
+    emailUser := os.Getenv("EMAIL_USER")
+    emailPass := os.Getenv("EMAIL_PASS")
+    smtpHost := os.Getenv("SMTP_HOST")
+    smtpPort := os.Getenv("SMTP_PORT")
+
+    log.Println("Email User:", emailUser)
+    log.Println("Email Pass:", emailPass) // แค่ทดสอบ (จริง ๆ ไม่ควร log password)
+    log.Println("SMTP Host:", smtpHost, "Port:", smtpPort)
+
    // open connection database
    config.ConnectionDB()
 
@@ -53,6 +78,26 @@ func main() {
         //Notification Route
         router.POST("/create-notification/:id", notification.CreateNotification)
         router.GET("/notification/:id", notification.GetNotificationsByUserID)
+        router.POST("/send-notifications", func(c *gin.Context) {
+            go services.SendPendingNotifications()
+            c.JSON(200, gin.H{"message": "Notifications sending started"})
+        })
+
+        //healthSummary Route
+        router.GET("/list-healthSummary", healthSummary.ListHealthSummary)
+        router.GET("/healthSummary/:id", healthSummary.GetHealthSummary)
+
+        //healthAnalysis Route
+        router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
+        router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
+
+        //HealthData Route
+        router.GET("/list-healthData", healthData.ListHealthData)
+        router.GET("/healthData/:id", healthData.GetHealthData)
+
+        //SmartwatchDevice Route
+        router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
+        router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
 
    }
 

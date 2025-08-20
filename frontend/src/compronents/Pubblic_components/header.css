@@ -1,98 +1,267 @@
-
+/* header.css */
 .topbar {
     position: fixed;
-    height: 60px;
-    justify-content: flex-end;
+    height: 100px;
+    display: flex;
+    align-items: center;
     width: calc(100% - 10px);
-    z-index: 1000;
-    background: linear-gradient(to right,#934A5E,#C2B4D7,#57648E); 
+    z-index: 90;
+    background: linear-gradient(to right, #934A5E, #C2B4D7, #57648E); 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    top:0px;
+    top: 0px;
     left: 0;
-  }
-  #HLogo{
-    margin-left: 30px;
-    width: 60px;
-  }#Logo{
-    margin-left: 30px;
-    width: 50px;
-    height: 50px;
-    margin-top: -7px;
-    transform: translate(0,12px);
+    padding: 0 20px;
+} 
+
+/* Logo section - แนวซ้าย */
+.topbar > a {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+#Logo {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-  
-    
-  }
-  #profile {
-    width: 47px;
+    margin-left: 10px;
+    margin-right: 25px;
+    vertical-align: middle;
+}
+
+/* Navbar container - กลาง */
+.topbar .category {
+    flex: 1 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 60px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: static !important;
+}
+
+.topbar .main-nav {
+    display: flex !important;
+    align-items: center !important;
+    gap: 24px !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    height: 60px !important;
+    position: static !important;
+}
+
+.topbar .nav-home-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+.topbar .nav-link {
+    color: #ffffff;
+    font-weight: normal;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 8px; 
+    text-decoration: none;
+    font-size: 14px;
+    height: 40px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.topbar .nav-link span {
+    line-height: 1;
+}
+
+.topbar .nav-link:not(.active-sub) {
+    color: #ffffff;
+}
+
+.topbar .nav-link:hover {
+    color: #934A5E;
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+}
+
+.topbar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.topbar .sub-nav {
     position: absolute;
-    right: 60px; /* ระยะห่างจากขอบขวาของ .topbar */
-    top: 50%; /* วางกลางแนวตั้งของ .topbar */
-    transform: translateY(-50%); /* ใช้เพื่อจัดตำแหน่งให้ชัดกลาง */
-    cursor: pointer;
-    }
-    #cointop{
-      width: 27px;
-     
-    }
-    .cointop{
-      /* border: 1px solid #FFFFFF; */
-      height: 60px;
-      width: 80px;
-      display: flex;
-      align-items: center;
-      color: #ffffff;
-      
-    }#cointxt{margin:40px 20px 20px  10px;}
+    top: 100%;
+    left: 0;
+    background: #C2B4D7;
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    z-index: 2000;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
+    min-width: 180px;
+}
 
-    .wrapcoin{
-      position: absolute;
-      right: 150px; /* ระยะห่างจากขอบขวาของ .topbar */
-      top: 50%; /* วางกลางแนวตั้งของ .topbar */
-      transform: translateY(-50%); /* ใช้เพื่อจัดตำแหน่งให้ชัดกลาง */
-    }
-    .login{
-      position: absolute;
-      right: 100px; /* ระยะห่างจากขอบขวาของ .topbar */
-      top: 50%; /* วางกลางแนวตั้งของ .topbar */
-      transform: translateY(-50%); /* ใช้เพื่อจัดตำแหน่งให้ชัดกลาง */
-    }
+.topbar .nav-sub-link {
+    display: block;
+    color: #57648E;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.topbar .nav-sub-link:hover {
+    background-color: #f3f4f6;
+    color: #934A5E;
+    transform: scale(1.02);
+}
+
+.topbar .nav-sub-link.active-sub {
+    background-color: #E5E7EB;
+    color: #57648E;
+    font-weight: bold;
+}
+
+/* Profile section - แนวขวา */
+#profile {
+    width: 47px;
+    height: 47px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.hindesometing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 47px;
+    width: 47px;
+}
+
+.dropdown-toggle::after {
+    display: none !important; /* ซ่อน arrow ของ dropdown */
+}
+
 #dropdown-profile {
-      position: absolute;
-      right: -43px; /* ปรับค่าให้เหมาะสม */
-      top: 50%; /* ปรับค่าตามที่ต้องการ */
-      transform: translateY(-50%);
-  }
-.dropdown-menu {
-      width: 190px;
-      z-index: 2000;
-      position: absolute; /* ถ้าไม่ได้กำหนดไว้ */
-      
-     
-}
-.search {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#login{
-  border: 2px solid rgb(124, 122, 122);
-  
-    font-size: 12px;
+.dropdown-menu {
+    width: 190px;
+    z-index: 2000;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 5px;
+}
+
+/* Modal styles */
+.custom-modal .modal-contentnew2 {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+.confirmation-message {
+    position: relative;
+}
+
+.cancle3 {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-    background-color: #df052f;
+}
+
+.ready {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+}
+
+.text2 {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.text-1 {
+    display: block;
+    margin-bottom: 20px;
+}
+
+#buttonin {
+    background-color: #934A5E;
     color: white;
-    border-radius: 21px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
 }
-#login:hover{
-   background-color: #8d021e;
+
+#buttonin:hover {
+    background-color: #7a3a4b;
 }
-#locks{
-  cursor: block;
+
+/* Reset any default navbar styles */
+.navbar, .navbar-nav, .nav {
+    margin: 0 !important;
+    padding: 0 !important;
 }
-#white{
-  color: #ffffff;
-  font-size: 45px;
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 0 10px;
+    }
+    
+    .topbar .main-nav {
+        gap: 12px;
+    }
+    
+    .topbar .nav-link {
+        font-size: 12px;
+        padding: 6px 10px;
+        height: 36px;
+    }
+    
+    #Logo {
+        width: 80px;
+        height: 80px;
+    }
+    
+    #profile {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .hindesometing {
+        width: 40px;
+        height: 40px;
+    }
 }

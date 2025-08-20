@@ -1,0 +1,45 @@
+import axios from "axios";
+import { HealthAnalysisInterface } from "../../../interface/health_analysis_interface/health_analysis";
+
+const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
+const getRequestOptions = () => {
+  const Authorization = localStorage.getItem("token");
+  const Bearer = localStorage.getItem("token_type");
+  return {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${Bearer} ${Authorization}`,
+    },
+  };
+};
+
+
+
+export const getHealthAnalysis = async (): Promise<HealthAnalysisInterface[]> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get<HealthAnalysisInterface[]>(
+      `${apiUrl}/list-healthAnalysis`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching health analysis: " + (error as Error).message);
+  }
+};
+
+
+export const getHealthAnalysisByUserID = async (
+  userId: number
+): Promise<HealthAnalysisInterface[]> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get<HealthAnalysisInterface[]>(
+      `${apiUrl}/healthAnalysis/${userId}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching health analysis: " + (error as Error).message);
+  }
+};

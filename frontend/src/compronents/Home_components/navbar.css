@@ -1,3 +1,6 @@
+/*navbar.css*/
+
+/* Default styles for standalone navbar (when not in topbar) */
 .category {
   padding: 16px 32px;
 }
@@ -7,10 +10,11 @@
   display: flex;
   align-items: center;
   gap: 24px;
+  margin-top: 60px; /* กัน topbar ที่สูง 60px */
 }
 
 .nav-link {
-  color: #934A5E;
+  color: #934A5E; 
   font-weight: normal;
   transition: all 0.3s ease;
   display: inline-block;
@@ -47,7 +51,7 @@
   background: #C2B4D7;
   border: 1px solid #e5e7eb;
   padding: 8px;
-  z-index: 100;
+  z-index: 2000;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -76,4 +80,133 @@
   background-color: #E5E7EB;
   color: #57648E;
   font-weight: bold;
+}
+
+/* Override styles when navbar is inside topbar */
+.topbar .category {
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  position: static !important;
+}
+
+.topbar .main-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+  height: 60px;
+  position: static !important;
+}
+
+.topbar .nav-home-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 60px;
+}
+
+.topbar .nav-link {
+  color: #ffffff !important;
+  font-weight: normal;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 8px; 
+  text-decoration: none;
+  font-size: 20px;
+  height: 40px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.topbar .nav-link span {
+  line-height: 1;
+}
+
+.topbar .nav-link:not(.active-sub) {
+  color: #ffffff !important;
+}
+
+.topbar .nav-link:hover {
+  color: #934A5E !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  transform: scale(1.05);
+}
+
+.topbar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+.topbar .sub-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #C2B4D7;
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  z-index: 2000;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  min-width: 180px;
+}
+
+.topbar .nav-sub-link {
+  display: block;
+  color: #57648E;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.topbar .nav-sub-link:hover {
+  background-color: #f3f4f6;
+  color: #934A5E;
+  transform: scale(1.02);
+}
+
+.topbar .nav-sub-link.active-sub {
+  background-color: #E5E7EB;
+  color: #57648E;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .main-nav {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .nav-link {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Mobile styles for topbar navbar */
+  .topbar .main-nav {
+    gap: 12px;
+    flex-direction: row; /* Keep horizontal on mobile for topbar */
+    flex-wrap: wrap;
+  }
+  
+  .topbar .nav-link {
+    font-size: 16px;
+    padding: 6px 10px;
+    height: 36px;
+  }
 }

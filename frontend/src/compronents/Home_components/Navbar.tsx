@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
   const [showSubmenu, setShowSubmenu] = useState<boolean>(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const isInPage = location.pathname === '/';
+  const isInPage = location.pathname === '/home';
 
   useEffect(() => {
     if (!isInPage) return;
@@ -38,15 +38,15 @@ const Navbar: React.FC = () => {
   }, [isInPage]);
 
   const isActive = (target: string) => {
-    if (location.pathname !== '/' && target.startsWith('#')) return false;
+    if (location.pathname !== '/home' && target.startsWith('#')) return false;
     if (!target.startsWith('#')) return location.pathname === target;
     return activeLink === target;
   };
 
   const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (location.pathname !== '/') {
+    if (location.pathname !== '/home') {
       e.preventDefault();
-      navigate('/');
+      navigate('/home');
     }
   };
 
@@ -59,9 +59,9 @@ const Navbar: React.FC = () => {
           onMouseLeave={() => isInPage && setShowSubmenu(false)}
         >
           <a
-            href="/"
+            href="/home"
             onClick={handleHomeClick}
-            className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+            className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}
           >
             <span>HOME</span>
           </a>
@@ -70,7 +70,7 @@ const Navbar: React.FC = () => {
           <div className="sub-nav">
             {[
               { id: 'chart1', label: 'Temperature' },
-              { id: 'chart2', label: 'Heart Rate' },
+              { id: 'chart2', label: 'Heart Rate' }, 
               { id: 'chart3', label: 'Calorie' },
               { id: 'chart4', label: 'SPO2' },
               { id: 'chart5', label: 'Steps' },

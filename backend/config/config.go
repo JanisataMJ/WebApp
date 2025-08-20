@@ -1,6 +1,22 @@
 package config
 
-import "golang.org/x/crypto/bcrypt"
+import (
+   "golang.org/x/crypto/bcrypt"
+   "github.com/joho/godotenv"
+   "log"
+   "os"
+)
+
+func LoadEnv() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+}
+
+func GetEnv(key string) string {
+    return os.Getenv(key)
+}
 
 
 // hashPassword เป็น function สำหรับการแปลง password

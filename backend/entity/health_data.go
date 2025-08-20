@@ -8,7 +8,7 @@ import (
 type HealthData struct {
 	gorm.Model
 	Timestamp 		time.Time
-	Bpm 			float64
+	Bpm 			uint
 	Steps 			uint
 	SleepHours 		float64
 	CaloriesBurned 	float64
@@ -18,6 +18,5 @@ type HealthData struct {
 	UserID 			uint
 	User   			*User `gorm:"foreignKey: UserID"`
 
-	// Many-to-Many
-	AnalysisResults []AnalysisResult `gorm:"many2many:HealthDataAnalysis;"`
+	HealthAnalysis		[]HealthAnalysis 	`gorm:"foreignKey:HealthDataID"`
 }

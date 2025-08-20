@@ -29,7 +29,7 @@ const Register: React.FC = () => {
       if (res.status === 201) {
         messageApi.success('Sign up successful!');
         setTimeout(() => {
-          navigate('/login');
+          navigate('/');
         }, 1000);
       } else {
         messageApi.error(res.data.error || 'Error occurred during sign up');

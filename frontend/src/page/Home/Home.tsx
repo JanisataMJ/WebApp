@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Home.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
+//import Navbar from '../../compronents/Home_components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Slider from '../../compronents/Home_components/slideshow';
 import Calendar from '../../page/calendar/calendar';
@@ -11,8 +12,7 @@ import Graph3 from '../../compronents/Home_components/GroupGraph/calorie';
 import Graph4 from '../../compronents/Home_components/GroupGraph/spo2';
 import Graph5 from '../../compronents/Home_components/GroupGraph/steps';
 import Graph6 from '../../compronents/Home_components/GroupGraph/sleep';
-import Navbar from '../../compronents/Home_components/Navbar';
-import SLoader from '../../compronents/Book_components/simpleLoader';
+import SLoader from '../../compronents/Loading_components/simpleLoader';
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
     <>
       <Headers />
       <a id='cat1' className='hide'>1</a>
-      <Navbar />
+      {/*<Navbar />*/}
       <div className='l1'>
         <div className='l11'>
           <Slider />

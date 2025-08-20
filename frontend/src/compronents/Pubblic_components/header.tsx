@@ -99,7 +99,7 @@ const TOP: React.FC = () => {
                 {contextHolder}
                 
                 {/* Logo */}
-                <a href="/">
+                <a href="/home">
                     <img id="Logo" src={logo} alt="Logo" />
                 </a>
                 

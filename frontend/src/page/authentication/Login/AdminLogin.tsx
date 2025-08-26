@@ -8,18 +8,14 @@ import { message } from 'antd';
 import { SignInInterface } from '../../../interface/user_interface/IUser';
 import logo from '../../../assets/Logo.jpg';
 
-const Login: React.FC = () => {
+const AdminLogin: React.FC = () => {
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
-    const Signup = () => {
-        navigate('/register');
-    };
-
-    const goToAdminLogin = () => {
-        navigate('/admin/login'); // เส้นทางไปยังหน้าล็อคอินแอดมิน
+    const goToLogin = () => {
+        navigate('/'); // เส้นทางไปยังหน้าล็อคอินยูสเซอร์
     };
 
     const onSubmit = async (e: React.FormEvent) => {
@@ -61,7 +57,7 @@ const Login: React.FC = () => {
                 <div>
                     <img id="Logo" src={logo} alt="Logo" style={{ width: "120px", height: "120px" }} />
                 </div>
-                <h1 className="signin-title">Sign In</h1>
+                <h1 className="signin-title">Admin</h1>
 
                 <div className="signin-container">
                     <form onSubmit={onSubmit}>
@@ -75,13 +71,12 @@ const Login: React.FC = () => {
                         </div>
                         {/* ข้อความลิงก์ไปยังหน้าแอดมิน */}
                         <div className="admin-login-link">
-                            <span onClick={goToAdminLogin} style={{ cursor: "pointer", color: "#1677ff" , fontSize: "14px"}}>
-                                Are you an admin?
+                            <span onClick={goToLogin} style={{ cursor: "pointer", color: "#1677ff" , fontSize: "14px"}}>
+                                Are you an user?
                             </span>
                         </div>
 
                         <div className="signin-button-group">
-                            <button type="button" className="signup-btn" onClick={Signup} >Sign Up</button>
                             <button type="submit" className="login-btn" >Sign In</button>
                         </div>
                     </form>
@@ -91,4 +86,4 @@ const Login: React.FC = () => {
     );
 };
 
-export default Login;
+export default AdminLogin;

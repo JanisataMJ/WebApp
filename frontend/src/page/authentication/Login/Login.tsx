@@ -30,22 +30,29 @@ const Login: React.FC = () => {
         try {
             let res = await SignIn(values);
             if (res.status === 200) {
+
+                if (res.data.role_id !== 2) {   // 👈 ป้องกัน admin เข้ามา
+                    messageApi.error("You are not a user account");
+                    return;
+                }
+
                 messageApi.success("Sign-in successful");
 
                 localStorage.setItem("isLogin", "true");
-                localStorage.setItem("page", "dashboard");
                 localStorage.setItem("token_type", res.data.token_type);
                 localStorage.setItem("token", res.data.token);
                 localStorage.setItem("id", res.data.id);
+                localStorage.setItem("role_id", res.data.role_id);
 
                 setTimeout(() => {
                     navigate('/home');
                     setTimeout(() => {
-                        window.location.reload();
+                    window.location.reload();
                     }, 500);
                 }, 2000);
+
             } else {
-                messageApi.error(res.data.error);
+            messageApi.error(res.data.error);
             }
         } catch (error) {
             messageApi.error('Failed to sign in');

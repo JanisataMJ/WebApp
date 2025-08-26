@@ -76,7 +76,7 @@ func SetupDatabase() {
         Bust:           33,
         Waist:          25,
         Hip:            37,
-        RoleID:         1,
+        RoleID:         2,
         GenderID:       1,
    }
    db.FirstOrCreate(User1, &entity.User{Email: "sa@gmail.com"})
@@ -96,7 +96,7 @@ func SetupDatabase() {
         Bust:           33,
         Waist:          25,
         Hip:            37,
-        RoleID:         1,
+        RoleID:         2,
         GenderID:       2,
    }
    db.FirstOrCreate(User2, &entity.User{Email: "webapp@gmail.com",})
@@ -117,7 +117,7 @@ func SetupDatabase() {
         Bust:           33,
         Waist:          25,
         Hip:            37,
-        RoleID:         1,
+        RoleID:         2,
         GenderID:       2,
    }
    db.FirstOrCreate(UserEmail, &entity.User{Email: "usercpe21@gmail.com",})

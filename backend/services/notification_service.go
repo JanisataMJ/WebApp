@@ -193,7 +193,7 @@ func CheckAndNotifyAbnormalAnalysis(analysis *entity.HealthAnalysis) {
 
         notif := entity.Notification{
             UserID:             user.ID,
-            HealthAnalysisID:   analysis.ID,
+            HealthAnalysisID:   &analysis.ID,
             Title:              "Health Alert",
             Message:            htmlBody,
             Timestamp:          time.Now(),

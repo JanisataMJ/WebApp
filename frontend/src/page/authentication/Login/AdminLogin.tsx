@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Flex } from 'antd';
 import '../Login/Login.css';
-import Headers from '../../../compronents/Pubblic_components/headerselect';
 import { useNavigate } from 'react-router-dom';
 import { SignIn } from '../../../services/https/User/user';
 import { message } from 'antd';
@@ -26,22 +25,28 @@ const AdminLogin: React.FC = () => {
         try {
             let res = await SignIn(values);
             if (res.status === 200) {
-                messageApi.success("Sign-in successful");
+            if (res.data.role_id !== 1) {   // 👈 ป้องกัน user เข้ามา
+                messageApi.error("You are not an admin account");
+                return;
+            }
 
-                localStorage.setItem("isLogin", "true");
-                localStorage.setItem("page", "dashboard");
-                localStorage.setItem("token_type", res.data.token_type);
-                localStorage.setItem("token", res.data.token);
-                localStorage.setItem("id", res.data.id);
+            messageApi.success("Sign-in successful");
 
+            localStorage.setItem("isLogin", "true");
+            localStorage.setItem("token_type", res.data.token_type);
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("id", res.data.id);
+            localStorage.setItem("role_id", res.data.role_id);
+
+            setTimeout(() => {
+                navigate('/admin/home');
                 setTimeout(() => {
-                    navigate('/home');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
-                }, 2000);
+                window.location.reload();
+                }, 500);
+            }, 2000);
+
             } else {
-                messageApi.error(res.data.error);
+            messageApi.error(res.data.error);
             }
         } catch (error) {
             messageApi.error('Failed to sign in');

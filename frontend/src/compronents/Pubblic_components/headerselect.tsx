@@ -1,43 +1,27 @@
-/*import React, { useEffect, useState } from 'react';
+import React from 'react';
 import TOP from './header';
-import TOP2 from './headerBefore';
-
+import HeaderAdmin from './headerAdmin';
 import { useAuth } from './AuthContextType';
+
 const Headers: React.FC = () => {
     const { isLoggedIn } = useAuth();
-
 
     if (isLoggedIn === null) {
         return null; 
     }
 
-    return (
-        <div>
-            {isLoggedIn ? <TOP /> : <TOP2 />} 
-        </div>
-    );
-};
+    const role = localStorage.getItem("role_id");
 
-export default Headers;*/
-
-import React from 'react';
-import TOP from './header';
-import { useAuth } from './AuthContextType';
-
-const Headers: React.FC = () => {
-    const { isLoggedIn } = useAuth();
-
-    if (isLoggedIn === null) {
-        return null; 
+     if (!isLoggedIn) {
+        return null; // ยังไม่ login
     }
 
     // ตอนนี้เราจะแสดง TOP เสมอถ้า isLoggedIn เป็น true
     return (
         <div>
-            {isLoggedIn && <TOP />}
+            {role === "1" ? <HeaderAdmin /> : <TOP />}
         </div>
     );
 };
 
 export default Headers;
-

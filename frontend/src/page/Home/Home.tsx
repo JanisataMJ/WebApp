@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './Home.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
-//import Navbar from '../../compronents/Home_components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Slider from '../../compronents/Home_components/slideshow';
-import Calendar from '../../page/calendar/calendar';
 import Notification from '../../compronents/Home_components/Notifiation/notice';
 import Graph1 from '../../compronents/Home_components/GroupGraph/temp';
 import Graph2 from '../../compronents/Home_components/GroupGraph/heartrate';

@@ -17,6 +17,7 @@ import Overview from './page/Overview/Overview';
 import Tips from './page/Tips/Tips';
 import Calendar from './page/calendar/calendar';
 import MoodTracker from './page/Mood/MoodTracker';
+import AdminHome from './page/Admin/AdminHome';
 
 const router = createBrowserRouter([
   { path: "/home", element: <Home /> },
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
   { path: "/calendar", element: <Calendar />},
   { path: "/moodtracker", element: <MoodTracker />},
   { path: "/admin/login", element: <AdminLogin /> },
+  { path: "/admin/home", element: <AdminHome /> },
 ]);
 
 

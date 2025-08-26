@@ -1,23 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import './slideshow.css';
-import { 
-  Activity, Heart, Droplets, Thermometer, 
-  Moon, TrendingUp 
-} from 'lucide-react';
+import { Activity, Heart, Droplets, Thermometer, Moon, TrendingUp } from 'lucide-react';
 
-type HealthData = {
-  ID: number;
-  Timestamp: string;
-  Bpm: number;
-  Steps: number;
-  SleepHours: number;
-  CaloriesBurned: number;
-  Spo2: number;
-  BodyTemp: number;
-};
+import { HealthDataInterface } from '../../interface/health_data_interface/health_data';
+import { getHealthDataByUserID } from '../../services/https/DataHealth/healthData';
 
 type HealthItem = {
   icon: React.ComponentType<any>;
@@ -30,37 +18,22 @@ type HealthItem = {
 
 const Slider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [healthDataList, setHealthDataList] = useState<HealthData[]>([]);
   const [healthItems, setHealthItems] = useState<HealthItem[]>([]);
+  const UserID = Number(localStorage.getItem("id"));
 
-  // โหลดข้อมูลจาก API Go
-  useEffect(() => {
-    axios.get<HealthData[]>("http://localhost:8080/health-data")
-      .then(res => {
-        setHealthDataList(res.data);
-        if (res.data.length > 0) {
-          setHealthItems(mapHealthData(res.data[0]));
-        }
-      })
-      .catch(err => console.error("Error fetching health data:", err));
-  }, []);
+  // ฟังก์ชันหาค่า Interpretation / Suggestion จาก HealthAnalysis
+  const findAnalysis = (data: HealthDataInterface, category: string) => {
+    return data.HealthAnalysis?.find(a => a.Category === category);
+  };
 
-  // Auto slide
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % healthItems.length);
-    }, 4000);
 
-    return () => clearInterval(interval);
-  }, [healthItems]);
-
-  // ฟังก์ชัน map ข้อมูลจาก Go → HealthItem[]
-  const mapHealthData = (data: HealthData): HealthItem[] => [
+  // ฟังก์ชัน map ข้อมูลจาก API → UI
+  const mapHealthData = (data: HealthDataInterface): HealthItem[] => [
     {
       icon: Heart,
       label: "Heart Rate",
       value: data.Bpm.toString(),
-      sub: "Normal Range",
+      sub: findAnalysis(data, "Heart Rate")?.Interpretation || "No Data",
       color: "#ef4444",
       bgGradient: "linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)"
     },
@@ -68,7 +41,7 @@ const Slider: React.FC = () => {
       icon: Activity,
       label: "Calorie",
       value: data.CaloriesBurned.toFixed(0),
-      sub: "kcal burned",
+      sub: findAnalysis(data, "Calorie")?.Suggestion || "No Data",
       color: "#f59e0b",
       bgGradient: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)"
     },
@@ -76,7 +49,7 @@ const Slider: React.FC = () => {
       icon: Droplets,
       label: "SPO2",
       value: `${data.Spo2}%`,
-      sub: "Excellent",
+      sub: findAnalysis(data, "SPO2")?.Interpretation || "No Data",
       color: "#3b82f6",
       bgGradient: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)"
     },
@@ -84,7 +57,7 @@ const Slider: React.FC = () => {
       icon: Moon,
       label: "Sleep",
       value: `${Math.floor(data.SleepHours)}h ${Math.round((data.SleepHours % 1) * 60)}m`,
-      sub: "Quality: 85%",
+      sub: findAnalysis(data, "Sleep")?.Suggestion || "No Data",
       color: "#6366f1",
       bgGradient: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)"
     },
@@ -92,7 +65,7 @@ const Slider: React.FC = () => {
       icon: TrendingUp,
       label: "Steps",
       value: data.Steps.toString(),
-      sub: "Goal: 10,000",
+      sub: findAnalysis(data, "Steps")?.Interpretation || "No Data",
       color: "#10b981",
       bgGradient: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"
     },
@@ -100,14 +73,47 @@ const Slider: React.FC = () => {
       icon: Thermometer,
       label: "Body Temp",
       value: `${data.BodyTemp.toFixed(1)}°C`,
-      sub: "Normal",
+      sub: findAnalysis(data, "Body Temp")?.Interpretation || "No Data",
       color: "#f97316",
       bgGradient: "linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)"
     }
   ];
 
+  // โหลดข้อมูล health data
+  useEffect(() => {
+    const fetchHealthdatas = async () => {
+      try {
+        const res = await getHealthDataByUserID(UserID);
+
+        // เรียงข้อมูลตาม Timestamp
+        const sorted = res.sort(
+          (a: HealthDataInterface, b: HealthDataInterface) =>
+            new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
+        );
+
+        if (sorted.length > 0) {
+          // ใช้ record ล่าสุดมา map → healthItems
+          setHealthItems(mapHealthData(sorted[0]));
+        }
+      } catch (error) {
+        console.error('Failed to fetch health data:', error);
+      }
+    };
+
+    fetchHealthdatas();
+  }, [UserID]);
+
+  // Auto slide
+  useEffect(() => {
+    if (healthItems.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % healthItems.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [healthItems]);
+
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? healthItems.length - 1 : prevIndex - 1
     );
   };

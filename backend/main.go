@@ -93,12 +93,11 @@ func main() {
 
         //HealthData Route
         router.GET("/list-healthData", healthData.ListHealthData)
-        router.GET("/healthData/:id", healthData.GetHealthData)
+        router.GET("/healthData/:id", healthData.GetHealthDataByUserID)
 
         //SmartwatchDevice Route
         router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
         router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
-
    }
 
    r.GET("/genders", genders.GetAll)

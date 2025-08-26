@@ -42,8 +42,8 @@ func CreateNotification(c *gin.Context) {
 		UserID               uint      `json:"user_id"`
 		HealthTypeID         uint      `json:"health_type_id"`
 		NotificationStatusID uint      `json:"notification_status_id"`
-		HealthSummaryID      uint      `json:"health_summary_id"`
-		HealthAnalysisID     uint      `json:"health_analysis_id"`
+		HealthSummaryID      *uint      `json:"health_summary_id"`
+		HealthAnalysisID     *uint      `json:"health_analysis_id"`
 		TrendsID             uint      `json:"trends_id"`
 	}
 

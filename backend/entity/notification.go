@@ -20,10 +20,10 @@ type Notification struct {
 	NotificationStatusID 	uint
 	NotificationStatus   	*NotificationStatus `gorm:"foreignKey: NotificationStatusID"`
 
-	HealthSummaryID 		uint
+	HealthSummaryID 		*uint
 	HealthSummary   		*HealthSummary `gorm:"foreignKey: HealthSummaryID"`
 
-	HealthAnalysisID 		uint
+	HealthAnalysisID 		*uint
 	HealthAnalysis   		*HealthAnalysis `gorm:"foreignKey: HealthAnalysisID"`
 
 	TrendsID 				uint

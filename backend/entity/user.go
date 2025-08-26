@@ -21,11 +21,11 @@ type User struct {
 	Waist       float64   `json:"waist"`
 	Hip         float64   `json:"hip"`
 
-	RoleID uint  `json:"RoleID"`
-	Role   *Role `gorm:"foreignKey:RoleID"`
+	RoleID 		uint  	`json:"RoleID"`
+	Role   		*Role 	`gorm:"foreignKey:RoleID"`
 
-	GenderID uint    `json:"genderID"`
-	Gender   *Gender `gorm:"foreignKey:GenderID"`
+	GenderID 	uint    `json:"genderID"`
+	Gender   	*Gender `gorm:"foreignKey:GenderID"`
 
 	HealthSummary		[]HealthSummary 	`gorm:"foreignKey:UserID"`
 	HealthData 			[]HealthData 		`gorm:"foreignKey:UserID"`

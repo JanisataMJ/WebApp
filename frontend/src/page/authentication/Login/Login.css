@@ -100,3 +100,7 @@
     color: rgb(255, 255, 255);
 
 }
+.admin-login-link {
+    margin-top: -15px;
+    text-align: left;
+}

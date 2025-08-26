@@ -9,7 +9,7 @@ import (
 	"github.com/JanisataMJ/WebApp/entity"
 )
 
-// GET /health-analysis
+// GET /list-healthAnalysis
 func ListHealthAnalysis(c *gin.Context) {
 	var analysis []entity.HealthAnalysis
 
@@ -26,7 +26,7 @@ func ListHealthAnalysis(c *gin.Context) {
 	c.JSON(http.StatusOK, analysis)
 }
 
-// GET /health-analysis/:id
+// GET /healthAnalysis/:id
 func GetHealthAnalysis(c *gin.Context) {
 	id := c.Param("id")
 

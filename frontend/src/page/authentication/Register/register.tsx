@@ -2,9 +2,9 @@ import React from 'react';
 import '../Register/register.css';
 import { Form, Input, Button, Radio, DatePicker, Row, Col, Card, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import Headers from '../../../compronents/Pubblic_components/headerselect';
 import { CreateUser } from '../../../services/https/User/user';
 import moment from 'moment';
+import logo from '../../../assets/Logo.jpg';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -43,9 +43,11 @@ const Register: React.FC = () => {
   return (
     <>
       {contextHolder}
-      <Headers />
 
       <div className="signup-page-wrapper">
+        <a href="/">
+          <img id="Logo" src={logo} alt="Logo"/>
+        </a>
         <h1 className="signup-title">Sign Up</h1>
         <div className="signup-container">
           <Card className="signup-card-register" style={{ width: '100%', maxWidth: 600 }}>

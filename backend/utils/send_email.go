@@ -1,8 +1,6 @@
 package utils
 
 import (
-    //"fmt"
-    //"net/smtp"
     "os"
     "database/sql"
     _ "github.com/mattn/go-sqlite3"
@@ -13,7 +11,6 @@ type User struct {
     Email string
     Alert string
 }
-
 
 /*func SendEmail(to, subject, body string) error {
     emailUser := os.Getenv("EMAIL_USER")
@@ -37,7 +34,7 @@ func SendEmail(to, subject, body string) error {
 
     d := gomail.NewDialer(
         os.Getenv("SMTP_HOST"),
-        587, // ปกติใช้ 587 สำหรับ TLS
+        587,
         os.Getenv("EMAIL_USER"),
         os.Getenv("EMAIL_PASS"),
     )

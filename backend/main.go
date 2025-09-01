@@ -59,10 +59,13 @@ func main() {
    // Auth Route
    r.POST("/signup", users.SignUp)
    r.POST("/signin", users.SignIn)
+   r.POST("/create-admin", users.CreateAdmin)
 
    router := r.Group("/")
    {
        router.Use(middlewares.Authorizes())
+
+       r.Static("/uploads", "./uploads")
 
        // User Route
        router.PUT("/user/:id", users.Update)

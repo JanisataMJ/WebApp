@@ -1,8 +1,27 @@
 import axios from "axios";
 import { UsersInterface ,SignInInterface,InterfaceStatusWriter,InterfaceIncome} from "../../../interface/user_interface/IUser";
 
-
 const apiUrl = "http://localhost:8000";
+
+/*const postRequestOptions = (body: any) => {
+  const Authorization = localStorage.getItem("token");
+  const Bearer = localStorage.getItem("token_type");
+
+  let headers: Record<string, string> = {
+    Authorization: `${Bearer} ${Authorization}`,
+  };
+
+  if (!(body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return {
+    method: "POST",
+    headers: headers, 
+    body: body instanceof FormData ? body : JSON.stringify(body), 
+  };
+};*/
+
 const Authorization = localStorage.getItem("token");
 const Bearer = localStorage.getItem("token_type");
 
@@ -29,6 +48,15 @@ async function CreateUser(data: UsersInterface) {
     .catch((e) => e.response);
 }
 
+
+export async function CreateAdmin(formData: FormData) {
+  return await axios
+    .post(`${apiUrl}/create-admin`, formData)
+    .then(res => res)
+    .catch(e => e.response);
+}
+
+
 async function GetUsers() {
   return await axios
     .get(`${apiUrl}/users`, requestOptions)
@@ -43,12 +71,20 @@ async function GetUsersById(id: string) {
     .catch((e) => e.response);
 }
 
-async function UpdateUsersById(id: string, data: UsersInterface) {
-  return await axios
-    .put(`${apiUrl}/user/${id}`, data, requestOptions)
-    .then((res) => res)
-    .catch((e) => e.response);
+export async function UpdateUsersById(id: string, formData: FormData) {
+  try {
+    const response = await axios.put(`${apiUrl}/user/${id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response;
+  } catch (error: any) {
+    return error.response;
+  }
 }
+
 
 async function UpdateStatusWriterById(id: string, data: InterfaceStatusWriter) {
   return await axios
@@ -156,7 +192,6 @@ export {
   CreateUser,
   GetUsers,
   GetUsersById,
-  UpdateUsersById,
   DeleteUsersById,
   UpdateStatusWriterById,
   UpdateIncomeById,

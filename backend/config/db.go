@@ -63,14 +63,14 @@ func SetupDatabase() {
    BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 
    User1 := &entity.User{
-        Username:       "User1",
+        Username:       "James",
         Password:       hashedPassword,
-        Email:          "sa@gmail.com",
-        FirstName:      "Software",
-        LastName:       "Analysis",
+        Email:          "user1@gmail.com",
+        FirstName:      "James",
+        LastName:       "Smith",
         Birthdate:      BirthDay,
         Phonenumber:    "0866666666",
-        Picture:        "photo",
+        Profile:        "uploads/Profiles/profile1.jpeg",
         Height:         166,
         Weight:         55,
         Bust:           33,
@@ -79,18 +79,18 @@ func SetupDatabase() {
         RoleID:         2,
         GenderID:       1,
    }
-   db.FirstOrCreate(User1, &entity.User{Email: "sa@gmail.com"})
+   db.FirstOrCreate(User1, &entity.User{Email: "user1@gmail.com"})
 
    // user id = 2
    User2 := &entity.User{
-        Username:       "User2",
+        Username:       "Emily",
         Password:       hashedPassword,
-        Email:          "webapp@gmail.com",
-        FirstName:      "Web",
-        LastName:       "App",
+        Email:          "user2@gmail.com",
+        FirstName:      "Emily",
+        LastName:       "Davis",
         Birthdate:      BirthDay,
-        Phonenumber:    "0866666666",
-        Picture:        "photo",
+        Phonenumber:    "0861234567",
+        Profile:        "uploads/Profiles/profile2.jpeg",
         Height:         166,
         Weight:         55,
         Bust:           33,
@@ -99,26 +99,26 @@ func SetupDatabase() {
         RoleID:         2,
         GenderID:       2,
    }
-   db.FirstOrCreate(User2, &entity.User{Email: "webapp@gmail.com",})
+   db.FirstOrCreate(User2, &entity.User{Email: "user2@gmail.com",})
 
 
    // user id = 3
    UserEmail := &entity.User{
-        Username:       "UserRealEmail",
+        Username:       "William",
         Password:       hashedPassword,
         Email:          "usercpe21@gmail.com",
-        FirstName:      "Web",
-        LastName:       "App",
+        FirstName:      "William",
+        LastName:       "Brown",
         Birthdate:      BirthDay,
-        Phonenumber:    "0866666666",
-        Picture:        "photo",
+        Phonenumber:    "0925552121",
+        Profile:        "uploads/Profiles/profile3.jpeg",
         Height:         166,
         Weight:         55,
         Bust:           33,
         Waist:          25,
         Hip:            37,
         RoleID:         2,
-        GenderID:       2,
+        GenderID:       1,
    }
    db.FirstOrCreate(UserEmail, &entity.User{Email: "usercpe21@gmail.com",})
 
@@ -127,20 +127,29 @@ func SetupDatabase() {
         Username:       "Admin1",
         Password:       hashedPassword,
         Email:          "admin1@gmail.com",
-        FirstName:      "Admin",
-        LastName:       "Admin",
+        FirstName:      "Olivia",
+        LastName:       "Wilson",
         Birthdate:      BirthDay,
-        Phonenumber:    "0899999999",
-        Picture:        "photo",
-        Height:         166,
-        Weight:         55,
-        Bust:           33,
-        Waist:          25,
-        Hip:            37,
+        Phonenumber:    "0871914646",
+        Profile:        "uploads/Profiles/profile4.jpeg",
         RoleID:         1,
         GenderID:       2,
    }
    db.FirstOrCreate(Admin1, &entity.User{Email: "admin1@gmail.com",})
+
+   Admin2 := &entity.User{
+        Username:       "Admin2",
+        Password:       hashedPassword,
+        Email:          "admin2@gmail.com",
+        FirstName:      "Michael",
+        LastName:       "Johnson",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0642339911",
+        Profile:        "uploads/Profiles/profile5.jpeg",
+        RoleID:         1,
+        GenderID:       1,
+   }
+   db.FirstOrCreate(Admin2, &entity.User{Email: "admin2@gmail.com",})
 
 
    

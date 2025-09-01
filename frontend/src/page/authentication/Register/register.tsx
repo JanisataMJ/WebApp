@@ -13,13 +13,13 @@ const Register: React.FC = () => {
   const onFinish = async (values: any) => {
     // Map form values to backend payload
     const formattedValues = {
-      username: values.user_name,
-      password: values.password,
-      email: values.email,
-      firstName: values.first_name,
-      lastName: values.last_name,
-      birthdate: values.birth_date ? values.birth_date.toISOString() : undefined,
-      genderID: values.gender, // 1, 2, 3
+      Username: values.user_name,
+      Password: values.password,
+      Email: values.email,
+      FirstName: values.first_name,
+      LastName: values.last_name,
+      Birthdate: values.birth_date ? values.birth_date.toISOString() : undefined,
+      GenderID: values.gender, // 1, 2, 3
     };
 
     console.log('Data to send to API:', formattedValues);

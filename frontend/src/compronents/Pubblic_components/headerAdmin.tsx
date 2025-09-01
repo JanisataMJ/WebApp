@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';   
 import './header.css';
 import { Dropdown, Image, Modal } from 'react-bootstrap';
-import { message, theme } from 'antd';  
+import { message, theme, Avatar } from 'antd';  
 import logo from '../../assets/Logo.jpg';
 import { GetUsersById, UpdateStatusWriterById } from '../../services/https/User/user';
 import { UsersInterface } from '../../interface/profile_interface/IProfile';
 import { IoPersonCircleOutline } from "react-icons/io5";
-import Navbar from '../../compronents/Home_components/Navbar';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { UserOutlined } from '@ant-design/icons';
 
 const HeaderAdmin: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
@@ -93,6 +94,22 @@ const HeaderAdmin: React.FC = () => {
         setShowModal(false);
     };
 
+    const [activeLink, setActiveLink] = useState<string>();
+
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveLink(`#${entry.target.id}`);
+        }
+      });
+    };
+
+    const isActive = (target: string) => {
+    if (location.pathname !== '/home' && target.startsWith('#')) return false;
+    if (!target.startsWith('#')) return location.pathname === target;
+    return activeLink === target;
+  };
+
     return (
         <>
             <div className="topbar">
@@ -102,21 +119,33 @@ const HeaderAdmin: React.FC = () => {
                 <a href="/admin/home">
                     <img id="Logo" src={logo} alt="Logo" />
                 </a>
+
+                <Link
+                    to="/admin/home" className={`header-link ${isActive('/admin/home') ? 'active' : ''}`}>
+                        <span>HOME</span>
+                </Link>
+                <Link
+                    to="/admin/article" className={`header-link ${isActive('/admin/article') ? 'active' : ''}`}>
+                        <span>ARTICLE</span>
+                </Link>
+                <Link
+                    to="/admin/manageAdmin" className={`header-link ${isActive('/admin/manageAdmin') ? 'active' : ''}`}>
+                        <span>ADMIN</span>
+                </Link>
                 
                 {/* Profile dropdown */}
                 <div id='profile'>
                     <Dropdown align="end" onSelect={handleDropdownSelect}>
                         <Dropdown.Toggle variant="light" id="dropdown-profile" as="div" className="hindesometing">
-                            {users?.profile ? (
-                                <Image
-                                    src={users.profile}
-                                    roundedCircle
-                                    alt="profile"
-                                    style={{ width: '45px', height: '45px', objectFit: 'cover' }}
-                                />
-                            ) : (
-                                <IoPersonCircleOutline size={45} color="#fff" />
-                            )} 
+                            <Avatar
+                                size={50}
+                                style={{
+                                    border: "3px solid #ffffffff",   // ขอบหนา 3px สีฟ้า
+                                    boxShadow: "0 0 8px rgba(0,0,0,0.2)" // เพิ่มเงาเล็กน้อยให้ดูเด่น
+                                }}
+                                src={users?.profile ? `http://localhost:8000/${users.profile}` : undefined}
+                                icon={!users?.profile && <UserOutlined />}
+                            />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Item href="/profile">โปรไฟล์ของฉัน</Dropdown.Item>

@@ -1,0 +1,429 @@
+/*.health-dashboard-manageadmin {
+  min-height: 100vh;
+  width: 1000px;
+  background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
+  padding: 20px;
+  margin-top: 130px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  
+}
+
+
+.ant-table-thead > tr > th {
+    color: #895E3C !important; 
+    background-color: #ebd5c1 !important;
+    font-weight: bold; 
+}
+
+
+
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  border-bottom: 0.25px solid #cb9763 !important; 
+}
+
+
+.ant-table-thead > tr > th {
+  border-bottom: 0.5px solid #cb9763 !important; 
+}*/
+
+
+/* Main Container */
+.health-dashboard-manageadmin {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1400px;
+  background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
+  padding: 30px;
+  margin-top: 130px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Section */
+.header-row-manageadmin {
+  margin-bottom: 0;
+  align-items: center;
+}
+
+.title-section-manageadmin {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.page-title-manageadmin {
+  font-size: 32px;
+  font-weight: bold;
+  color: #B25900;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-count-badge-manageadmin {
+  background-color: #FED400;
+  color: #000;
+  font-weight: bold;
+  font-size: 20px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #B25900;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-button-section-manageadmin {
+  text-align: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.add-admin-btn-manageadmin {
+  background: linear-gradient(135deg, #FED400 0%, #f5c700 100%) !important;
+  border: 2px solid #B25900 !important;
+  color: #000000 !important;
+  border-radius: 25px !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  height: 45px !important;
+  padding: 0 25px !important;
+  box-shadow: 0 4px 15px rgba(254, 212, 0, 0.4) !important;
+  transition: all 0.3s ease !important;
+}
+
+.add-admin-btn-manageadmin:hover {
+  background: linear-gradient(135deg, #f5c700 0%, #e6b800 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(254, 212, 0, 0.6) !important;
+}
+
+.add-admin-btn-manageadmin:active {
+  transform: translateY(0) !important;
+}
+
+/* Divider */
+.section-divider-manageadmin {
+  border-top: 2px solid #cb9763;
+  margin: 20px 0;
+}
+
+/* Filters Section */
+.filters-section-manageadmin {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.filters-row-manageadmin {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-controls-manageadmin {
+  display: flex;
+  gap: 16px;
+}
+
+/* Table Container */
+.table-container-manageadmin {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Table Styling */
+.admin-table-manageadmin .ant-table-thead > tr > th {
+  color: #895E3C !important;
+  background-color: #ebd5c1 !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  padding: 16px 12px !important;
+  border-bottom: 2px solid #cb9763 !important;
+}
+
+.table-header-manageadmin {
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  color: #895E3C !important;
+}
+
+.admin-table-manageadmin .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #cb9763 !important;
+  padding: 12px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.admin-table-manageadmin .ant-table-tbody > tr:hover > td {
+  background-color: #fef7ed !important;
+}
+
+/* Profile Image */
+.profile-image-container-manageadmin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-image-manageadmin {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ebd5c1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Action Buttons */
+.action-buttons-manageadmin {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.edit-btn-manageadmin {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.edit-btn-manageadmin:hover {
+  background-color: #40a9ff !important;
+  border-color: #40a9ff !important;
+  transform: translateY(-1px) !important;
+}
+
+.delete-btn-manageadmin {
+  background-color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.delete-btn-manageadmin:hover {
+  background-color: #ff7875 !important;
+  border-color: #ff7875 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Pagination */
+.custom-pagination-manageadmin {
+  margin-top: 20px !important;
+  text-align: center !important;
+}
+
+.custom-pagination-manageadmin .ant-pagination-item-active {
+  background-color: #FED400 !important;
+  border-color: #B25900 !important;
+  color: #000 !important;
+}
+
+.custom-pagination-manageadmin .ant-pagination-item-active a {
+  color: #000 !important;
+}
+
+.custom-pagination-manageadmin .ant-pagination-item:hover {
+  border-color: #FED400 !important;
+}
+
+.custom-pagination-manageadmin .ant-pagination-item:hover a {
+  color: #B25900 !important;
+}
+
+/* Delete Modal */
+.delete-modal-manageadmin .ant-modal-header {
+  background: linear-gradient(135deg, #ff4d4f, #ff7875);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.delete-modal-title-manageadmin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+}
+
+.delete-icon-manageadmin {
+  font-size: 18px;
+  color: white;
+}
+
+.delete-modal-manageadmin .ant-modal-close {
+  color: white;
+}
+
+.delete-modal-manageadmin .ant-modal-close:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.delete-modal-text-manageadmin {
+  color: #000000;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.delete-modal-manageadmin .ant-btn-primary {
+  background-color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  border-radius: 25px !important;
+  font-weight: 600 !important;
+}
+
+.delete-modal-manageadmin .ant-btn-primary:hover {
+  background-color: #ff7875 !important;
+  border-color: #ff7875 !important;
+}
+
+.delete-modal-manageadmin .ant-btn-default {
+  border-color: #d9d9d9 !important;
+  border-radius: 25px !important;
+  font-weight: 600 !important;
+}
+
+.delete-modal-manageadmin .ant-btn-default:hover {
+  border-color: #40a9ff !important;
+  color: #40a9ff !important;
+}
+
+/* Table Responsive */
+.admin-table-manageadmin .ant-table-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table-manageadmin .ant-table-content {
+  border-radius: 8px;
+}
+
+/* Scrollbar Styling */
+.table-container-manageadmin .ant-table-body::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-container-manageadmin .ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-container-manageadmin .ant-table-body::-webkit-scrollbar-thumb {
+  background: #cb9763;
+  border-radius: 3px;
+}
+
+.table-container-manageadmin .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #B25900;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .health-dashboard-manageadmin {
+    width: 95%;
+    padding: 25px;
+    margin-top: 120px;
+  }
+  
+  .page-title-manageadmin {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .health-dashboard-manageadmin {
+    width: 100%;
+    padding: 20px;
+    margin-top: 110px;
+  }
+  
+  .header-row-manageadmin {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .title-section-manageadmin {
+    justify-content: center;
+  }
+  
+  .add-button-section-manageadmin {
+    text-align: center;
+  }
+  
+  .page-title-manageadmin {
+    font-size: 24px;
+  }
+  
+  .admin-count-badge-manageadmin {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .add-admin-btn-manageadmin {
+    width: 200px;
+    font-size: 14px !important;
+    height: 42px !important;
+  }
+  
+  .table-container-manageadmin {
+    padding: 15px;
+  }
+  
+  .admin-table-manageadmin .ant-table-thead > tr > th,
+  .admin-table-manageadmin .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+    font-size: 12px !important;
+  }
+  
+  .profile-image-manageadmin {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .action-buttons-manageadmin {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .health-dashboard-manageadmin {
+    padding: 15px;
+    margin-top: 100px;
+  }
+  
+  .page-title-manageadmin {
+    font-size: 20px;
+  }
+  
+  .admin-count-badge-manageadmin {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+  
+  .table-container-manageadmin {
+    padding: 10px;
+  }
+  
+  .profile-image-manageadmin {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .custom-pagination-manageadmin .ant-pagination-options {
+    display: none;
+  }
+}

@@ -15,19 +15,12 @@ import (
 
 
 type (
-
    Authen struct {
-
        Email    string `json:"email"`
-
        Password string `json:"password"`
-
    }
 
-
    signUp struct {
-
-    
     Username  string    `json:"username"`   // เพิ่ม username
     FirstName string    `json:"firstName"`
     LastName  string    `json:"lastName"`
@@ -35,9 +28,6 @@ type (
     Password  string    `json:"password"`
     Birthdate time.Time `json:"birthdate"`
     GenderID  uint      `json:"genderID"`
-
-
-
    }
 
 )
@@ -75,22 +65,23 @@ func SignUp(c *gin.Context) {
    hashedPassword, _ := config.HashPassword(payload.Password)
 
    // Create a new user
-user := entity.User{
-    Username:  payload.Username,
-    FirstName: payload.FirstName,
-    LastName:  payload.LastName,
-    Email:     payload.Email,
-    Password:  hashedPassword,
-    Birthdate: payload.Birthdate,
-    GenderID:  payload.GenderID,
-}
+    user := entity.User{
+        Username:  payload.Username,
+        FirstName: payload.FirstName,
+        LastName:  payload.LastName,
+        Email:     payload.Email,
+        Password:  hashedPassword,
+        Birthdate: payload.Birthdate,
+        GenderID:  payload.GenderID,
+        RoleID:    2,
+    }
 
-   // Save the user to the database
-   if err := db.Create(&user).Error; err != nil {
-       c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-       return
-   }
-   c.JSON(http.StatusCreated, gin.H{"message": "Sign-up successful"})
+    // Save the user to the database
+    if err := db.Create(&user).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusCreated, gin.H{"message": "Sign-up successful"})
 }
 
 

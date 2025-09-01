@@ -30,7 +30,7 @@
     vertical-align: middle;
 }
 
-/* Navbar container - กลาง */
+/* header container - กลาง */
 .topbar .category {
     flex: 1 !important;
     display: flex !important;
@@ -42,7 +42,7 @@
     position: static !important;
 }
 
-.topbar .main-nav {
+.topbar .main-header {
     display: flex !important;
     align-items: center !important;
     gap: 24px !important;
@@ -53,14 +53,14 @@
     position: static !important;
 }
 
-.topbar .nav-home-wrapper {
+.topbar .header-home-wrapper {
     position: relative;
     display: flex;
     align-items: center;
     height: 60px;
 }
 
-.topbar .nav-link {
+.topbar .header-link {
     color: #ffffff;
     font-weight: normal;
     transition: all 0.3s ease;
@@ -70,33 +70,35 @@
     padding: 8px 14px;
     border-radius: 8px; 
     text-decoration: none;
-    font-size: 14px;
+    font-size: 18px;
     height: 40px;
     line-height: 1;
     white-space: nowrap;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-.topbar .nav-link span {
+.topbar .header-link span {
     line-height: 1;
 }
 
-.topbar .nav-link:not(.active-sub) {
+.topbar .header-link:not(.active-sub) {
     color: #ffffff;
 }
 
-.topbar .nav-link:hover {
+.topbar .header-link:hover {
     color: #934A5E;
     background-color: rgba(255, 255, 255, 0.9);
     transform: scale(1.05);
 }
 
-.topbar .nav-link.active {
+.topbar .header-link.active {
     background-color: rgba(255, 255, 255, 0.2);
     color: #ffffff;
     font-weight: bold;
 }
 
-.topbar .sub-nav {
+.topbar .sub-header {
     position: absolute;
     top: 100%;
     left: 0;
@@ -112,7 +114,7 @@
     min-width: 180px;
 }
 
-.topbar .nav-sub-link {
+.topbar .header-sub-link {
     display: block;
     color: #57648E;
     padding: 8px 12px;
@@ -122,13 +124,13 @@
     transition: all 0.3s ease;
 }
 
-.topbar .nav-sub-link:hover {
+.topbar .header-sub-link:hover {
     background-color: #f3f4f6;
     color: #934A5E;
     transform: scale(1.02);
 }
 
-.topbar .nav-sub-link.active-sub {
+.topbar .header-sub-link.active-sub {
     background-color: #E5E7EB;
     color: #57648E;
     font-weight: bold;
@@ -228,8 +230,8 @@
     background-color: #7a3a4b;
 }
 
-/* Reset any default navbar styles */
-.navbar, .navbar-nav, .nav {
+/* Reset any default header styles */
+.headerbar, .headerbar-header, .header {
     margin: 0 !important;
     padding: 0 !important;
 }
@@ -240,11 +242,11 @@
         padding: 0 10px;
     }
     
-    .topbar .main-nav {
+    .topbar .main-header {
         gap: 12px;
     }
     
-    .topbar .nav-link {
+    .topbar .header-link {
         font-size: 12px;
         padding: 6px 10px;
         height: 36px;

@@ -3,7 +3,8 @@ import './profile.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import { Link, useNavigate } from 'react-router-dom';
 import { GetUsersById } from '../../services/https/User/user';
-import { UsersInterface } from '../../interface/profile_interface/IProfile';
+//import { UsersInterface } from '../../interface/profile_interface/IProfile';
+import { UsersInterface } from '../../interface/user_interface/IUser';
 import { message, Spin } from 'antd';
 import dayjs from 'dayjs';
 
@@ -29,28 +30,27 @@ const Profile: React.FC = () => {
 
         if (res?.data) {
           const userData = res.data;
-          console.log('User data:', userData);
 
           setUsers({
-            user_name: userData.username || '-', 
-            first_name: userData.firstName || '-', 
-            last_name: userData.lastName || '-',
-            email: userData.email || '-',
-            gender: userData.Gender?.Gender 
-              ? userData.Gender.Gender
-              : userData.genderID === 1
-                ? 'Male'
-                : userData.genderID === 2
-                  ? 'Female'
-                  : 'Not specified',
-            birth_date: userData.birthdate ? dayjs(userData.birthdate).toDate() : null,
-            weight: userData.weight || null,
-            height: userData.height || null,
-            bust: userData.bust || null,
-            waist: userData.waist || null,
-            hip: userData.hip || null,
-            phone: userData.phonenumber || '-',
-            profile: userData.picture || '', 
+            FirstName: userData.firstName || '',
+            LastName: userData.lastName || '',
+            Username: userData.username || '',
+            Email: userData.email || '',
+            Phonenumber: userData.phonenumber || '',
+            Profile: userData.profile
+              ? userData.profile.startsWith('uploads/')
+                ? `http://localhost:8000/${userData.profile}`
+                : `http://localhost:8000/uploads/${userData.profile}`
+              : '',
+            Weight: userData.weight || undefined,
+            Height: userData.height || undefined,
+            Bust: userData.bust || undefined,
+            Waist: userData.waist || undefined,
+            Hip: userData.hip || undefined,
+            BirthDay: userData.birthdate
+              ? dayjs(userData.birthdate).format('YYYY-MM-DD')
+              : undefined,
+            GenderID: userData.genderID || undefined
           });
         } else {
           messageApi.error('Unable to fetch user data');
@@ -65,6 +65,19 @@ const Profile: React.FC = () => {
 
     fetchUser();
   }, [messageApi, navigate]);
+
+  const getGenderName = (genderID?: number) => {
+    switch (genderID) {
+      case 1:
+        return 'Male';
+      case 2:
+        return 'Female';
+      case 3:
+        return 'Other';
+      default:
+        return '-';
+    }
+  };
 
   return (
     <>
@@ -82,57 +95,61 @@ const Profile: React.FC = () => {
             </Link>
 
             <div className="profile-header">
-              {users?.profile ? (
-                <img src={users.profile} alt="Profile" className="profile-picture" />
+              {users?.Profile ? (
+                <img
+                  src={users.Profile}
+                  alt="Profile"
+                  className="profile-picture"
+                />
               ) : (
                 <div className="no-profile-picture">No profile picture</div>
               )}
               <h2 style={{ color: 'black' }}>
-                {users?.user_name || 'Username not found'}
+                {users?.Username || 'Username not found'}
               </h2>
             </div>
 
             <div className="profile-content">
               <div className="item">
                 <span className="label">Full Name</span>
-                <span className="value">{users ? `${users.first_name} ${users.last_name}` : '-'}</span>
+                <span className="value">{users ? `${users.FirstName} ${users.LastName}` : '-'}</span>
 
                 <span className="label">Email</span>
-                <span className="value">{users?.email || '-'}</span>
+                <span className="value">{users?.Email || '-'}</span>
               </div>
 
               <div className="item">
                 <span className="label">Gender</span>
-                <span className="value">{users?.gender || '-'}</span>
+                <span className="value">{getGenderName(users?.GenderID)}</span>
 
                 <span className="label">Birth Date</span>
                 <span className="value">
-                  {users?.birth_date ? dayjs(users.birth_date).format('DD/MM/YYYY') : '-'}
+                  {users?.BirthDay ? dayjs(users.BirthDay).format('DD/MM/YYYY') : '-'}
                 </span>
               </div>
 
               <div className="item">
                 <span className="label">Phone</span>
-                <span className="value">{users?.phone || '-'}</span>
+                <span className="value">{users?.Phonenumber || '-'}</span>
 
                 <span className="label">Weight</span>
-                <span className="value">{users?.weight ? `${users.weight} kg` : 'Not specified'}</span>
+                <span className="value">{users?.Weight ? `${users.Weight} kg` : 'Not specified'}</span>
               </div>
 
               <div className="item">
                 <span className="label">Height</span>
-                <span className="value">{users?.height ? `${users.height} cm` : 'Not specified'}</span>
+                <span className="value">{users?.Height ? `${users.Height} cm` : 'Not specified'}</span>
 
                 <span className="label">Bust</span>
-                <span className="value">{users?.bust ? `${users.bust} cm` : 'Not specified'}</span>
+                <span className="value">{users?.Bust ? `${users.Bust} cm` : 'Not specified'}</span>
               </div>
 
               <div className="item">
                 <span className="label">Waist</span>
-                <span className="value">{users?.waist ? `${users.waist} cm` : 'Not specified'}</span>
+                <span className="value">{users?.Waist ? `${users.Waist} cm` : 'Not specified'}</span>
 
                 <span className="label">Hip</span>
-                <span className="value">{users?.hip ? `${users.hip} cm` : 'Not specified'}</span>
+                <span className="value">{users?.Hip ? `${users.Hip} cm` : 'Not specified'}</span>
               </div>
             </div>
           </div>

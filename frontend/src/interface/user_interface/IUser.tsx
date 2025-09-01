@@ -1,9 +1,6 @@
 export interface SignInInterface {
-
     email?: string;
-  
     password?: string;
-  
   }
 
 
@@ -28,6 +25,7 @@ export interface SignInInterface {
     ID?:          number;
     FirstName?:   string;
     LastName?:    string;
+    Username?:    string;
     Email?:       string;
     Phone?:       string;
     Age?:         number;
@@ -35,6 +33,13 @@ export interface SignInInterface {
     GenderID?:    number;
     Password?:    string;
     RoleID?:      number;
+    Phonenumber?: string;
+
+    Weight?:      number;
+    Height?:      number;
+    Bust?:        number;
+    Waist?:       number;
+    Hip?:         number;
   }
     
  

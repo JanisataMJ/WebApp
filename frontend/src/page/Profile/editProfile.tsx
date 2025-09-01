@@ -136,7 +136,7 @@ const EditProfile: React.FC = () => {
         imgWindow?.document.write(image.outerHTML);
     };
 
-    const onFinish = async (values: FormData) => {
+    /*const onFinish = async (values: FormData) => {
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("id");
 
@@ -200,7 +200,48 @@ const EditProfile: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    };*/
+    const onFinish = async (values: FormData) => {
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("id");
+        if (!token || !userId) return;
+
+        const formData = new FormData();
+        formData.append("username", values.user_name);
+        formData.append("firstName", values.first_name);
+        formData.append("lastName", values.last_name);
+        formData.append("email", values.email);
+        formData.append("genderID", values.gender === 'Male' ? "1" : values.gender === 'Female' ? "2" : "3");
+        formData.append("birthdate", values.birth_date ? values.birth_date.format('YYYY-MM-DD') : "");
+        formData.append("weight", values.weight?.toString() ?? "");
+        formData.append("height", values.height?.toString() ?? "");
+        formData.append("phonenumber", values.phonenumber);
+        formData.append("bust", values.bust?.toString() ?? "");
+        formData.append("waist", values.waist?.toString() ?? "");
+        formData.append("hip", values.hip?.toString() ?? "");
+
+        if (fileList.length > 0 && fileList[0].originFileObj) {
+            formData.append("profile", fileList[0].originFileObj);
+        }
+
+        try {
+            setLoading(true);
+            const res = await axios.put(`http://localhost:8000/user/${userId}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            messageApi.success("Profile updated successfully");
+            navigate("/profile");
+        } catch (err: any) {
+            console.error(err);
+            messageApi.error("Failed to save profile");
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const validateMessages = {
         required: '${label} is required!',

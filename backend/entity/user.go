@@ -14,7 +14,7 @@ type User struct {
 	LastName    string    `json:"lastName"`
 	Birthdate   time.Time `json:"birthdate"`
 	Phonenumber string    `json:"phonenumber"`
-	Picture     string    `json:"picture"`
+	Profile     string    `json:"profile"`
 	Height      float64   `json:"height"`
 	Weight      float64   `json:"weight"`
 	Bust        float64   `json:"bust"`

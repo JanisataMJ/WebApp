@@ -19,13 +19,13 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
   useEffect(() => {
     if (adminData) {
       form.setFieldsValue({
-        user_name: adminData.user_name,
+        user_name: adminData.username,
         first_name: adminData.firstName,
         last_name: adminData.lastName,
         email: adminData.email,
-        phonnumber: adminData.phone,
-        gender: adminData.gender,
-        birth_date: adminData.birth_date,
+        phonnumber: adminData.phonenumber,
+        gender: adminData.genderID,
+        birth_date: adminData.birthdate,
       });
     }
   }, [adminData, form]);

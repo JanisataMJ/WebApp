@@ -1,14 +1,20 @@
 export interface UsersInterface {
     profile?:     string;
     ID?:          number;
-    user_name?:   string;
+    username?:   string;
     firstName?:  string;
     lastName?:   string;
     email?:       string;
-    phone?:       string;
+    phonenumber?:       string;
     age?:         number;
-    birth_date?:  string;
-    gender?:      string;
+    birthdate?:  string;
+    genderID?:      number;
     password?:    string;
     RoleID?:       number;
+
+    weight?:      number;
+    height?:      number;
+    bust?:        number;
+    waist?:       number;
+    hip?:         number;
   }

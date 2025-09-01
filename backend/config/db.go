@@ -43,6 +43,7 @@ func SetupDatabase() {
        &entity.HealthSummary{},
        &entity.HealthData{},
        &entity.SmartwatchDevice{},
+       &entity.Article{},
    )
 
 
@@ -71,10 +72,10 @@ func SetupDatabase() {
         Birthdate:      BirthDay,
         Phonenumber:    "0866666666",
         Profile:        "uploads/Profiles/profile1.jpeg",
-        Height:         166,
-        Weight:         55,
-        Bust:           33,
-        Waist:          25,
+        Height:         186,
+        Weight:         75,
+        Bust:           42,
+        Waist:          35,
         Hip:            37,
         RoleID:         2,
         GenderID:       1,
@@ -112,11 +113,11 @@ func SetupDatabase() {
         Birthdate:      BirthDay,
         Phonenumber:    "0925552121",
         Profile:        "uploads/Profiles/profile3.jpeg",
-        Height:         166,
-        Weight:         55,
-        Bust:           33,
-        Waist:          25,
-        Hip:            37,
+        Height:         177,
+        Weight:         67,
+        Bust:           40,
+        Waist:          33,
+        Hip:            35,
         RoleID:         2,
         GenderID:       1,
    }
@@ -537,4 +538,60 @@ func SetupDatabase() {
     db.Create(&noti7)
     db.Create(&noti8)
     db.Create(&noti9)
+
+
+
+    //Article
+    article1 := entity.Article{
+		Title:          "เคล็ดลับดูแลสุขภาพหัวใจ",
+        Information:    "การออกกำลังกายเป็นประจำ และการควบคุมอาหารสามารถช่วยลดความเสี่ยงโรคหัวใจได้",
+		Reference:      "กรมอนามัย",
+		PublishDate:    time.Now().AddDate(0, -1, 0), // เดือนก่อน
+        Image:          "uploads/Articles/article1.jpeg",
+		UserID:         5,
+	
+	}
+    article2 := entity.Article{
+		Title:          "วิธีลดน้ำตาลในชีวิตประจำวัน",
+		Information:    "หลีกเลี่ยงเครื่องดื่มหวานและขนมขบเคี้ยวที่มีน้ำตาลสูง ช่วยควบคุมน้ำหนักและสุขภาพโดยรวม",
+		Reference:      "สมาคมโภชนาการ",
+		PublishDate:    time.Now().AddDate(0, -2, 0),
+        Image:          "uploads/Articles/article2.jpeg",
+		UserID:         4,
+	
+	}
+    article3 := entity.Article{
+		Title:          "อาหารที่ช่วยเสริมภูมิคุ้มกัน",
+		Information:    "ผักผลไม้หลากสี และอาหารที่มีวิตามินซี ช่วยเพิ่มภูมิคุ้มกันและลดความเสี่ยงการเจ็บป่วย",
+		Reference:      "กรมอนามัย",
+		PublishDate:    time.Now().AddDate(0, 0, -10), // 10 วันก่อน
+        Image:          "uploads/Articles/article3.jpeg",
+		UserID:         5,
+	
+	}
+    article4 := entity.Article{
+		Title:          "การนอนหลับให้เพียงพอ",
+		Information:    "ผู้ใหญ่ควรนอนวันละ 7–8 ชั่วโมง การนอนเพียงพอช่วยฟื้นฟูร่างกายและเพิ่มสมาธิ",
+		Reference:      "สถาบันสุขภาพแห่งชาติ",
+		PublishDate:    time.Now().Add(-12 * time.Hour),
+        Image:          "uploads/Articles/article4.jpeg",
+		UserID:         4,
+	
+	}
+    article5 := entity.Article{
+		Title:          "ออกกำลังกายง่าย ๆ ที่บ้าน",
+		Information:    "การเดิน ยกน้ำหนักเบา หรือโยคะสั้น ๆ วันละ 20–30 นาที ช่วยเพิ่มความแข็งแรงของร่างกาย",
+		Reference:      "สมาคมกีฬาสาธารณะ",
+		PublishDate:    time.Now(),
+        Image:          "uploads/Articles/article5.jpeg",
+		UserID:         4,
+	
+	}
+    
+    // user id = 4 (admin)
+	db.Create(&article1)
+	db.Create(&article2)
+	db.Create(&article3)
+	db.Create(&article4)
+	db.Create(&article5)
 }

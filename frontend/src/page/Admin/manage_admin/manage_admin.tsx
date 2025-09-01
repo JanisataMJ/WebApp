@@ -3,6 +3,7 @@ import Headers from '../../../compronents/Pubblic_components/headerselect';
 import './manageAdmin.css';
 import AddAdmin from './create/create_admin';
 import EditAdmin from './edit/edit_admin';
+import ViewUser from './view_user/view_user';
 
 import { Space, Table, Button, Col, Row, Divider, Modal, message, Select } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -105,22 +106,33 @@ function ManageAdmin() {
       width: "15%",
       render: (text, record) => (
         <div className="action-buttons-manageadmin">
-          <Button 
-            onClick={() => handleEditAdmin(record)}
-            shape="circle"
-            icon={<EditOutlined />}
-            size="middle"
-            className="edit-btn-manageadmin"
-            disabled={record.RoleID !== 1} // แก้ไขได้เฉพาะ Admin
-          />
-          <Button
-            onClick={() => showDeleteModal(record)}
-            shape="circle"
-            icon={<DeleteOutlined />}
-            size="middle"
-            className="delete-btn-manageadmin"
-            danger
-          />
+          {record.RoleID === 1 ? (
+            <>
+              <Button
+                onClick={() => handleEditAdmin(record)}
+                shape="circle"
+                icon={<EditOutlined />}
+                size="middle"
+                className="edit-btn-manageadmin"
+              />
+              <Button
+                onClick={() => showDeleteModal(record)}
+                shape="circle"
+                icon={<DeleteOutlined />}
+                size="middle"
+                className="delete-btn-manageadmin"
+                danger
+              />
+            </>
+          ) : (
+            <Button
+              onClick={() => handleViewMore(record)}
+              type="default"
+              size="middle"
+            >
+              ดูข้อมูล
+            </Button>
+          )}
         </div>
       ),
     },
@@ -136,6 +148,8 @@ function ManageAdmin() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<UsersInterface | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
   
   // Delete modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -170,7 +184,7 @@ function ManageAdmin() {
 
 
   const showDeleteModal = (admin: UsersInterface) => {
-    setDeleteModalText(`คุณต้องการลบแอดมิน "${admin.user_name}" หรือไม่?`);
+    setDeleteModalText(`คุณต้องการลบแอดมิน "${admin.username}" หรือไม่?`);
     setDeleteId(admin.ID || null);
     setIsDeleteModalOpen(true);
   };
@@ -249,6 +263,12 @@ function ManageAdmin() {
     setFilteredAdmins(data);
     console.log(admins);
   }, [admins, roleFilter]);
+
+
+  const handleViewMore = (user: UsersInterface) => {
+    setSelectedAdmin(user);
+    setIsViewModalOpen(true);
+  };
 
 
 
@@ -358,6 +378,15 @@ function ManageAdmin() {
           adminData={selectedAdmin}
         />
       )}
+
+      {selectedAdmin && (
+        <ViewUser
+          open={isViewModalOpen}
+          onCancel={() => setIsViewModalOpen(false)}
+          userData={selectedAdmin}
+        />
+      )}
+
     </div>
     </>
   );

@@ -32,4 +32,5 @@ type User struct {
 	SmartwatchDevice 	*SmartwatchDevice 	`gorm:"foreignKey:UserID"`
 	MoodData 			[]MoodData 			`gorm:"foreignKey:UserID"`
 	Notification 		[]Notification 		`gorm:"foreignKey:UserID"`
+	Article 			[]Article 			`gorm:"foreignKey:UserID"`
 }

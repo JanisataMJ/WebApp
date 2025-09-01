@@ -8,21 +8,23 @@ import (
 	"github.com/JanisataMJ/WebApp/config"
 
 	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
-    "github.com/JanisataMJ/WebApp/controller/gender"
-	"github.com/JanisataMJ/WebApp/controller/healthSummary"
-    "github.com/JanisataMJ/WebApp/controller/healthAnalysis"
+	"github.com/JanisataMJ/WebApp/controller/article"
+	"github.com/JanisataMJ/WebApp/controller/gender"
+	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthData"
+	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
-    "github.com/JanisataMJ/WebApp/services"
+	"github.com/JanisataMJ/WebApp/services"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
 
 	"github.com/JanisataMJ/WebApp/middlewares"
 
-    "log"
-    "os"
-    "github.com/joho/godotenv"
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 
@@ -85,6 +87,16 @@ func main() {
             go services.SendPendingNotifications()
             c.JSON(200, gin.H{"message": "Notifications sending started"})
         })
+
+        //Article Route
+        router.POST("/create-article/:id", article.CreateArticle)
+        router.GET("/list-article", article.ListArticles)
+        router.GET("/article/:id", article.GetArticleByID)
+        router.PUT("/update-article/:id", article.UpdateArticle)
+        router.DELETE("/delete-article/:id", article.DeleteArticle)
+
+        router.PUT("/order-articles", article.UpdateArticleOrder)
+
 
         //healthSummary Route
         router.GET("/list-healthSummary", healthSummary.ListHealthSummary)

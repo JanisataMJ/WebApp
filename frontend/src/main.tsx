@@ -15,6 +15,7 @@ import Register from './page/authentication/Register/register';
 import Income from './page/writer/Income';
 import Overview from './page/Overview/Overview';
 import Tips from './page/Tips/Tips';
+import TipsDetail from './page/Tips/detail/TipsDetail';
 import Calendar from './page/calendar/calendar';
 import MoodTracker from './page/Mood/MoodTracker';
 import AdminHome from './page/Admin/AdminHome';
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
   { path: "/register", element: <Register /> },
   { path: "/overview", element: <Overview />},
   { path: "/tips", element: <Tips />},
+  { path: "/tips/:id", element: <TipsDetail />},
   { path: "/calendar", element: <Calendar />},
   { path: "/moodtracker", element: <MoodTracker />},
   { path: "/admin/login", element: <AdminLogin /> },

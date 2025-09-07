@@ -546,8 +546,8 @@ func SetupDatabase() {
 		Title:          "เคล็ดลับดูแลสุขภาพหัวใจ",
         Information:    "การออกกำลังกายเป็นประจำ และการควบคุมอาหารสามารถช่วยลดความเสี่ยงโรคหัวใจได้",
 		Reference:      "กรมอนามัย",
-		PublishDate:    time.Now().AddDate(0, -1, 0), // เดือนก่อน
         Image:          "uploads/Articles/article1.jpeg",
+        Published:      false,
 		UserID:         5,
 	
 	}
@@ -555,8 +555,8 @@ func SetupDatabase() {
 		Title:          "วิธีลดน้ำตาลในชีวิตประจำวัน",
 		Information:    "หลีกเลี่ยงเครื่องดื่มหวานและขนมขบเคี้ยวที่มีน้ำตาลสูง ช่วยควบคุมน้ำหนักและสุขภาพโดยรวม",
 		Reference:      "สมาคมโภชนาการ",
-		PublishDate:    time.Now().AddDate(0, -2, 0),
         Image:          "uploads/Articles/article2.jpeg",
+        Published:      false,
 		UserID:         4,
 	
 	}
@@ -564,8 +564,8 @@ func SetupDatabase() {
 		Title:          "อาหารที่ช่วยเสริมภูมิคุ้มกัน",
 		Information:    "ผักผลไม้หลากสี และอาหารที่มีวิตามินซี ช่วยเพิ่มภูมิคุ้มกันและลดความเสี่ยงการเจ็บป่วย",
 		Reference:      "กรมอนามัย",
-		PublishDate:    time.Now().AddDate(0, 0, -10), // 10 วันก่อน
         Image:          "uploads/Articles/article3.jpeg",
+        Published:      false,
 		UserID:         5,
 	
 	}
@@ -573,17 +573,19 @@ func SetupDatabase() {
 		Title:          "การนอนหลับให้เพียงพอ",
 		Information:    "ผู้ใหญ่ควรนอนวันละ 7–8 ชั่วโมง การนอนเพียงพอช่วยฟื้นฟูร่างกายและเพิ่มสมาธิ",
 		Reference:      "สถาบันสุขภาพแห่งชาติ",
-		PublishDate:    time.Now().Add(-12 * time.Hour),
         Image:          "uploads/Articles/article4.jpeg",
+        Published:      false,
 		UserID:         4,
 	
 	}
+    t := time.Now().AddDate(0, 0, -2) // 2 วันที่แล้ว
     article5 := entity.Article{
 		Title:          "ออกกำลังกายง่าย ๆ ที่บ้าน",
 		Information:    "การเดิน ยกน้ำหนักเบา หรือโยคะสั้น ๆ วันละ 20–30 นาที ช่วยเพิ่มความแข็งแรงของร่างกาย",
 		Reference:      "สมาคมกีฬาสาธารณะ",
-		PublishDate:    time.Now(),
         Image:          "uploads/Articles/article5.jpeg",
+        PublishDate:    &t,
+        Published:      true,
 		UserID:         4,
 	
 	}

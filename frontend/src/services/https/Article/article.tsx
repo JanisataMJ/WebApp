@@ -137,6 +137,38 @@ export const updateArticle = async (
   }
 };
 
+
+// PUBLISH Article Now
+export const publishArticleNow = async (id: number): Promise<ArticleInterface> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.put<ArticleInterface>(
+      `${apiUrl}/article/${id}/publishArticleNow`,
+      {}, // body ว่าง
+      requestOptions
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error("Error publishing article: " + error.message);
+  }
+};
+
+// UNPUBLISH Article
+export const unpublishArticle = async (id: number): Promise<ArticleInterface> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.put<ArticleInterface>(
+      `${apiUrl}/article/${id}/unpublishArticle`,
+      {}, // body ว่าง
+      requestOptions
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error("Error unpublishing article: " + error.message);
+  }
+};
+
+
 // DELETE Article
 export const deleteArticle = async (id: number): Promise<void> => {
   try {

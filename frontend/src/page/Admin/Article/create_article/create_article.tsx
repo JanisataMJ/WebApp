@@ -12,11 +12,12 @@ const AddArticle: React.FC<AddArticleModalProps> = ({ adminID, onSuccess }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<any[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string>(""); // preview รูปตอนเลือกไฟล์
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const [form] = Form.useForm();
 
   const showModal = () => setVisible(true);
+
   const handleCancel = () => {
     form.resetFields();
     setFileList([]);
@@ -53,7 +54,7 @@ const AddArticle: React.FC<AddArticleModalProps> = ({ adminID, onSuccess }) => {
   const handleFileChange = ({ fileList }: any) => {
     setFileList(fileList);
 
-    // preview รูปจากไฟล์ที่เลือก
+    // Preview image
     if (fileList.length > 0 && fileList[0].originFileObj) {
       const reader = new FileReader();
       reader.onload = (e) => setPreviewUrl(e.target?.result as string);
@@ -99,7 +100,7 @@ const AddArticle: React.FC<AddArticleModalProps> = ({ adminID, onSuccess }) => {
 
           <Form.Item label="Image">
             <Upload
-              beforeUpload={() => false} // ป้องกัน upload อัตโนมัติ
+              beforeUpload={() => false}
               fileList={fileList}
               onChange={handleFileChange}
               maxCount={1}

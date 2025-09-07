@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Spin, Button, Popconfirm, message } from "antd";
+import { Card, Spin, Button, Popconfirm, message, Tag } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Headers from '../../../compronents/Pubblic_components/headerselect';
 import AddArticle from './create_article/create_article';
 import EditArticle from './edit_article/edit_article';
 import { ArticleInterface } from '../../../interface/article_interface/article';
-import { getAllArticles, deleteArticle, updateArticleOrder } from '../../../services/https/Article/article';
+import { 
+  getAllArticles, 
+  deleteArticle, 
+  updateArticleOrder,
+  publishArticleNow,
+  unpublishArticle
+} from '../../../services/https/Article/article';
 import './article.css';
+import moment from "moment";
 
 const { Meta } = Card;
 
@@ -41,6 +48,27 @@ const ArticlePage: React.FC = () => {
       fetchArticles();
     } catch (err) {
       message.error("ลบไม่สำเร็จ");
+    }
+  };
+
+  // Publish / Unpublish
+  const handlePublish = async (id: number) => {
+    try {
+      await publishArticleNow(id);
+      message.success("เผยแพร่บทความแล้ว");
+      fetchArticles();
+    } catch (err) {
+      message.error("เผยแพร่ไม่สำเร็จ");
+    }
+  };
+
+  const handleUnpublish = async (id: number) => {
+    try {
+      await unpublishArticle(id);
+      message.success("เลิกเผยแพร่บทความแล้ว");
+      fetchArticles();
+    } catch (err) {
+      message.error("เลิกเผยแพร่ไม่สำเร็จ");
     }
   };
 
@@ -88,44 +116,69 @@ const ArticlePage: React.FC = () => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
-                        <Card
-                          key={article.ID}
-                          hoverable
-                          cover={
-                            article.Image ? (
-                              <img
-                                alt={article.Title}
-                                src={article.Image.startsWith("http") ? article.Image : `http://localhost:8000/${article.Image}`}
-                                className="h-48 object-cover"
-                              />
-                            ) : (
-                              <div className="h-48 flex items-center justify-center bg-gray-100 text-gray-500">
-                                No Image
-                              </div>
-                            )
-                          }
-                          actions={[
-                            <Button type="link" onClick={() => setEditing(article)}>✏️ แก้ไข</Button>,
-                            <Popconfirm
-                              title="ยืนยันการลบ?"
-                              onConfirm={() => handleDelete(article.ID)}
-                              okText="ใช่"
-                              cancelText="ยกเลิก"
-                            >
-                              <Button type="link" danger>🗑️ ลบ</Button>
-                            </Popconfirm>,
-                          ]}
-                        >
-                          <Meta
-                            title={article.Title}
-                            description={
-                              <div>
-                                <p className="line-clamp-2">{article.Information}</p>
-                                <small className="text-gray-500">แหล่งอ้างอิง: {article.Reference}</small>
-                              </div>
-                            }
-                          />
-                        </Card>
+  <Card
+  key={article.ID}
+  hoverable
+  className={article.Published ? "border-green-500 border-2 relative" : "border-gray-200 relative"}
+  cover={
+    article.Image ? (
+      <img
+        alt={article.Title}
+        src={article.Image.startsWith("http") ? article.Image : `http://localhost:8000/${article.Image}`}
+        className="h-48 object-cover"
+      />
+    ) : (
+      <div className="h-48 flex items-center justify-center bg-gray-100 text-gray-500">
+        No Image
+      </div>
+    )
+  }
+>
+  {/* ปุ่มเผยแพร่เป็นวงกลม มุมบนขวา */}
+  <Button
+    shape="circle"
+    size="small"
+    style={{
+      position: "absolute",
+      top: 8,
+      right: 8,
+      backgroundColor: article.Published ? "#22c55e" : "#9ca3af",
+      borderColor: article.Published ? "#22c55e" : "#9ca3af",
+      boxShadow: "0 0 4px rgba(0,0,0,0.2)"
+    }}
+    onClick={() => article.Published ? handleUnpublish(article.ID) : handlePublish(article.ID)}
+  />
+
+  <Meta
+    title={article.Title}
+    description={
+      <div className="mt-2">
+        <p className="line-clamp-2">{article.Information}</p>
+        <small className="text-gray-500">แหล่งอ้างอิง: {article.Reference}</small><br />
+        {article.PublishDate && (
+          <small style={{ color: article.Published ? "#22c55e" : "#ef4444" }}>
+            วันที่เผยแพร่ล่าสุด: {moment(article.PublishDate).format("YYYY-MM-DD HH:mm")}
+          </small>
+        )}
+      </div>
+    }
+  />
+
+  {/* ปุ่มแก้ไขและลบ */}
+  <div className="flex justify-between mt-2">
+    <Button type="link" onClick={() => setEditing(article)}>✏️ แก้ไข</Button>
+    <Popconfirm
+      title="ยืนยันการลบ?"
+      onConfirm={() => handleDelete(article.ID)}
+      okText="ใช่"
+      cancelText="ยกเลิก"
+    >
+      <Button type="link" danger>🗑️ ลบ</Button>
+    </Popconfirm>
+  </div>
+</Card>
+
+
                       </div>
                     )}
                   </Draggable>

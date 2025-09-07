@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import './Navbar.css';
+//import './Navbar.css';
+import '../Pubblic_components/header.css'
 
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -13,7 +14,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     if (!isInPage) return;
-
+ 
     const sections = document.querySelectorAll('.hide');
     const options = {
       root: null,

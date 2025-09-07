@@ -23,8 +23,11 @@ func CreateArticle(c *gin.Context) {
 	information := c.PostForm("information")
 	reference := c.PostForm("reference")
 	userIDStr := c.PostForm("user_id")
-
 	userID := toUint(userIDStr)
+
+	// ไม่ตั้ง publishDate ตอนสร้างใหม่
+	var publishDate *time.Time = nil
+	published := false
 
 	// รับไฟล์รูป (ถ้ามี)
 	var filePath string
@@ -45,14 +48,15 @@ func CreateArticle(c *gin.Context) {
 		}
 	}
 
-	// สร้าง Article
+	// สร้าง Article (ยังไม่เผยแพร่)
 	article := entity.Article{
 		Title:       title,
 		Information: information,
 		Reference:   reference,
 		Image:       filePath, // อาจเป็น "" ถ้าไม่มีรูป
 		UserID:      userID,
-		// PublishDate ปล่อยว่างไว้ จะ set เมื่อ publish
+		Published:   published,   // false เสมอ
+		PublishDate: publishDate, // null เสมอ
 	}
 
 	if err := db.Create(&article).Error; err != nil {
@@ -61,7 +65,7 @@ func CreateArticle(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Article created",
+		"message": "Article created (draft)",
 		"article": article,
 	})
 }
@@ -72,22 +76,22 @@ func toUint(s string) uint {
 }
 
 
+
+
 // ✅ Get All Articles
 func ListArticles(c *gin.Context) {
-    var articles []entity.Article
+	var articles []entity.Article
 
-    if err := config.DB().
-        Preload("User").
-        Order("`order` ASC"). // เรียงตาม order
-        Find(&articles).Error; err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+	if err := config.DB().
+		Preload("User").
+		Order("`order` ASC").
+		Find(&articles).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-    c.JSON(http.StatusOK, articles)
+	c.JSON(http.StatusOK, articles)
 }
-
-
 
 // ✅ Get Article by ID
 func GetArticleByID(c *gin.Context) {
@@ -102,89 +106,182 @@ func GetArticleByID(c *gin.Context) {
 	c.JSON(http.StatusOK, article)
 }
 
-
 // PUT /articles/:id
 func UpdateArticle(c *gin.Context) {
+	id := c.Param("id")
+	var article entity.Article
+	db := config.DB()
+
+	// หา article
+	if err := db.First(&article, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Article not found"})
+		return
+	}
+
+	// รับค่าฟอร์มทั่วไป
+	if title := c.PostForm("title"); title != "" {
+		article.Title = title
+	}
+	if information := c.PostForm("information"); information != "" {
+		article.Information = information
+	}
+	if reference := c.PostForm("reference"); reference != "" {
+		article.Reference = reference
+	}
+
+	// จัดการ PublishDate และ Published
+	publishDateStr := c.PostForm("publishDate")
+	if publishDateStr != "" {
+		// รองรับหลาย format
+		layouts := []string{"2006-01-02 15:04:05", "2006-01-02 15:04", "2006-01-02", time.RFC3339}
+		var parsedTime time.Time
+		var err error
+
+		loc, _ := time.LoadLocation("Local") // ใช้ timezone server/local
+		for _, layout := range layouts {
+			parsedTime, err = time.ParseInLocation(layout, publishDateStr, loc)
+			if err == nil {
+				break
+			}
+		}
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid publishDate format"})
+			return
+		}
+
+		article.PublishDate = &parsedTime
+		// ปรับ Published ตามวัน/เวลา
+		if parsedTime.After(time.Now()) {
+			article.Published = false
+		} else {
+			article.Published = true
+		}
+	} else {
+		// ถ้าไม่ได้ส่ง publishDate มา -> ไม่รีเซ็ตค่าเดิม
+		if article.PublishDate == nil {
+			article.Published = false
+		} else {
+			if article.PublishDate.After(time.Now()) {
+				article.Published = false
+			} else {
+				article.Published = true
+			}
+		}
+	}
+
+	// รับไฟล์รูป
+	file, err := c.FormFile("image")
+	if err == nil {
+		uploadDir := "uploads/articles"
+		os.MkdirAll(uploadDir, os.ModePerm)
+
+		fileName := fmt.Sprintf("%s-%s", uuid.New().String(), filepath.Base(file.Filename))
+		filePath := filepath.Join(uploadDir, fileName)
+
+		if err := c.SaveUploadedFile(file, filePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
+			return
+		}
+		article.Image = filePath
+	}
+
+	// บันทึก
+	if err := db.Save(&article).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Article updated successfully",
+		"article": article,
+	})
+}
+
+
+
+
+// PUT /articles/:id/publishArticle
+func PublishArticleNow(c *gin.Context) {
     id := c.Param("id")
     var article entity.Article
     db := config.DB()
 
-    // ตรวจสอบว่ามี Article นี้หรือไม่
     if err := db.First(&article, id).Error; err != nil {
         c.JSON(http.StatusNotFound, gin.H{"error": "Article not found"})
         return
     }
 
-    // รับค่าฟอร์มทั่วไป
-    if title := c.PostForm("title"); title != "" {
-        article.Title = title
-    }
-    if information := c.PostForm("information"); information != "" {
-        article.Information = information
-    }
-    if reference := c.PostForm("reference"); reference != "" {
-        article.Reference = reference
-    }
-    if publishDate := c.PostForm("publishDate"); publishDate != "" {
-        t, err := time.Parse("2006-01-02", publishDate)
-        if err == nil {
-            article.PublishDate = t
-        }
-    }
+    now := time.Now()
+    article.Published = true
+    article.PublishDate = &now
 
-    // รับไฟล์รูป
-    file, err := c.FormFile("image")
-    if err == nil {
-        uploadDir := "uploads"
-        os.MkdirAll(uploadDir, os.ModePerm)
-        filePath := filepath.Join(uploadDir, file.Filename)
-        c.SaveUploadedFile(file, filePath)
-        article.Image = filePath
-    }
-
-    // บันทึก
     if err := db.Save(&article).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
 
     c.JSON(http.StatusOK, gin.H{
-        "message": "Article updated successfully",
+        "message": "Article published immediately",
+        "article": article,
+    })
+}
+
+// PUT /articles/:id/unpublishArticle
+func UnpublishArticle(c *gin.Context) {
+    id := c.Param("id")
+    var article entity.Article
+    db := config.DB()
+
+    if err := db.First(&article, id).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Article not found"})
+        return
+    }
+
+    article.Published = false
+
+    if err := db.Save(&article).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Article unpublished",
         "article": article,
     })
 }
 
 
+
+
 type OrderUpdate struct {
-    ID    uint `json:"id"`
-    Order int  `json:"order"`
+	ID    uint `json:"id"`
+	Order int  `json:"order"`
 }
 
 func UpdateArticleOrder(c *gin.Context) {
-    var updates []OrderUpdate
-    if err := c.ShouldBindJSON(&updates); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	var updates []OrderUpdate
+	if err := c.ShouldBindJSON(&updates); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    db := config.DB()
-    for _, u := range updates {
-        db.Model(&entity.Article{}).Where("id = ?", u.ID).Update("order", u.Order)
-    }
+	db := config.DB()
+	for _, u := range updates {
+		db.Model(&entity.Article{}).Where("id = ?", u.ID).Update("order", u.Order)
+	}
 
-    c.JSON(http.StatusOK, gin.H{"message": "Order updated"})
+	c.JSON(http.StatusOK, gin.H{"message": "Order updated"})
 }
-
-
 
 // DELETE /articles/:id
 func DeleteArticle(c *gin.Context) {
-    id := c.Param("id")
+	id := c.Param("id")
 
-    if err := config.DB().Delete(&entity.Article{}, id).Error; err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+	if err := config.DB().Delete(&entity.Article{}, id).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{"message": "deleted"})
+	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
 }

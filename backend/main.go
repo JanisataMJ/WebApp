@@ -15,6 +15,7 @@ import (
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
+    "github.com/JanisataMJ/WebApp/controller/admin_count"
 	"github.com/JanisataMJ/WebApp/services"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
@@ -96,6 +97,8 @@ func main() {
         router.DELETE("/delete-article/:id", article.DeleteArticle)
 
         router.PUT("/order-articles", article.UpdateArticleOrder)
+        router.PUT("/article/:id/publishArticleNow", article.PublishArticleNow)
+        router.PUT("/article/:id/unpublishArticle", article.UnpublishArticle)
 
 
         //healthSummary Route
@@ -113,6 +116,9 @@ func main() {
         //SmartwatchDevice Route
         router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
         router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
+
+        //Count Route
+        router.GET("/admin-counts", count.GetAdminCounts)
    }
 
    r.GET("/genders", genders.GetAll)

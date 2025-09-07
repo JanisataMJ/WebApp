@@ -1,0 +1,77 @@
+/*tipsDetail.css*/
+.tips-detail-dashboard {
+  min-height: 100vh;
+  width: 90%; /* ใช้ % เพื่อ responsive กับหน้าจอ */
+  max-width: 1000px;
+  background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
+  padding: 20px;
+  margin: 130px auto 20px auto; /* จัดกึ่งกลางแนวนอน */
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+.tips-detail-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+.tips-detail-title {
+  font-size: 28px;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.tips-publish-date {
+  font-size: 14px;
+  margin-bottom: 16px;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.tips-publish-date.published {
+  color: #22c55e; /* สีเขียว หากเผยแพร่แล้ว */
+}
+
+.tips-publish-date.unpublished {
+  color: #ef4444; /* สีแดง หากยกเลิกเผยแพร่ */
+}
+
+.tips-detail-img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.tips-detail-info,
+.tips-detail-ref {
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.tips-back {
+  display: inline-block;
+  margin-bottom: 20px;
+  text-decoration: none;
+  color: #1890ff;
+}
+
+/* Responsive สำหรับหน้าจอเล็ก */
+@media (max-width: 768px) {
+  .tips-detail-title {
+    font-size: 24px;
+  }
+
+  .tips-detail-info,
+  .tips-detail-ref {
+    font-size: 14px;
+  }
+}

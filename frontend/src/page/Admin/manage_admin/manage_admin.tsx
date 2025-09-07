@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 const { Option } = Select;
  
 function ManageAdmin() {
+  
   const columns: ColumnsType<UsersInterface> = [
     {
       title: <span className="table-header-manageadmin">ลำดับ</span>,
@@ -115,14 +116,16 @@ function ManageAdmin() {
                 size="middle"
                 className="edit-btn-manageadmin"
               />
-              <Button
-                onClick={() => showDeleteModal(record)}
-                shape="circle"
-                icon={<DeleteOutlined />}
-                size="middle"
-                className="delete-btn-manageadmin"
-                danger
-              />
+              {record.ID !== currentAdminID && ( // ซ่อนปุ่มลบถ้าเป็นตัวเอง
+                <Button
+                  onClick={() => showDeleteModal(record)}
+                  shape="circle"
+                  icon={<DeleteOutlined />}
+                  size="middle"
+                  className="delete-btn-manageadmin"
+                  danger
+                />
+              )}
             </>
           ) : (
             <Button
@@ -139,6 +142,7 @@ function ManageAdmin() {
   ];
 
   const navigate = useNavigate();
+  const currentAdminID = Number(localStorage.getItem("id")); // ID ของ admin ที่ล็อกอินอยู่
   const [admins, setAdmins] = useState<UsersInterface[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [filteredAdmins, setFilteredAdmins] = useState<UsersInterface[]>([]);
@@ -191,7 +195,14 @@ function ManageAdmin() {
 
   const handleDeleteOk = async () => {
     if (!deleteId) return;
-    
+
+    // ป้องกัน admin ลบตัวเอง
+    if (deleteId === currentAdminID) {
+      messageApi.error("คุณไม่สามารถลบบัญชีของตัวเองได้!");
+      setIsDeleteModalOpen(false);
+      return;
+    }
+
     setConfirmLoading(true);
     try {
       const res = await DeleteUsersById(String(deleteId));

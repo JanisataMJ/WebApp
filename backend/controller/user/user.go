@@ -121,7 +121,7 @@ func Update(c *gin.Context) {
 
 
 
-func Delete(c *gin.Context) {
+/*func Delete(c *gin.Context) {
    id := c.Param("id")
 
    db := config.DB()
@@ -131,4 +131,21 @@ func Delete(c *gin.Context) {
        return
    }
    c.JSON(http.StatusOK, gin.H{"message": "Deleted successful"})
+}*/
+func Delete(c *gin.Context) {
+    id := c.Param("id")
+    currentAdminID := c.GetString("currentUserID") // สมมติคุณเก็บ ID ของผู้ล็อกอินไว้ใน context
+
+    if id == currentAdminID {
+        c.JSON(http.StatusForbidden, gin.H{"error": "ไม่สามารถลบบัญชีของตัวเองได้"})
+        return
+    }
+
+    db := config.DB()
+
+    if tx := db.Exec("DELETE FROM users WHERE id = ?", id); tx.RowsAffected == 0 {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "id not found"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"message": "Deleted successful"})
 }

@@ -10,9 +10,10 @@ type Article struct {
 	Title			string
 	Information 	string
 	Reference		string
-	PublishDate 	time.Time
 	Image			string
 	Order			uint
+	PublishDate 	*time.Time
+	Published    	bool `gorm:"default:false"` // ยังไม่เผยแพร่
 	
 	UserID 	uint
 	User   	*User `gorm:"foreignKey: UserID"`

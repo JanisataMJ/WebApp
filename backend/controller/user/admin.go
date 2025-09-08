@@ -1,19 +1,18 @@
 package users
 
 import (
-   "time"
-   "strconv"
-   "os"
-   "fmt"
-   "net/http"
-   "path/filepath"
-   
-   "github.com/gin-gonic/gin"
-   "github.com/google/uuid"
-   "github.com/JanisataMJ/WebApp/config"
-   "github.com/JanisataMJ/WebApp/entity"
-)
+	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
 
+	"github.com/JanisataMJ/WebApp/config"
+	"github.com/JanisataMJ/WebApp/entity"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
 
 type (
 	createAdmin struct {
@@ -28,32 +27,32 @@ type (
 		GenderID    uint      `json:"genderID"`
 	}
 )
- 
-//create admin
+
+// create admin
 func CreateAdmin(c *gin.Context) {
 	db := config.DB()
 
-	// ✅ รับค่า text fields
 	username := c.PostForm("username")
 	firstName := c.PostForm("firstName")
 	lastName := c.PostForm("lastName")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 	genderID := c.PostForm("genderID")
-	birthdateStr := c.PostForm("birthdate")
 	phonenumber := c.PostForm("phonenumber")
 
+	birthdateStr := c.PostForm("birthdate")
 	var birthdate time.Time
 	if birthdateStr != "" {
-		parsedTime, err := time.Parse("2006-01-02", birthdateStr) // format yyyy-mm-dd
+		parsed, err := time.Parse("2006-01-02", birthdateStr)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid birthdate format, use YYYY-MM-DD"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid birthdate format"})
 			return
 		}
-		birthdate = parsedTime
+		loc, _ := time.LoadLocation("Asia/Bangkok")
+		birthdate = time.Date(parsed.Year(), parsed.Month(), parsed.Day(), 0, 0, 0, 0, loc)
 	}
 
-	// ✅ รับไฟล์รูป
+	// รับไฟล์รูป
 	file, err := c.FormFile("profile")
 	var filePath string
 	if err == nil {
@@ -70,32 +69,32 @@ func CreateAdmin(c *gin.Context) {
 		}
 	}
 
-	// ✅ เช็คซ้ำ email
+	// เช็ค email ซ้ำ
 	var adminCheck entity.User
 	if err := db.Where("email = ?", email).First(&adminCheck).Error; err == nil && adminCheck.ID != 0 {
 		c.JSON(http.StatusConflict, gin.H{"error": "Email is already used"})
 		return
 	}
 
-	// ✅ Hash password
+	// Hash password
 	hashedPassword, err := config.HashPassword(password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
 
-	// ✅ สร้าง User
+	// สร้าง Admin
 	admin := entity.User{
-		Username:  username,
-		FirstName: firstName,
-		LastName:  lastName,
-		Email:     email,
-		Password:  hashedPassword,
-		Birthdate: birthdate,
+		Username:    username,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Email:       email,
+		Password:    hashedPassword,
+		Birthdate:   birthdate,
 		Phonenumber: phonenumber,
-		Profile:   filePath,      // เก็บ path ของไฟล์รูป
-		GenderID:  toUint(genderID),
-		RoleID:    1,             // fix เป็น Admin
+		Profile:     filePath,
+		GenderID:    toUint(genderID),
+		RoleID:      1, // fix เป็น Admin
 	}
 
 	if err := db.Create(&admin).Error; err != nil {

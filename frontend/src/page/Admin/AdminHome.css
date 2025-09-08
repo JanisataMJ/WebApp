@@ -1,65 +1,408 @@
-/* AdminDashboard.css */
 .health-dashboard-admin {
   min-height: 100vh;
-  width: 1000px;
+  width: 90vw;
+  max-width: 1400px;
   background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
-  padding: 20px;
-  margin-top: 130px;
-  margin-bottom: 20px;
+  padding: 30px;
+  margin: 130px auto 20px;
   border-radius: 10px;
-  
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  overflow-y: auto;
+  /* ซ่อน scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.health-dashboard-admin::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
 .dashboard-title-admin {
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  color: #333;
-  font-weight: 600;
+  font-size: 2.2rem;
+  margin-bottom: 32px;
+  color: #2d3748;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  letter-spacing: -0.5px;
+  /* 🔧 ปรับปรุงการแสดงผลข้อความ */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
 }
 
 .dashboard-grid-admin {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  width: max-content;    /* สำคัญ! ทำให้ grid ขยายตามจำนวน card */
+  min-width: 100%;       /* แต่ยังเต็ม container */
+  padding: 10px;
+  background: linear-gradient(135deg, #faf5ff);
+  border-radius: 10px;
 }
 
 .dashboard-card-admin {
   text-align: center;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 20px;
+  padding: 28px 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  /* 🔧 ปรับปรุงการจัดการ overflow ของ card */
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.dashboard-card-admin::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  pointer-events: none;
 }
 
 .dashboard-card-admin:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
 }
 
 .dashboard-icon-admin {
-  font-size: 2rem;
-  margin-bottom: 12px;
+  font-size: 3rem;
+  margin-bottom: 16px;
+  color: rgba(255,255,255,0.9);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  position: relative;
+  z-index: 1;
 }
 
+/* 🎨 New Color Theme Cards */
 .admin-card-admin {
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  background: linear-gradient(135deg, #934A5E, #d9718d);
+  color: white;
 }
 
 .user-card-admin {
-  background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+  background: linear-gradient(135deg, #57648E, #8190bf);
+  color: white;
 }
 
 .article-card-admin {
-  background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+  background: linear-gradient(135deg, #846fa8, #C2B4D7);
+  color: #2d3748;
 }
 
 .dashboard-card-admin h3 {
-  margin: 8px 0;
+  margin: 12px 0 8px;
   font-weight: 600;
+  font-size: 1.1rem;
+  position: relative;
+  z-index: 1;
+  /* 🔧 ปรับปรุงการแสดงผลข้อความ */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
 }
 
-.dashboard--admin p {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #222;
+.dashboard-card-admin p {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  /* 🔧 ปรับปรุงการแสดงผลข้อความ */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+ 
+/* 🔧 สำหรับ ManageAdmin component */
+.manage-admin-container {
+  width: 100%;
+  /* 🔧 แก้ไข: ใช้ overflow-x เฉพาะในตารางที่ต้องการ */
+  overflow-x: visible;
+  margin-top: 50px;
+} 
+
+/* 🔧 แก้ไข: ให้ตารางมี horizontal scroll เฉพาะเมื่อจำเป็น */
+.manage-admin-container table,
+.manage-admin-container .ant-table-wrapper {
+  min-width: 600px;
+  overflow-x: auto;
+}
+
+/* 🔧 เพิ่ม: การจัดการ scroll เฉพาะในตาราง */
+.manage-admin-container .ant-table-content {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* ✅ Enhanced Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .dashboard-title-admin {
+    font-size: 2rem;
+    margin-bottom: 28px;
+  }
+  
+  .dashboard-grid-admin {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  
+  .dashboard-card-admin {
+    padding: 24px 18px;
+  }
+}
+
+@media (max-width: 992px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 30px;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 2.5rem;
+    margin-bottom: 14px;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 30px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 90vw;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-card-admin {
+    padding: 20px 16px;
+    border-radius: 16px;
+    margin: 0;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+  }
+  
+  .dashboard-card-admin h3 {
+    font-size: 1rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.6rem;
+  }
+
+}
+
+@media (max-width: 640px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 30px;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .dashboard-card-admin {
+    padding: 18px 14px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 2rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 20px;
+    margin-left: 8px;
+    margin-right: 8px;
+    width: 90vw;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    text-align: center;
+    padding: 0 10px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-card-admin {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .dashboard-card-admin h3 {
+    font-size: 0.9rem;
+    margin: 8px 0 4px;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 360px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 20px;
+    margin-left: 6px;
+    margin-right: 6px;
+    width: 90vw;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    padding: 0 5px;
+  }
+
+  .dashboard-card-admin {
+    padding: 14px 10px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 1.6rem;
+  }
+  
+  .dashboard-card-admin h3 {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.3rem;
+  }
+}
+
+/* 🎭 Loading State */
+.loading-card {
+  background: linear-gradient(135deg, #E5E5E5, #f0f0f0);
+  color: #666;
+}
+
+.loading-card .dashboard-icon-admin {
+  color: #999;
+}
+
+/* 🌟 Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-card-admin {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.dashboard-card-admin:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.dashboard-card-admin:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* 📱 Very Small Screens (Apple Watch, etc.) */
+@media (max-width: 280px) {
+  .health-dashboard-admin {
+    padding: 20px;
+    margin-top: 120px;
+    height: 90vh;
+  }
+  
+  .dashboard-title-admin {
+    font-size: 1rem;
+  }
+  
+  .dashboard-card-admin {
+    padding: 12px 8px;
+  }
+  
+  .dashboard-icon-admin {
+    font-size: 1.4rem;
+  }
+  
+  .dashboard-card-admin h3 {
+    font-size: 0.85rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.2rem;
+  }
 }

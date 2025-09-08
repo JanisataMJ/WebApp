@@ -3,7 +3,6 @@ import './createAdmin.css';
 import { Form, Input, Button, Radio, DatePicker, Row, Col, Card, message, Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { CreateAdmin } from '../../../../services/https/User/user';
-import logo from '../../../../assets/Logo.jpg';
 import type { UploadFile, UploadProps } from 'antd';
 import moment from 'moment';
 
@@ -17,6 +16,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm(); // <-- เพิ่มตรงนี้
 
   const getBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -58,26 +58,30 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
   };
 
   const onFinish = async (values: any) => {
-    try {
-      setLoading(true);
-      const formData = new FormData();
-      formData.append('username', values.user_name);
-      formData.append('password', values.password);
-      formData.append('email', values.email);
-      formData.append('firstName', values.first_name);
-      formData.append('lastName', values.last_name);
-      formData.append(
-        'birthdate',
-        values.birth_date ? moment(values.birth_date).format('YYYY-MM-DD') : ''
-      );
-      formData.append('genderID', values.gender.toString());
-      formData.append('phonenumber', values.phonnumber || '');
+  try {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('username', values.user_name);
+    formData.append('password', values.password);
+    formData.append('email', values.email);
+    formData.append('firstName', values.first_name);
+    formData.append('lastName', values.last_name);
 
-      if (fileList.length > 0 && fileList[0].originFileObj) {
-        formData.append('profile', fileList[0].originFileObj);
-      }
+    if (values.birthdate) {
+      const birth = values.birthdate.format
+        ? values.birthdate.format('YYYY-MM-DD')
+        : moment(values.birthdate).format('YYYY-MM-DD');
+      formData.append('birthdate', birth);
+    }
 
-      const res = await CreateAdmin(formData);
+    formData.append('genderID', values.gender.toString());
+    formData.append('phonenumber', values.phonnumber || '');
+
+    if (fileList.length > 0 && fileList[0].originFileObj) {
+      formData.append('profile', fileList[0].originFileObj);
+    }
+
+    const res = await CreateAdmin(formData);
       if (res.status === 201) {
         messageApi.success('Admin created successfully!');
         setTimeout(() => {
@@ -97,6 +101,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
     }
   };
 
+
   const handleCancel = () => {
     setFileList([]);
     onCancel();
@@ -108,43 +113,55 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
       <Modal
         title={
           <div className="modal-header-create-ad">
-            <img className="logo-create-ad" src={logo} alt="Logo" />
             <h2 className="modal-title-create-ad">Create New Admin</h2>
           </div>
         }
         open={open}
         onCancel={handleCancel}
         footer={null}
-        width={800}
+        width={900}
         centered
         className="addadmin-modal-create-ad"
         destroyOnClose
       >
         <div className="addadmin-container-create-ad">
           <Card className="addadmin-card-register-create-ad">
-            <Form name="register" layout="vertical" onFinish={onFinish}>
-              {/* Upload รูป */}
-              <Form.Item label="Profile Picture" className="profile-upload-item-create-ad">
-                <Upload
-                  listType="picture-card"
-                  fileList={fileList}
-                  onChange={onChange}
-                  onPreview={onPreview}
-                  maxCount={1}
-                  beforeUpload={beforeUpload}
-                  accept="image/png,image/jpeg,image/jpg"
-                  className="profile-upload-create-ad"
-                >
-                  {fileList.length < 1 && (
-                    <div className="upload-placeholder-create-ad">
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
-                  )}
-                </Upload>
-              </Form.Item>
+            <Form name="register" layout="vertical" onFinish={onFinish} form={form}>
+              <Row gutter={24} className="form-row-create-ad">
+                <Col span={12}>
+                  <Form.Item label="Profile Picture" className="profile-upload-item-create-ad">
+                    <Upload
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={onChange}
+                      onPreview={onPreview}
+                      maxCount={1}
+                      beforeUpload={beforeUpload}
+                      accept="image/png,image/jpeg,image/jpg"
+                      className="profile-upload-create-ad"
+                    >
+                      {fileList.length < 1 && (
+                        <div className="upload-placeholder-create-ad">
+                          <PlusOutlined />
+                          <div style={{ marginTop: 8 }}>Upload</div>
+                        </div>
+                      )}
+                    </Upload>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Username"
+                    name="user_name"
+                    rules={[{ required: true, message: 'Please enter username!' }]}
+                    className="form-item-create-ad"
+                  >
+                    <Input placeholder="Enter username" className="form-input-create-ad" />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Row gutter={16} className="form-row-create-ad">
+              <Row gutter={24} className="form-row-create-ad">
                 <Col span={12}>
                   <Form.Item
                     label="First Name"
@@ -167,15 +184,18 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                 </Col>
               </Row>
 
-              <Row gutter={16} className="form-row-create-ad">
+              <Row gutter={24} className="form-row-create-ad">
                 <Col span={12}>
                   <Form.Item
-                    label="Username"
-                    name="user_name"
-                    rules={[{ required: true, message: 'Please enter username!' }]}
+                    label="Email"
+                    name="email"
+                    rules={[
+                      { type: 'email', message: 'Invalid email format!' },
+                      { required: true, message: 'Please enter email!' },
+                    ]}
                     className="form-item-create-ad"
                   >
-                    <Input placeholder="Enter username" className="form-input-create-ad" />
+                    <Input placeholder="Enter email" className="form-input-create-ad" />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -190,20 +210,58 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                 </Col>
               </Row>
 
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  { type: 'email', message: 'Invalid email format!' },
-                  { required: true, message: 'Please enter email!' },
-                ]}
-                className="form-item-create-ad"
-              >
-                <Input placeholder="Enter email" className="form-input-create-ad" />
-              </Form.Item>
-
-              <Row gutter={16} className="form-row-create-ad">
+              <Row gutter={24} className="form-row-create-ad">
+                
                 <Col span={12}>
+                  <Form.Item
+                    label="Phone Number"
+                    name="phonnumber"
+                    rules={[
+                      { required: true, message: 'Please enter phone number!' },
+                      {
+                        pattern: /^\d{10}$/, // ตัวเลข 10 หลักพอดี
+                        message: 'Phone number must be exactly 10 digits!',
+                      },
+                    ]}
+                    className="form-item-create-ad"
+                  >
+                    <Input
+                      placeholder="Enter phone number"
+                      className="form-input-create-ad"
+                      maxLength={10} // ป้องกันกรอกเกิน
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Birth Date"
+                    name="birthdate"
+                    rules={[
+                      {
+                        validator: (_, value) => {
+                          if (!value) return Promise.reject(new Error('Please select birth date!'));
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
+                    className="form-item-create-ad"
+                  >
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      placeholder="Select birth date"
+                      className="date-picker-create-ad"
+                      disabledDate={(current) => {
+                        const today = moment();
+                        const cutoff = today.clone().subtract(18, 'years').endOf('day');
+                        return current && (current > cutoff || current > moment().endOf('day'));
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Row gutter={24} className="form-row-create-ad">
+                <Col span={24}>
                   <Form.Item
                     label="Gender"
                     name="gender"
@@ -216,43 +274,20 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Birth Date"
-                    name="birth_date"
-                    rules={[{ required: true, message: 'Please select birth date!' }]}
-                    className="form-item-create-ad"
-                  >
-                    <DatePicker 
-                      style={{ width: '100%' }} 
-                      placeholder="Select birth date" 
-                      className="date-picker-create-ad"
-                    />
-                  </Form.Item>
-                </Col>
               </Row>
-
-              <Form.Item
-                label="Phone Number"
-                name="phonnumber"
-                rules={[{ required: true, message: 'Please enter phone number!' }]}
-                className="form-item-create-ad"
-              >
-                <Input placeholder="Enter phone number" className="form-input-create-ad" />
-              </Form.Item>
 
               <Form.Item className="submit-item-create-ad">
                 <div className="button-group-create-ad">
-                  <Button 
-                    onClick={handleCancel} 
+                  <Button
+                    onClick={handleCancel}
                     className="cancel-btn-create-ad"
                     disabled={loading}
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    type="primary" 
-                    htmlType="submit" 
+                  <Button
+                    type="primary"
+                    htmlType="submit"
                     className="confirm-btn-create-ad"
                     loading={loading}
                   >

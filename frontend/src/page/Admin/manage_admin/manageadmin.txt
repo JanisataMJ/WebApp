@@ -1,394 +1,492 @@
-/*import React, { useState, useEffect } from 'react';
-import Headers from '../../../compronents/Pubblic_components/headerselect';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './manageAdmin.css';
-import CreateAdmin from './create/create_admin';
+import AddAdmin from './create/create_admin';
 import EditAdmin from './edit/edit_admin';
+import ViewUser from './view_user/view_user';
 
-const ManageAdmin = () => {
-
-  return (
-    <div><Headers />
-      <div className="health-dashboard-manageadmin">
-        ManageAdmin
-
-        <CreateAdmin />
-        <EditAdmin />
-      </div>
-    </div>
-  );
-};
-
-export default ManageAdmin;*/
-
-
-import React, { useState, useEffect } from 'react';
-import Headers from '../../../compronents/Pubblic_components/headerselect';
-import './manageAdmin.css';
-import CreateAdmin from './create/create_admin';
-import EditAdmin from './edit/edit_admin';
-
-import { Space, Table, Button, Col, Row, Divider, Modal, message, Select } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Space, Table, Button, Col, Row, Divider, Modal, message, Select, Spin } from "antd";
+import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, TeamOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { GetUsers, DeleteUsersById } from "../../../services/https/User/user";
 import { UsersInterface } from '../../../interface/profile_interface/IProfile';
-import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
-
 const { Option } = Select;
- 
+const { confirm } = Modal;
+
 function ManageAdmin() {
-  const columns: ColumnsType<UsersInterface> = [
+  const currentAdminID = Number(localStorage.getItem("id"));
+  
+  // State management
+  const [admins, setAdmins] = useState<UsersInterface[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(true);
+  
+  // Modal states
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<UsersInterface | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [roleFilter, setRoleFilter] = useState<number | null>(null);
+
+  // Memoized filtered data
+  const filteredAdmins = useMemo(() => {
+    if (roleFilter === null) return admins;
+    return admins.filter(admin => Number(admin.RoleID) === Number(roleFilter));
+  }, [admins, roleFilter]);
+
+  // Memoized table columns
+  const columns: ColumnsType<UsersInterface> = useMemo(() => [
     {
-      title: <span className="table-header">ลำดับ</span>,
+      title: <span className="table-header-manageadmin">ลำดับ</span>,
       key: "no",
-      // @ts-ignore
+      width: "8%",
       render: (text, record, index) => {
         const currentPage = pagination.current || 1;
-        const pageSize = pagination.pageSize || 5;
+        const pageSize = pagination.pageSize || 10;
         return currentPage === 1 ? index + 1 : (currentPage - 1) * pageSize + index + 1;
       },
     },
     {
-      title: <span className="table-header">รูปภาพ</span>,
-      dataIndex: "Profile",
-      key: "Name",
-      width: "15%",
-      render: ( // @ts-ignore
-      text, record) => (
-        <img
-          src={`http://localhost:8000/${record.profile}`}
-          className="w3-left w3-circle w3-margin-right"
-          width="50%"
-          alt="Profile"
-        />
-      ),
-    },
-    {
-      title: <span className="table-header">ชื่อ</span>,
-      dataIndex: "Name",
-      key: "name",
-    },
-    {
-      title: <span className="table-header">สี</span>,
-      dataIndex: "VehicleColor",
-      key: "vehicleColor",
-      render: (vehicleColor) => <>{vehicleColor?.Name || "N/A"}</>,
-    },
-    {
-      title: <span className="table-header">ประเภท</span>,
-      dataIndex: "VehicleType",
-      key: "vehicleType",
-      render: (vehicleType) => <>{vehicleType?.VehicleType || "N/A"}</>,
-    },
-    {
-      title: <span className="table-header">คำอธิบาย</span>,
-      dataIndex: "Description",
-      key: "description",
-    },
-    {
-      title: <span className="table-header">ราคา</span>,
-      dataIndex: "Price",
-      key: "price",
-    },
-    {
-      title: <span className="table-header">วันที่ได้รับรถ</span>,
-      dataIndex: "ReceivedDate",
-      key: "receivedDate",
-      render: (record) => <p>{dayjs(record).format("dddd DD MMM YYYY")}</p>,
-    },
-    {
-      title: <span className="table-header">สถานะ</span>,
-      dataIndex: "VehicleStatus",
-      key: "vehicleStatus",
-      render: (vehicleStatus) => <>{vehicleStatus?.VehicleStatus || "N/A"}</>,
-    },
-    {
-      title: <span className="table-header">จัดการ</span>,
-      dataIndex: "Manage",
-      key: "manage",
-      render: (// @ts-ignore
-        text, record) => (
-        <>
-          <Button 
-            onClick={() => navigate(`/vehiclemanager/vehicles/edit/${record.ID}`)}
-            shape="circle"
-            icon={<EditOutlined />}
-            size={"large"} />
-          <Button
-            onClick={() => showModal(record)}
-            style={{ marginLeft: 10 }}
-            shape="circle"
-            icon={<DeleteOutlined />}
-            size={"large"}
-            danger
+      title: <span className="table-header-manageadmin">รูปภาพ</span>,
+      dataIndex: "profile",
+      key: "profile",
+      width: "12%",
+      render: (text, record) => (
+        <div className="profile-image-container-manageadmin">
+          <img
+            src={record.profile ? `http://localhost:8000/${record.profile}` : '/default-avatar.png'}
+            className="profile-image-manageadmin"
+            alt="Profile"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/default-avatar.png';
+            }}
           />
-        </>
+        </div>
       ),
     },
     {
-      title: <span className="table-header">พนักงาน</span>,
-      dataIndex: "Employee",
-      key: "employee",
-      render: (employee) => (
-        <>
-          {employee?.User?.FirstName ? `${employee.User.FirstName} ${employee.User.LastName}` : "N/A"}
-        </>
+      title: <span className="table-header-manageadmin">ชื่อผู้ใช้</span>,
+      dataIndex: "username",
+      key: "username",
+      width: "15%",
+      render: (username) => (
+        <span style={{ fontWeight: 600, color: '#57648E' }}>
+          {username || "N/A"}
+        </span>
       ),
     },
-  ];
+    {
+      title: <span className="table-header-manageadmin">ชื่อ-นามสกุล</span>,
+      key: "fullName",
+      width: "20%",
+      render: (text, record) => (
+        <span style={{ fontWeight: 500 }}>
+          {`${record.firstName || ''} ${record.lastName || ''}`}
+        </span>
+      ),
+    },
+    {
+      title: <span className="table-header-manageadmin">อีเมล</span>,
+      dataIndex: "email",
+      key: "email",
+      width: "20%",
+      render: (email) => (
+        <span style={{ color: '#666' }}>
+          {email || "N/A"}
+        </span>
+      ),
+    },
+    {
+      title: <span className="table-header-manageadmin">เบอร์โทร</span>,
+      dataIndex: "phonenumber",
+      key: "phonenumber",
+      width: "15%",
+      render: (phone) => phone || "N/A",
+    },
+    {
+      title: <span className="table-header-manageadmin">วันเกิด</span>,
+      dataIndex: "birthdate",
+      key: "birthdate",
+      width: "15%",
+      render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "N/A",
+    },
+    {
+      title: <span className="table-header-manageadmin">เพศ</span>,
+      dataIndex: "genderID",
+      key: "gender",
+      width: "10%",
+      render: (gender) => {
+        const genderConfig = {
+          1: { text: "ชาย", color: "#57648E" },
+          2: { text: "หญิง", color: "#934A5E" }
+        };
+        const config = genderConfig[gender as keyof typeof genderConfig];
+        return config ? (
+          <span style={{ color: config.color, fontWeight: 600 }}>
+            {config.text}
+          </span>
+        ) : "N/A";
+      },
+    },
+    {
+      title: <span className="table-header-manageadmin">Role</span>,
+      dataIndex: "RoleID",
+      key: "role",
+      width: "10%",
+      render: (role) => {
+        const roleConfig = {
+          1: { text: "Admin", color: "#934A5E", icon: <UserOutlined /> },
+          2: { text: "User", color: "#57648E", icon: <TeamOutlined /> }
+        };
+        const config = roleConfig[role as keyof typeof roleConfig];
+        return config ? (
+          <span style={{ 
+            color: config.color, 
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px'
+          }}>
+            {config.icon}
+            {config.text}
+          </span>
+        ) : "N/A";
+      },
+    },
+    {
+      title: <span className="table-header-manageadmin">จัดการ</span>,
+      key: "manage",
+      width: "15%",
+      render: (text, record) => (
+        <div className="action-buttons-manageadmin">
+          {record.RoleID === 1 ? (
+            <>
+              <Button
+                onClick={() => handleEditAdmin(record)}
+                shape="circle"
+                icon={<EditOutlined />}
+                size="middle"
+                className="edit-btn-manageadmin"
+                title="แก้ไขข้อมูล"
+              />
+              {record.ID !== currentAdminID && (
+                <Button
+                  onClick={() => showDeleteConfirm(record)}
+                  shape="circle"
+                  icon={<DeleteOutlined />}
+                  size="middle"
+                  className="delete-btn-manageadmin"
+                  title="ลบข้อมูล"
+                />
+              )}
+            </>
+          ) : (
+            <Button
+              onClick={() => handleViewMore(record)}
+              type="default"
+              size="middle"
+              className="view-btn-manageadmin"
+              title="ดูข้อมูลเพิ่มเติม"
+            >
+              ดูข้อมูล
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ], [currentAdminID, pagination.current, pagination.pageSize]);
 
-  const navigate = useNavigate();
-  const [admins, setAdmins] = useState<UsersInterface[]>([]);
-  const [messageApi, contextHolder] = message.useMessage();
-
-  const [filteredAdmins, setFilteredAdmins] = useState<UsersInterface[]>([]);
-  //const [selectedType, setSelectedType] = useState<string | null>(null);
-  //const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 3 });
-  /*const [vehicletype, setVehicletype] = useState<VehicleTypeInterface[]>([]);
-  const [vehiclestatus, setVehiclestatus] = useState<VehicleStatusInterface[]>([]);*/
-
-
-  const getAdmins = async () => {
+  // Get admin data with loading state
+  const getAdmins = useCallback(async () => {
     try {
+      setTableLoading(true);
       const res = await GetUsers();
-      console.log(res)
-      if (res && Array.isArray(res)) {
+      console.log("Users data:", res);
+
+      if (res && Array.isArray(res.data)) {
+        setAdmins(res.data);
+      } else if (Array.isArray(res)) {
         setAdmins(res);
-        setFilteredAdmins(res);
       } else {
-        console.error("Error: Received data is not an array");
+        console.error("Error: Received data is not an array", res);
+        messageApi.error("ข้อมูลที่ได้รับไม่ถูกต้อง");
+        setAdmins([]);
       }
     } catch (error) {
-      messageApi.open({
-        type: "error",
-        content: "ไม่สามารถโหลดข้อมูลได้",
-      });
+      console.error("Error fetching admins:", error);
+      messageApi.error("ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+      setAdmins([]);
+    } finally {
+      setTableLoading(false);
     }
-  };
+  }, [messageApi]);
 
-  /*const GetVehicleType = async () => {
-    let res = await getAllVehicleTypes();
-    if (res) {
-      setVehicletype(res);
-    }
-  };
-
-  const GetVehicleStatus = async () => {
-    let res = await getAllVehicleStatus();
-    if (res) {
-      setVehiclestatus(res);
-    }
-  };
-
-  const handleFilterType = (value: string | null) => {
-    setSelectedType(value);
-    applyFilters(value, selectedStatus);
-  };
-
-  const handleFilterStatus = (value: string | null) => {
-    setSelectedStatus(value);
-    applyFilters(selectedType, value);
-  };
-
-  const applyFilters = (type: string | null, status: string | null) => {
-    let filtered = vehicles;
-
-    if (type) {
-      filtered = filtered.filter((v) => v.VehicleType?.ID === Number(type));
+  // Enhanced delete confirmation with modern modal
+  const showDeleteConfirm = useCallback((admin: UsersInterface) => {
+    if (admin.ID === currentAdminID) {
+      messageApi.error("คุณไม่สามารถลบบัญชีของตัวเองได้!");
+      return;
     }
 
-    if (status) {
-      filtered = filtered.filter((v) => v.VehicleStatus?.ID === Number(status));
-    }
+    confirm({
+      title: 'ยืนยันการลบข้อมูล',
+      icon: <ExclamationCircleOutlined style={{ color: '#934A5E' }} />,
+      content: (
+        <div style={{ padding: '12px 0' }}>
+          <p style={{ margin: 0, fontSize: '16px', fontWeight: 500 }}>
+            คุณต้องการลบแอดมิน <strong>"{admin.username}"</strong> หรือไม่?
+          </p>
+          <p style={{ margin: '8px 0 0', color: '#666', fontSize: '14px' }}>
+            การดำเนินการนี้ไม่สามารถย้อนกลับได้
+          </p>
+        </div>
+      ),
+      okText: 'ลบ',
+      okType: 'danger',
+      cancelText: 'ยกเลิก',
+      centered: true,
+      okButtonProps: {
+        style: {
+          background: 'linear-gradient(135deg, #ff0044ff, #ff0044ff)',
+          borderColor: '#ff0044ff',
+          borderRadius: '8px',
+          fontWeight: 600,
+          height: '40px',
+          padding: '0 20px',
+          color: '#ffffffff',
+        }
+      },
+      cancelButtonProps: {
+        style: {
+          borderColor: '#C2B4D7',
+          color: '#57648E',
+          borderRadius: '8px',
+          fontWeight: 600,
+          height: '40px',
+          padding: '0 20px'
+        }
+      },
+      onOk: () => handleDeleteAdmin(admin.ID),
+    });
+  }, [currentAdminID, messageApi]);
 
-    setFilteredVehicles(filtered);
-  };*/
+  const handleDeleteAdmin = useCallback(async (adminId: number | undefined) => {
+    if (!adminId) return;
 
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState<String>();
-  const [deleteId, setDeleteId] = useState<Number>();
-
-  const getUsers = async () => {
+    setLoading(true);
     try {
-      const res = await GetUsers();
-      if (res && Array.isArray(res)) {
-        setAdmins(res);
+      const res = await DeleteUsersById(String(adminId));
+      if (res) {
+        messageApi.success({
+          content: "ลบข้อมูลสำเร็จ",
+          duration: 3,
+          style: { marginTop: '20vh' }
+        });
+        await getAdmins();
       } else {
-        console.error("Received data is not an array:", res);
+        messageApi.error("เกิดข้อผิดพลาดในการลบข้อมูล");
       }
     } catch (error) {
-      console.error("Error fetching vehicles:", error);
-      messageApi.open({
-        type: "error",
-        content: "ไม่สามารถโหลดข้อมูลได้",
-      });
+      console.error("Delete error:", error);
+      messageApi.error("เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [messageApi, getAdmins]);
 
-  const showModal = (val: UsersInterface) => {
-    setModalText(`Do you want to delete the vehicle "${val.user_name}" ?`);
-    setDeleteId(val.ID);
-    setOpen(true);
-  };
+  // Event handlers
+  const handleAddAdmin = useCallback(() => {
+    setIsAddModalOpen(true);
+  }, []);
 
-  const handleOk = async () => {
-    setConfirmLoading(true);
-    let res = await DeleteUsersById(String(deleteId));
-    if (res) {
-      setOpen(false);
-      messageApi.open({
-        type: "success",
-        content: "ลบข้อมูลสำเร็จ",
-      });
-      getAdmins();
-    } else {
-      setOpen(false);
-      messageApi.open({
-        type: "error",
-        content: "เกิดข้อผิดพลาด !",
-      });
-    }
-    setConfirmLoading(false);
-  };
+  const handleAddModalCancel = useCallback(() => {
+    setIsAddModalOpen(false);
+  }, []);
 
-  const handleCancel = () => {
-    setOpen(false);
-  };
+  const handleAddSuccess = useCallback(() => {
+    getAdmins();
+    messageApi.success({
+      content: "เพิ่มแอดมินสำเร็จ",
+      duration: 3,
+      style: { marginTop: '20vh' }
+    });
+  }, [getAdmins, messageApi]);
 
-  const handlePageChange = (page: number, pageSize: number) => {
+  const handleEditAdmin = useCallback((admin: UsersInterface) => {
+    setSelectedAdmin(admin);
+    setIsEditModalOpen(true);
+  }, []);
+
+  const handleEditModalCancel = useCallback(() => {
+    setIsEditModalOpen(false);
+    setSelectedAdmin(null);
+  }, []);
+
+  const handleEditSuccess = useCallback(() => {
+    getAdmins();
+    messageApi.success({
+      content: "แก้ไขข้อมูลสำเร็จ",
+      duration: 3,
+      style: { marginTop: '20vh' }
+    });
+  }, [getAdmins, messageApi]);
+
+  const handlePageChange = useCallback((page: number, pageSize: number) => {
     setPagination({
       current: page,
       pageSize,
     });
-  };
-
-  useEffect(() => {
-    getUsers();
-    getAdmins();
-    //GetVehicleType();
-    //GetVehicleStatus();
   }, []);
 
+  const handleViewMore = useCallback((user: UsersInterface) => {
+    setSelectedAdmin(user);
+    setIsViewModalOpen(true);
+  }, []);
+
+  const handleViewModalCancel = useCallback(() => {
+    setIsViewModalOpen(false);
+    setSelectedAdmin(null);
+  }, []);
+
+  // Filter handler
+  const handleRoleFilterChange = useCallback((value: number | undefined) => {
+    setRoleFilter(value !== undefined ? Number(value) : null);
+    // Reset pagination to first page when filter changes
+    setPagination(prev => ({ ...prev, current: 1 }));
+  }, []);
+
+  // Format numbers with commas
+  const formatCount = useCallback((count: number): string => {
+    return count.toLocaleString('th-TH');
+  }, []);
+
+  // Effects
+  useEffect(() => {
+    getAdmins();
+  }, [getAdmins]);
+
   return (
-    <>
-      
+    <Spin spinning={loading} tip="กำลังประมวลผล...">
       {contextHolder}
-      <Row>
-        <Col span={12}>
-        <div style={{ display: "flex"}}>
-          <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#B25900', marginRight: "15px" }}>Manage Vehicle</h2>
-            <span
-              style={{
-                marginLeft: "8px",
-                backgroundColor: "#FED400",
-                color: "#000",
-                fontWeight: "bold",
-                fontSize: "25px",
-                width: "45px",
-                height: "45px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px solid #B25900",
-                
-              }}
-            >
-              {/*{filteredVehicles.length}*/}
+      
+      {/* Header Section */}
+      <Row className="header-row-manageadmin">
+        <Col xs={24} sm={24} md={12} lg={12}>
+          <div className="title-section-manageadmin">
+            <h2 className="page-title-manageadmin">จัดการแอดมิน</h2>
+            <span className="admin-count-badge-manageadmin">
+              {formatCount(filteredAdmins.length)}
             </span>
           </div>
         </Col>
-        <Col span={12} style={{ textAlign: "end", alignSelf: "center" }}>
-          <Space>
-            <Link to="/vehiclemanager/create-vehicle">
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined/>}
-                style={{ backgroundColor: '#FED400', borderColor: '#FED400', color: '#000000', borderRadius: '30px', boxShadow: "0px 0px 10px 2px rgba(0, 0, 0, 0.2)" }}
-                size="large"
-              >
-                Add Vehicle
-              </Button>
-            </Link>
-          </Space>
+        <Col xs={24} sm={24} md={12} lg={12} className="add-button-section-manageadmin">
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={handleAddAdmin}
+            className="add-admin-btn-manageadmin"
+            size="large"
+            loading={loading}
+          >
+            เพิ่มแอดมิน
+          </Button>
         </Col>
       </Row>
-      <Divider />
 
-      <Space style={{ marginBottom: 10, width: "100%" }} direction="vertical">
-        <Row style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Space style={{ display: "flex", gap: "16px" }}>
-            {/*<Col flex="none">
-              <span>Type : </span>
-              <Select
-                style={{ width: 150 }}
-                placeholder="Choose Type"
-                onChange={handleFilterType}
-                allowClear
-              >
-                {vehicletype.map((item) => (
-                  <Option key={item.ID} value={item.ID}>
-                    {item.VehicleType}
-                  </Option>
-                ))}
-              </Select>
-            </Col>*
-            <Col flex="none">
-              <span>Status : </span>
-              <Select
-                style={{ width: 150 }}
-                placeholder="Choose Status"
-                onChange={handleFilterStatus}
-                allowClear
-              >
-                {vehiclestatus.map((item) => (
-                  <Option key={item.ID} value={item.ID}>
-                    {item.VehicleStatus}
-                  </Option>
-                ))}
-              </Select>
-            </Col>*/}
+      <Divider className="section-divider-manageadmin" />
+
+      {/* Filters Section */}
+      <Space className="filters-section-manageadmin" direction="vertical">
+        <Row className="filters-row-manageadmin">
+          <Space className="filter-controls-manageadmin" wrap>
+            <span>กรองตาม Role:</span>
+            <Select
+              style={{ minWidth: 150 }}
+              placeholder="เลือก Role"
+              allowClear
+              value={roleFilter}
+              onChange={handleRoleFilterChange}
+              disabled={tableLoading}
+            >
+              <Option value={1}>
+                <UserOutlined style={{ marginRight: 8 }} />
+                Admin
+              </Option>
+              <Option value={2}>
+                <TeamOutlined style={{ marginRight: 8 }} />
+                User
+              </Option>
+            </Select>
           </Space>
         </Row>
       </Space>
       
-      <div>
+      {/* Table Section */}
+      <div className="table-container-manageadmin">
         <Table
           rowKey="ID"
           columns={columns}
-          
-          scroll={{ x: "100%" }}
+          dataSource={filteredAdmins}
+          loading={tableLoading}
+          scroll={{ x: 1200 }}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
+            total: filteredAdmins.length,
             onChange: handlePageChange,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => 
+              `แสดง ${range[0]}-${range[1]} จาก ${formatCount(total)} รายการทั้งหมด`,
+            className: "custom-pagination-manageadmin",
+            pageSizeOptions: ['5', '10', '20', '50'],
+            responsive: true,
+          }}
+          className="admin-table-manageadmin"
+          size="middle"
+          locale={{
+            emptyText: (
+              <div style={{ padding: '40px', textAlign: 'center' }}>
+                <UserOutlined style={{ fontSize: '48px', color: '#C2B4D7', marginBottom: '16px' }} />
+                <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
+                  {roleFilter !== null ? 'ไม่พบข้อมูลที่ตรงกับการกรอง' : 'ไม่พบข้อมูล'}
+                </p>
+              </div>
+            )
           }}
         />
       </div>
-      <Modal
-        title={<span><DeleteOutlined /> Delete?</span>}
-        open={open}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        okText="Delete"
-        width={450} 
-        bodyStyle={{ padding: '30px' }} 
-        style={{ top: 200 }} 
-        okButtonProps={{
-          style: { backgroundColor: '#FFFFFF', borderColor: '#FF3333', color: '#FF3333', borderRadius: '50px' }, 
-        }}
-        cancelButtonProps={{
-          style: { backgroundColor: '#FF3333', borderColor: '#FFFFFF', color: '#FFFFFF', borderRadius: '50px' }, 
-        }}
-      >
-        <p style={{ color: '#000000', fontWeight: 'bold', fontSize: '15px' }}>{modalText}</p>
-      </Modal>
-    </>
+
+      {/* Modals */}
+      <AddAdmin 
+        open={isAddModalOpen}
+        onCancel={handleAddModalCancel}
+        onSuccess={handleAddSuccess}
+      />
+
+      {selectedAdmin && (
+        <EditAdmin 
+          open={isEditModalOpen}
+          onCancel={handleEditModalCancel}
+          onSuccess={handleEditSuccess}
+          adminData={selectedAdmin}
+        />
+      )}
+
+      {selectedAdmin && (
+        <ViewUser
+          open={isViewModalOpen}
+          onCancel={handleViewModalCancel}
+          userData={selectedAdmin}
+        />
+      )}
+    </Spin>
   );
 }
+
 export default ManageAdmin;

@@ -5,9 +5,9 @@ import Headers from '../../../compronents/Pubblic_components/headerselect';
 import AddArticle from './create_article/create_article';
 import EditArticle from './edit_article/edit_article';
 import { ArticleInterface } from '../../../interface/article_interface/article';
-import { 
-  getAllArticles, 
-  deleteArticle, 
+import {
+  getAllArticles,
+  deleteArticle,
   updateArticleOrder,
   publishArticleNow,
   unpublishArticle
@@ -91,23 +91,40 @@ const ArticlePage: React.FC = () => {
     }
   };
 
-  if (loading) return <Spin size="large" />;
+  if (loading) {
+    return (
+      <div>
+        <Headers />
+        <div className="loading-container-article">
+          <Spin size="large" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       <Headers />
-      <div className="health-dashboard-article p-4">
-        <h2>Admin Home</h2>
+      <div className="health-dashboard-article">
+        <div className="page-header-article">
+          <h2 className="page-title-article">📝 จัดการบทความ</h2>
+        </div>
 
-        <AddArticle
-          adminID={currentAdminID}
-          onSuccess={fetchArticles} // refresh list after adding
-        />
+        <div className="add-article-section-article">
+          <AddArticle
+            adminID={currentAdminID}
+            onSuccess={fetchArticles}
+          />
+        </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="articles">
             {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="articles-grid-article"
+              >
                 {articles.map((article, index) => (
                   <Draggable key={article.ID} draggableId={article.ID.toString()} index={index}>
                     {(provided) => (
@@ -115,70 +132,97 @@ const ArticlePage: React.FC = () => {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
+                        className="article-card-wrapper-article"
                       >
-  <Card
-  key={article.ID}
-  hoverable
-  className={article.Published ? "border-green-500 border-2 relative" : "border-gray-200 relative"}
-  cover={
-    article.Image ? (
-      <img
-        alt={article.Title}
-        src={article.Image.startsWith("http") ? article.Image : `http://localhost:8000/${article.Image}`}
-        className="h-48 object-cover"
-      />
-    ) : (
-      <div className="h-48 flex items-center justify-center bg-gray-100 text-gray-500">
-        No Image
-      </div>
-    )
-  }
->
-  {/* ปุ่มเผยแพร่เป็นวงกลม มุมบนขวา */}
-  <Button
-    shape="circle"
-    size="small"
-    style={{
-      position: "absolute",
-      top: 8,
-      right: 8,
-      backgroundColor: article.Published ? "#22c55e" : "#9ca3af",
-      borderColor: article.Published ? "#22c55e" : "#9ca3af",
-      boxShadow: "0 0 4px rgba(0,0,0,0.2)"
-    }}
-    onClick={() => article.Published ? handleUnpublish(article.ID) : handlePublish(article.ID)}
-  />
+                        <Card
+                          key={article.ID}
+                          hoverable
+                          className={`article-card-article ${article.Published
+                              ? "published-card-article"
+                              : "unpublished-card-article"
+                            }`}
+                          cover={
+                            article.Image ? (
+                              <div className="card-image-container-article">
+                                <img
+                                  alt={article.Title}
+                                  src={article.Image.startsWith("http")
+                                    ? article.Image
+                                    : `http://localhost:8000/${article.Image}`}
+                                  className="card-image-article"
+                                />
+                              </div>
+                            ) : (
+                              <div className="no-image-placeholder-article">
+                                <span>📷 No Image</span>
+                              </div>
+                            )
+                          }
+                        >
+                          {/* ปุ่มเผยแพร่เป็นวงกลม มุมบนขวา */}
+                          <Button
+                            shape="circle"
+                            size="small"
+                            className={`publish-button-article ${article.Published
+                                ? "published-button-article"
+                                : "unpublished-button-article"
+                              }`}
+                            onClick={() =>
+                              article.Published
+                                ? handleUnpublish(article.ID)
+                                : handlePublish(article.ID)
+                            }
+                          />
 
-  <Meta
-    title={article.Title}
-    description={
-      <div className="mt-2">
-        <p className="line-clamp-2">{article.Information}</p>
-        <small className="text-gray-500">แหล่งอ้างอิง: {article.Reference}</small><br />
-        {article.PublishDate && (
-          <small style={{ color: article.Published ? "#22c55e" : "#ef4444" }}>
-            วันที่เผยแพร่ล่าสุด: {moment(article.PublishDate).format("YYYY-MM-DD HH:mm")}
-          </small>
-        )}
-      </div>
-    }
-  />
+                          <Meta
+                            title={<span className="card-title-article">{article.Title}</span>}
+                            description={
+                              <div className="card-description-article">
+                                <p className="card-info-article">{article.Information}</p>
+                                <div className="card-reference-article">
+                                  <small>แหล่งอ้างอิง: {article.Reference}</small>
+                                </div>
+                                {article.PublishDate && (
+                                  <div className={`publish-date-article ${article.Published ? "published-date-article" : "unpublished-date-article"
+                                    }`}>
+                                    <small>
+                                      วันที่เผยแพร่ล่าสุด: {moment(article.PublishDate).format("DD/MM/YYYY HH:mm")}
+                                    </small>
+                                  </div>
+                                )}
+                              </div>
+                            }
+                          />
 
-  {/* ปุ่มแก้ไขและลบ */}
-  <div className="flex justify-between mt-2">
-    <Button type="link" onClick={() => setEditing(article)}>✏️ แก้ไข</Button>
-    <Popconfirm
-      title="ยืนยันการลบ?"
-      onConfirm={() => handleDelete(article.ID)}
-      okText="ใช่"
-      cancelText="ยกเลิก"
-    >
-      <Button type="link" danger>🗑️ ลบ</Button>
-    </Popconfirm>
-  </div>
-</Card>
+                          {/* ปุ่มแก้ไขและลบ */}
+                          <div className="card-actions-article">
+                            <Button
+                              type="link"
+                              className="edit-button-article"
+                              onClick={() => setEditing(article)}
+                            >
+                              ✏️ Edit
+                            </Button>
 
+                            <Popconfirm
+                              title="ยืนยันการลบบทความ?"
+                              onConfirm={() => handleDelete(article.ID)}
+                              okText="ใช่"
+                              cancelText="ยกเลิก"
+                              placement="topRight"
+                            >
+                              {/* เปลี่ยน type เป็น "default" หรือ "text" แทน "link" */}
+                              <Button
+                                type="text"
+                                danger
+                                className="delete-button-article"
+                              >
+                                🗑️ Delete
+                              </Button>
+                            </Popconfirm>
+                          </div>
 
+                        </Card>
                       </div>
                     )}
                   </Draggable>

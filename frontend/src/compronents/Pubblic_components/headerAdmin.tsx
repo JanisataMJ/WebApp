@@ -6,7 +6,7 @@ import logo from '../../assets/Logo.jpg';
 import { GetUsersById, UpdateStatusWriterById } from '../../services/https/User/user';
 import { UsersInterface } from '../../interface/profile_interface/IProfile';
 import { UserOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation  } from 'react-router-dom';
 
 const HeaderAdmin: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
@@ -14,6 +14,7 @@ const HeaderAdmin: React.FC = () => {
     const [isWriter, setIsWriter] = useState<boolean | null>(null);
     const [users, setUser] = useState<UsersInterface | null>(null);
     const { token: { colorBgContainer } } = theme.useToken();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -58,6 +59,10 @@ const HeaderAdmin: React.FC = () => {
         }
     };
 
+    const isActive = (path: string) => {
+        return location.pathname === path; // true ถ้า path ปัจจุบันตรงกับ path ที่ส่งมา
+    };
+
     return (
         <>
             {contextHolder}
@@ -66,10 +71,20 @@ const HeaderAdmin: React.FC = () => {
                     <img src={logo} alt="Logo" className="logo-img-headAdmin" />
                 </a>
 
-                <Link to="/admin/home" className="header-link-headAdmin">HOME</Link>
-                <Link to="/admin/article" className="header-link-headAdmin">ARTICLE</Link>
-                <Link to="/admin/manageAdmin" className="header-link-headAdmin">ADMIN</Link>
-                
+                <Link 
+                    to="/admin/home" 
+                    className={`header-link-headAdmin ${isActive('/admin/home') ? 'active-link-headAdmin' : ''}`}
+                >
+                    MANAGE
+                </Link>
+
+                <Link 
+                    to="/admin/article" 
+                    className={`header-link-headAdmin ${isActive('/admin/article') ? 'active-link-headAdmin' : ''}`}
+                >
+                    ARTICLE
+                </Link>
+
                 <div className="profile-headAdmin">
                     <Dropdown align="end" onSelect={handleDropdownSelect}>
                         <Dropdown.Toggle as="div" className="avatar-toggle-headAdmin">

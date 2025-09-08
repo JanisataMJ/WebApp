@@ -3,6 +3,7 @@ package users
 import (
    "net/http"
    "time"
+   "strconv"
 
    "github.com/gin-gonic/gin"
    "github.com/JanisataMJ/WebApp/config"
@@ -72,51 +73,87 @@ func Get(c *gin.Context) {
    c.JSON(http.StatusOK, gin.H{"message": "Updated successful"})
 }*/
 func Update(c *gin.Context) {
-    var user entity.User
+	var user entity.User
 
-    UserID := c.Param("id")
-    db := config.DB()
+	UserID := c.Param("id")
+	db := config.DB()
 
-    result := db.First(&user, UserID)
-    if result.Error != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "id not found"})
-        return
-    }
+	result := db.First(&user, UserID)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "id not found"})
+		return
+	}
 
-    // รับค่าฟอร์มทั่วไป
-    if username := c.PostForm("username"); username != "" {
-        user.Username = username
-    }
-    if email := c.PostForm("email"); email != "" {
-        user.Email = email
-    }
-    if firstName := c.PostForm("firstName"); firstName != "" {
-        user.FirstName = firstName
-    }
-    if lastName := c.PostForm("lastName"); lastName != "" {
-        user.LastName = lastName
-    }
-    if birthdate := c.PostForm("birthdate"); birthdate != "" {
-        t, err := time.Parse("2006-01-02", birthdate)
-        if err == nil {
-            user.Birthdate = t
-        }
-    }
+	// รับค่าฟอร์มทั่วไป
+	if username := c.PostForm("username"); username != "" {
+		user.Username = username
+	}
+	if email := c.PostForm("email"); email != "" {
+		user.Email = email
+	}
+	if firstName := c.PostForm("firstName"); firstName != "" {
+		user.FirstName = firstName
+	}
+	if lastName := c.PostForm("lastName"); lastName != "" {
+		user.LastName = lastName
+	}
+	if birthdate := c.PostForm("birthdate"); birthdate != "" {
+		if t, err := time.Parse("2006-01-02", birthdate); err == nil {
+			user.Birthdate = t
+		}
+	}
+	if genderID := c.PostForm("genderID"); genderID != "" {
+		if id, err := strconv.ParseUint(genderID, 10, 32); err == nil {
+			user.GenderID = uint(id)
+		}
+	}
+	if phonenumber := c.PostForm("phonenumber"); phonenumber != "" {
+		user.Phonenumber = phonenumber
+	}
 
-    // รับไฟล์รูป
-    file, err := c.FormFile("profile")
-    if err == nil {
-        filePath := "uploads/" + file.Filename
-        c.SaveUploadedFile(file, filePath)
-        user.Profile = filePath
-    }
+	// รับค่าตัวเลขร่างกาย
+	if height := c.PostForm("height"); height != "" {
+		if h, err := strconv.ParseFloat(height, 64); err == nil {
+			user.Height = h
+		}
+	}
+	if weight := c.PostForm("weight"); weight != "" {
+		if w, err := strconv.ParseFloat(weight, 64); err == nil {
+			user.Weight = w
+		}
+	}
+	if bust := c.PostForm("bust"); bust != "" {
+		if b, err := strconv.ParseFloat(bust, 64); err == nil {
+			user.Bust = b
+		}
+	}
+	if waist := c.PostForm("waist"); waist != "" {
+		if w, err := strconv.ParseFloat(waist, 64); err == nil {
+			user.Waist = w
+		}
+	}
+	if hip := c.PostForm("hip"); hip != "" {
+		if h, err := strconv.ParseFloat(hip, 64); err == nil {
+			user.Hip = h
+		}
+	}
 
-    result = db.Save(&user)
-    if result.Error != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
-        return
-    }
-    c.JSON(http.StatusOK, gin.H{"message": "Updated successful"})
+	// รับไฟล์รูป
+	file, err := c.FormFile("profile")
+	if err == nil {
+		filePath := "uploads/" + file.Filename
+		if err := c.SaveUploadedFile(file, filePath); err == nil {
+			user.Profile = filePath
+		}
+	}
+
+	// บันทึกลง DB
+	result = db.Save(&user)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Updated successful"})
 }
 
 

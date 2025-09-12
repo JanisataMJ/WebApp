@@ -64,18 +64,18 @@ const Navbar: React.FC = () => {
             onClick={handleHomeClick}
             className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}
           >
-            <span>HOME</span>
+            <span>หน้าหลัก</span>
           </a>
 
           {isInPage && showSubmenu && (
           <div className="sub-nav">
             {[
-              { id: 'chart1', label: 'Temperature' },
-              { id: 'chart2', label: 'Heart Rate' }, 
-              { id: 'chart3', label: 'Calorie' },
-              { id: 'chart4', label: 'SPO2' },
-              { id: 'chart5', label: 'Steps' },
-              { id: 'chart6', label: 'Sleep' },
+              { id: 'chart1', label: 'อุณหภูมิร่างกาย' },
+              { id: 'chart2', label: 'อัตราการเต้นหัวใจ' }, 
+              { id: 'chart3', label: 'พลังงานที่ใช้ไป' },
+              { id: 'chart4', label: 'ออกซิเจนในเลือด' },
+              { id: 'chart5', label: 'จำนวนก้าว' },
+              { id: 'chart6', label: 'การนอนหลับ' },
             ].map((item) => (
               <a
                 key={item.id}
@@ -93,21 +93,21 @@ const Navbar: React.FC = () => {
           to="/calendar"
           className={`nav-link ${isActive('/calendar') ? 'active' : ''}`}
         >
-          <span>MOOD</span>
+          <span>อารมณ์/ความรู้สึก</span>
         </Link>
 
         <Link
           to="/overview"
           className={`nav-link ${isActive('/overview') ? 'active' : ''}`}
         >
-          <span>OVERVIEW</span>
+          <span>ภาพรวมสุขภาพ</span>
         </Link>
 
         <Link
           to="/tips"
           className={`nav-link ${isActive('/tips') ? 'active' : ''}`}
         >
-          <span>HEALTHY TIPS</span>
+          <span>เคล็ดลับดูแลสุขภาพ</span>
         </Link>
       </div>
     </div>

@@ -95,7 +95,7 @@
 
 /* Filters Section */
 .filters-section-manageadmin {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   width: 100%;
 }
 
@@ -116,6 +116,7 @@
   font-weight: 600;
   color: #934A5E;
   margin-bottom: 14px;
+  margin-top: 8px;
 }
 
 .filter-controls-manageadmin .ant-select {
@@ -134,6 +135,16 @@
 .filter-controls-manageadmin .ant-select-focused .ant-select-selector {
   border-color: #57648E !important;
   box-shadow: 0 0 0 2px rgba(87, 100, 142, 0.2) !important;
+}
+
+.filter-sub-controls-manageadmin {
+  height: 30px;
+  width: 100% !important;
+  border-radius: 10px;
+  border: 2px solid #C2B4D7;
+  background: rgba(255, 255, 255, 0.9);
+  color: #934A5E;
+  padding: 0px 15px;
 }
 
 /* Table Container */

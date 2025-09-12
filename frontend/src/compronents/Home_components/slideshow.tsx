@@ -31,49 +31,49 @@ const Slider: React.FC = () => {
   const mapHealthData = (data: HealthDataInterface): HealthItem[] => [
     {
       icon: Heart,
-      label: "Heart Rate",
+      label: "อัตราการเต้นหัวใจ",
       value: data.Bpm.toString(),
-      sub: findAnalysis(data, "Heart Rate")?.Interpretation || "No Data",
+      sub: findAnalysis(data, "Heart Rate")?.Interpretation || "ไม่มีข้อมูล",
       color: "#ef4444",
       bgGradient: "linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)"
     },
     {
       icon: Activity,
-      label: "Calorie",
+      label: "พลังงานที่ใช้ไป",
       value: data.CaloriesBurned.toFixed(0),
-      sub: findAnalysis(data, "Calorie")?.Suggestion || "No Data",
+      sub: findAnalysis(data, "Calorie")?.Suggestion || "ไม่มีข้อมูล",
       color: "#f59e0b",
       bgGradient: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)"
     },
     {
       icon: Droplets,
-      label: "SPO2",
+      label: "ออกซิเจนในเลือด",
       value: `${data.Spo2}%`,
-      sub: findAnalysis(data, "SPO2")?.Interpretation || "No Data",
+      sub: findAnalysis(data, "SPO2")?.Interpretation || "ไม่มีข้อมูล",
       color: "#3b82f6",
       bgGradient: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)"
     },
     {
       icon: Moon,
-      label: "Sleep",
+      label: "การนอนหลับ",
       value: `${Math.floor(data.SleepHours)}h ${Math.round((data.SleepHours % 1) * 60)}m`,
-      sub: findAnalysis(data, "Sleep")?.Suggestion || "No Data",
+      sub: findAnalysis(data, "Sleep")?.Suggestion || "ไม่มีข้อมูล",
       color: "#6366f1",
       bgGradient: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)"
     },
     {
       icon: TrendingUp,
-      label: "Steps",
+      label: "จำนวนก้าว",
       value: data.Steps.toString(),
-      sub: findAnalysis(data, "Steps")?.Interpretation || "No Data",
+      sub: findAnalysis(data, "Steps")?.Interpretation || "ไม่มีข้อมูล",
       color: "#10b981",
       bgGradient: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"
     },
     {
       icon: Thermometer,
-      label: "Body Temp",
+      label: "อุณหภูมิร่างกาย",
       value: `${data.BodyTemp.toFixed(1)}°C`,
-      sub: findAnalysis(data, "Body Temp")?.Interpretation || "No Data",
+      sub: findAnalysis(data, "Body Temp")?.Interpretation || "ไม่มีข้อมูล",
       color: "#f97316",
       bgGradient: "linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)"
     }
@@ -134,16 +134,16 @@ const Slider: React.FC = () => {
 
   const getCurrentDate = () => {
     const now = new Date();
-    return now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    return now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const getCurrentTime = () => {
     const now = new Date();
-    return now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return now.toLocaleTimeString('th-TH', { hour: 'numeric', minute: '2-digit', hour12: false });
   };
 
   if (healthItems.length === 0) {
-    return <div>Loading health data...</div>;
+    return <div>โหลดข้อมูลสุขภาพ...</div>;
   }
 
   return (
@@ -151,7 +151,7 @@ const Slider: React.FC = () => {
       <div className="slider-wrapper">
         {/* Header Section */}
         <div className="slider-header">
-          <h2 className="slider-title">Health Metrics</h2>
+          <h2 className="slider-title">ดัชนีสุขภาพ</h2>
           <div className="date-container">
             <div className="date">{getCurrentDate()}</div>
             <div className="time">{getCurrentTime()}</div>
@@ -245,13 +245,13 @@ const Slider: React.FC = () => {
         {/* Quick Stats */}
         <div className="quick-stats">
           <div className="stat-item">
-            <span className="stat-label">Today's Focus</span>
+            <span className="stat-label">สิ่งที่ควรโฟกัสวันนี้</span>
             <span className="stat-value" style={{ color: healthItems[currentIndex].color }}>
               {healthItems[currentIndex].label}
             </span>
           </div>
           <div className="stat-item">
-            <span className="stat-label">Status</span>
+            <span className="stat-label">สถานะ</span>
             <span className="stat-value" style={{ color: healthItems[currentIndex].color }}>
               {healthItems[currentIndex].sub || 'Monitoring'}
             </span>

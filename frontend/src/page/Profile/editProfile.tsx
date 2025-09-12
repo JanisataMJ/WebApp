@@ -136,71 +136,6 @@ const EditProfile: React.FC = () => {
         imgWindow?.document.write(image.outerHTML);
     };
 
-    /*const onFinish = async (values: FormData) => {
-        const token = localStorage.getItem("token");
-        const userId = localStorage.getItem("id");
-
-        if (!token || !userId) {
-            messageApi.error("Token or User ID not found, please log in again");
-            return;
-        }
-
-        try {
-            setLoading(true);
-
-            let base64Image: string | undefined = undefined;
-            if (fileList.length > 0 && fileList[0].originFileObj) {
-                base64Image = await getBase64(fileList[0].originFileObj as File);
-            }
-
-            const data = {
-                Username: values.user_name,
-                FirstName: values.first_name,
-                LastName: values.last_name,
-                Email: values.email,
-                GenderID: values.gender === 'Male' ? 1 : values.gender === 'Female' ? 2 : 3,
-                Birthdate: values.birth_date ? values.birth_date.toISOString() : null,
-                weight: values.weight,
-                height: values.height,
-                Phonenumber: values.phonenumber,
-                bust: values.bust,
-                waist: values.waist,
-                hip: values.hip,
-                Picture: base64Image || (profileDeleted ? null : undefined),
-            };
-
-            console.log("📦 Payload:", data);
-
-            const res = await axios.put(`http://localhost:8000/user/${userId}`, data, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            console.log("✅ Response:", res.data);
-            messageApi.success("Profile updated successfully");
-
-            setTimeout(() => {
-                navigate('/profile');
-            }, 1500);
-
-        } catch (err: any) {
-            console.error("❌ Error:", err.response?.data || err.message);
-            if (err.response?.status === 401) {
-                messageApi.error("Session expired, please log in again");
-                localStorage.removeItem('token');
-                localStorage.removeItem('id');
-                navigate('/login');
-            } else if (err.response?.status === 400) {
-                messageApi.error("Invalid data submitted");
-            } else {
-                messageApi.error("Failed to save data, please try again");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };*/
     const onFinish = async (values: FormData) => {
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("id");
@@ -280,35 +215,34 @@ const EditProfile: React.FC = () => {
                     >
                         <ArrowLeftOutlined />
                     </button>
-                    <h1 className="editprofile-title">Edit Profile</h1>
+                    <h1 className="editprofile-title">กลับหน้าโปรไฟล์</h1>
                 </div>
 
                 <div className="edit-profile-content">
-                    <div className="profile-image-section">
-                        <div className="profile-upload-container">
-                            <Upload
-                                listType="picture-card"
-                                fileList={fileList}
-                                onChange={onChange}
-                                onPreview={onPreview}
-                                maxCount={1}
-                                beforeUpload={beforeUpload}
-                                className="profile-upload"
-                                accept="image/png,image/jpeg,image/jpg"
-                            >
-                                {fileList.length < 1 && (
-                                    <div className="upload-placeholder">
-                                        <PlusOutlined />
-                                        <div style={{ marginTop: 8 }}>Upload</div>
-                                    </div>
-                                )}
-                            </Upload>
-                        </div>
-                    </div>
-
                     <div className="form-section">
                         <div className="form-card">
-                            <h2 className="form-title">Personal Information</h2>
+                            <h2 className="form-title">แก้ไขข้อมูลส่วนตัว</h2>
+                            <div className="profile-image-section">
+                                <div className="profile-upload-container">
+                                    <Upload
+                                        listType="picture-card"
+                                        fileList={fileList}
+                                        onChange={onChange}
+                                        onPreview={onPreview}
+                                        maxCount={1}
+                                        beforeUpload={beforeUpload}
+                                        className="profile-upload"
+                                        accept="image/png,image/jpeg,image/jpg"
+                                    >
+                                        {fileList.length < 1 && (
+                                            <div className="upload-placeholder">
+                                                <PlusOutlined />
+                                                <div style={{ marginTop: 8 }}>เพิ่มรูปภาพ</div>
+                                            </div>
+                                        )}
+                                    </Upload>
+                                </div>
+                            </div>
                             <Form
                                 form={form}
                                 layout="vertical"
@@ -321,7 +255,7 @@ const EditProfile: React.FC = () => {
                                     {/* Name */}
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>First Name</label>
+                                            <label>ชื่อ</label>
                                             <Form.Item
                                                 name="first_name"
                                                 className="form-item"
@@ -334,7 +268,7 @@ const EditProfile: React.FC = () => {
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>Last Name</label>
+                                            <label>นามสกุล</label>
                                             <Form.Item
                                                 name="last_name"
                                                 className="form-item"
@@ -351,20 +285,20 @@ const EditProfile: React.FC = () => {
                                     {/* Gender & Birthday */}
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Gender</label>
+                                            <label>เพศ</label>
                                             <Form.Item
                                                 name="gender"
                                                 className="form-item"
                                                 rules={[{ required: true, message: 'Please select gender' }]}
                                             >
                                                 <Select placeholder="Select gender" allowClear>
-                                                    <Option value="Male">Male</Option>
-                                                    <Option value="Female">Female</Option>
+                                                    <Option value="Male">ผู้ชาย</Option>
+                                                    <Option value="Female">ผู้หญิง</Option>
                                                 </Select>
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>Birthday</label>
+                                            <label>วันเกิด</label>
                                             <Form.Item
                                                 name="birth_date"
                                                 className="form-item"
@@ -383,7 +317,7 @@ const EditProfile: React.FC = () => {
                                     {/* Phone */}
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Phone Number</label>
+                                            <label>เบอร์โทรศัพท์</label>
                                             <Form.Item name="phonenumber">
                                                 <Input placeholder="Enter phone number" style={{ width: '100%', height: '50px' }} />
                                             </Form.Item>
@@ -393,13 +327,13 @@ const EditProfile: React.FC = () => {
                                     {/* Body Measurements */}
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Weight</label>
+                                            <label>น้ำหนัก</label>
                                             <Form.Item name="weight">
                                                 <InputNumber placeholder="kg" style={{ width: '100%' }} />
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>Height</label>
+                                            <label>ส่วนสูง</label>
                                             <Form.Item name="height">
                                                 <InputNumber placeholder="cm" style={{ width: '100%' }} />
                                             </Form.Item>
@@ -407,13 +341,13 @@ const EditProfile: React.FC = () => {
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Bust</label>
+                                            <label>รอบอก</label>
                                             <Form.Item name="bust" rules={[{ type: 'number', message: 'Please enter a number' }]}>
                                                 <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
-                                            <label>Waist</label>
+                                            <label>เอว</label>
                                             <Form.Item name="waist" rules={[{ type: 'number', message: 'Please enter a number' }]}>
                                                 <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
                                             </Form.Item>
@@ -421,7 +355,7 @@ const EditProfile: React.FC = () => {
                                     </div>
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Hip</label>
+                                            <label>สะโพก</label>
                                             <Form.Item name="hip" rules={[{ type: 'number', message: 'Please enter a number' }]}>
                                                 <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
                                             </Form.Item>
@@ -433,7 +367,7 @@ const EditProfile: React.FC = () => {
                                 <div className="account-section">
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Username</label>
+                                            <label>ชื่อผู้ใช้</label>
                                             <Form.Item
                                                 name="user_name"
                                                 className="form-item"
@@ -451,7 +385,7 @@ const EditProfile: React.FC = () => {
 
                                     <div className="form-row">
                                         <div className="form-group full-width">
-                                            <label>Email</label>
+                                            <label>อีเมล</label>
                                             <Form.Item
                                                 name="email"
                                                 className="form-item"
@@ -465,7 +399,7 @@ const EditProfile: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    
+
                                 </div>
 
                                 <div className="submit-section">
@@ -477,7 +411,7 @@ const EditProfile: React.FC = () => {
                                         disabled={loading}
                                         size="large"
                                     >
-                                        {loading ? 'Saving...' : 'Save'}
+                                        {loading ? 'กำลังบันทึก...' : 'บันทึก'}
                                     </Button>
                                 </div>
                             </Form>

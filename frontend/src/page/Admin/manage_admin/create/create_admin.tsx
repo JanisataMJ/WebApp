@@ -113,7 +113,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
       <Modal
         title={
           <div className="modal-header-create-ad">
-            <h2 className="modal-title-create-ad">Create New Admin</h2>
+            <h2 className="modal-title-create-ad">เพิ่มแอดมินใหม่</h2>
           </div>
         }
         open={open}
@@ -129,7 +129,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
             <Form name="register" layout="vertical" onFinish={onFinish} form={form}>
               <Row gutter={24} className="form-row-create-ad">
                 <Col span={12}>
-                  <Form.Item label="Profile Picture" className="profile-upload-item-create-ad">
+                  <Form.Item label="รูปภาพ" className="profile-upload-item-create-ad">
                     <Upload
                       listType="picture-card"
                       fileList={fileList}
@@ -143,7 +143,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                       {fileList.length < 1 && (
                         <div className="upload-placeholder-create-ad">
                           <PlusOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
+                          <div style={{ marginTop: 8 }}>เพิ่มรูปภาพ</div>
                         </div>
                       )}
                     </Upload>
@@ -291,7 +291,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                     className="confirm-btn-create-ad"
                     loading={loading}
                   >
-                    Create Admin
+                    เพิ่มแอดมิน
                   </Button>
                 </div>
               </Form.Item>

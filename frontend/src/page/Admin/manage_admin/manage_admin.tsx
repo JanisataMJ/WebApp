@@ -16,33 +16,35 @@ const { confirm } = Modal;
 
 function ManageAdmin() {
   const currentAdminID = Number(localStorage.getItem("id"));
-  
+
   // State management
   const [admins, setAdmins] = useState<UsersInterface[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(true);
-  
+
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<UsersInterface | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [roleFilter, setRoleFilter] = useState<number | null>(null);
+  const [roleFilter, setRoleFilter] = useState<number | undefined>(undefined);
+
 
   // Memoized filtered data
   const filteredAdmins = useMemo(() => {
-    if (roleFilter === null) return admins;
+    if (roleFilter === undefined) return admins; // แสดงทั้งหมด
     return admins.filter(admin => Number(admin.RoleID) === Number(roleFilter));
   }, [admins, roleFilter]);
+
 
   // Memoized table columns
   const columns: ColumnsType<UsersInterface> = useMemo(() => [
     {
-      title: <span className="table-header-manageadmin">NO.</span>,
+      title: <span className="table-header-manageadmin">ลำดับ</span>,
       key: "no",
-      width: "8%",
+      width: "5%",
       render: (text, record, index) => {
         const currentPage = pagination.current || 1;
         const pageSize = pagination.pageSize || 10;
@@ -50,10 +52,10 @@ function ManageAdmin() {
       },
     },
     {
-      title: <span className="table-header-manageadmin">Image</span>,
+      title: <span className="table-header-manageadmin">รูปภาพ</span>,
       dataIndex: "profile",
       key: "profile",
-      width: "12%",
+      width: "8%",
       render: (text, record) => (
         <div className="profile-image-container-manageadmin">
           <img
@@ -69,10 +71,10 @@ function ManageAdmin() {
       ),
     },
     {
-      title: <span className="table-header-manageadmin">Username</span>,
+      title: <span className="table-header-manageadmin">ชื่อผู้ใช้</span>,
       dataIndex: "username",
       key: "username",
-      width: "15%",
+      width: "12%",
       render: (username) => (
         <span style={{ fontWeight: 600, color: '#57648E' }}>
           {username || "N/A"}
@@ -80,9 +82,9 @@ function ManageAdmin() {
       ),
     },
     {
-      title: <span className="table-header-manageadmin">Full Name</span>,
+      title: <span className="table-header-manageadmin">ชื่อ-นามสกุล</span>,
       key: "fullName",
-      width: "20%",
+      width: "18%",
       render: (text, record) => (
         <span style={{ fontWeight: 500 }}>
           {`${record.firstName || ''} ${record.lastName || ''}`}
@@ -90,10 +92,10 @@ function ManageAdmin() {
       ),
     },
     {
-      title: <span className="table-header-manageadmin">Email</span>,
+      title: <span className="table-header-manageadmin">อีเมล</span>,
       dataIndex: "email",
       key: "email",
-      width: "20%",
+      width: "16%",
       render: (email) => (
         <span style={{ color: '#666' }}>
           {email || "N/A"}
@@ -101,24 +103,24 @@ function ManageAdmin() {
       ),
     },
     {
-      title: <span className="table-header-manageadmin">Phonenumber</span>,
+      title: <span className="table-header-manageadmin">เบอร์โทรศัพท์</span>,
       dataIndex: "phonenumber",
       key: "phonenumber",
-      width: "15%",
+      width: "10%",
       render: (phone) => phone || "N/A",
     },
     {
-      title: <span className="table-header-manageadmin">Birthdate</span>,
+      title: <span className="table-header-manageadmin">วันเกิด</span>,
       dataIndex: "birthdate",
       key: "birthdate",
-      width: "15%",
+      width: "10%",
       render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "N/A",
     },
     {
-      title: <span className="table-header-manageadmin">Gender</span>,
+      title: <span className="table-header-manageadmin">เพศ</span>,
       dataIndex: "genderID",
       key: "gender",
-      width: "10%",
+      width: "6%",
       render: (gender) => {
         const genderConfig = {
           1: { text: "ชาย", color: "#57648E" },
@@ -133,19 +135,19 @@ function ManageAdmin() {
       },
     },
     {
-      title: <span className="table-header-manageadmin">Role</span>,
+      title: <span className="table-header-manageadmin">บทบาท</span>,
       dataIndex: "RoleID",
       key: "role",
-      width: "10%",
+      width: "8%",
       render: (role) => {
         const roleConfig = {
-          1: { text: "Admin", color: "#934A5E", icon: <UserOutlined /> },
-          2: { text: "User", color: "#57648E", icon: <TeamOutlined /> }
+          1: { text: "แอดมิน", color: "#934A5E", icon: <UserOutlined /> },
+          2: { text: "ผู้ใช้", color: "#57648E", icon: <TeamOutlined /> }
         };
         const config = roleConfig[role as keyof typeof roleConfig];
         return config ? (
-          <span style={{ 
-            color: config.color, 
+          <span style={{
+            color: config.color,
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
@@ -159,9 +161,9 @@ function ManageAdmin() {
       },
     },
     {
-      title: <span className="table-header-manageadmin">Setting</span>,
+      title: <span className="table-header-manageadmin">จัดการ</span>,
       key: "manage",
-      width: "15%",
+      width: "7%",
       render: (text, record) => (
         <div className="action-buttons-manageadmin">
           {record.RoleID === 1 ? (
@@ -252,7 +254,7 @@ function ManageAdmin() {
       centered: true,
       okButtonProps: {
         style: {
-          background: 'linear-gradient(135deg, #ff0044ff, #ff0044ff)',
+          background: 'linear-gradient(135deg, #934A5E, #934A5E)',
           borderColor: '#934A5E',
           borderRadius: '8px',
           fontWeight: 600,
@@ -354,11 +356,15 @@ function ManageAdmin() {
   }, []);
 
   // Filter handler
-  const handleRoleFilterChange = useCallback((value: number | undefined) => {
-    setRoleFilter(value !== undefined ? Number(value) : null);
-    // Reset pagination to first page when filter changes
+  const handleRoleFilterChange = useCallback((value: string) => {
+    if (value === "") {
+      setRoleFilter(undefined);   // กรณีเลือก "ทั้งหมด" => ไม่กรอง
+    } else {
+      setRoleFilter(Number(value)); // กรณีเลือก 1 หรือ 2
+    }
     setPagination(prev => ({ ...prev, current: 1 }));
   }, []);
+
 
   // Format numbers with commas
   const formatCount = useCallback((count: number): string => {
@@ -373,7 +379,7 @@ function ManageAdmin() {
   return (
     <Spin spinning={loading} tip="กำลังประมวลผล...">
       {contextHolder}
-      
+
       {/* Header Section */}
       <Row className="header-row-manageadmin">
         <Col xs={24} sm={24} md={12} lg={12}>
@@ -391,8 +397,8 @@ function ManageAdmin() {
       {/* Filters Section */}
       <Space className="filters-section-manageadmin" direction="vertical">
         <Row className="filters-row-manageadmin">
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
             onClick={handleAddAdmin}
             className="add-admin-btn-manageadmin"
@@ -402,28 +408,22 @@ function ManageAdmin() {
             เพิ่มแอดมิน
           </Button>
           <Space className="filter-controls-manageadmin" wrap>
-            <span>กรองตามผู้ใช้ :</span>
-            <Select
+            <span>กรองตามบทบาท :</span>
+            <select
               style={{ minWidth: 150 }}
-              placeholder="เลือกบทบาท"
-              allowClear
-              value={roleFilter}
-              onChange={handleRoleFilterChange}
-              disabled={tableLoading}
+              value={roleFilter ?? ""}   // ถ้า undefined จะให้เป็น ""
+              onChange={(e) => handleRoleFilterChange(e.target.value)}
+              className='filter-sub-controls-manageadmin'
             >
-              <Option value={1}>
-                <UserOutlined style={{ marginRight: 8 }} />
-                แอดมิน
-              </Option>
-              <Option value={2}>
-                <TeamOutlined style={{ marginRight: 8 }} />
-                ผู้ใช้
-              </Option>
-            </Select>
+              <option value="">ทั้งหมด</option>
+              <option value="1">แอดมิน</option>
+              <option value="2">ผู้ใช้</option>
+            </select>
+
           </Space>
         </Row>
       </Space>
-      
+
       {/* Table Section */}
       <div className="table-container-manageadmin">
         <Table
@@ -438,7 +438,7 @@ function ManageAdmin() {
             onChange: handlePageChange,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => 
+            showTotal: (total, range) =>
               `แสดง ${range[0]}-${range[1]} จาก ${formatCount(total)} รายการทั้งหมด`,
             className: "custom-pagination-manageadmin",
             pageSizeOptions: ['5', '10', '20', '50'],
@@ -460,14 +460,14 @@ function ManageAdmin() {
       </div>
 
       {/* Modals */}
-      <AddAdmin 
+      <AddAdmin
         open={isAddModalOpen}
         onCancel={handleAddModalCancel}
         onSuccess={handleAddSuccess}
       />
 
       {selectedAdmin && (
-        <EditAdmin 
+        <EditAdmin
           open={isEditModalOpen}
           onCancel={handleEditModalCancel}
           onSuccess={handleEditSuccess}

@@ -75,14 +75,14 @@ const HeaderAdmin: React.FC = () => {
                     to="/admin/home" 
                     className={`header-link-headAdmin ${isActive('/admin/home') ? 'active-link-headAdmin' : ''}`}
                 >
-                    MANAGE
+                    หน้าหลัก
                 </Link>
 
                 <Link 
                     to="/admin/article" 
                     className={`header-link-headAdmin ${isActive('/admin/article') ? 'active-link-headAdmin' : ''}`}
                 >
-                    ARTICLE
+                    บทความ
                 </Link>
 
                 <div className="profile-headAdmin">
@@ -97,42 +97,14 @@ const HeaderAdmin: React.FC = () => {
                                 src={users?.profile ? `http://localhost:8000/${users.profile}` : undefined}
                                 icon={!users?.profile && <UserOutlined />}
                             />
-                        </Dropdown.Toggle>
+                     </Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Item href="/profile">โปรไฟล์ของฉัน</Dropdown.Item>
-                            <Dropdown.Item eventKey="writer">งานเขียน</Dropdown.Item>
-                            <Dropdown.Item href="/bookshelf">ชั้นหนังสือ</Dropdown.Item>
-                            <Dropdown.Item href="/Payment">เหรียญ & ประวัติธุรกรรม</Dropdown.Item>
-                            <Dropdown.Item href="/settings">ตั้งค่า</Dropdown.Item>
                             <Dropdown.Item onClick={Logout}>ออกจากระบบ</Dropdown.Item>
                         </Dropdown.Menu> 
                     </Dropdown>
                 </div>
             </div>
-
-            <Modal show={showModal} onHide={() => setShowModal(false)} className="custom-modal-headAdmin">
-                <div className='modal-content-headAdmin'>
-                    <div className='confirmation-message-headAdmin'>
-                        <div onClick={() => setShowModal(false)}>
-                            <img className="cancel-headAdmin" src="./src/assets/no.png" alt="cancel" />
-                        </div>
-                        <div style={{ transform: 'translate(-50px, -40px)', width: '300%' }}>
-                            <img className="ready-headAdmin" src="./src/assets/error.png" alt="submit" />
-                            <span className='text2-headAdmin'><b>คุณต้องเป็นนักเขียนก่อน</b></span>
-                        </div>
-                        <span className="text1-headAdmin">
-                            <span id='ready2' style={{ transform: 'translate(-20px, 0)' }}>
-                                สมัครเข้าร่วมเป็นนักเขียน
-                            </span>
-                        </span>
-                        <div>
-                            <span id='buttonin' onClick={handleWriterClick} style={{ cursor: 'pointer' }}>
-                                <span id='button3'>&nbsp;&nbsp;&nbsp;&nbsp;สมัคร</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
         </>
     );
 };

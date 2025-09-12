@@ -201,7 +201,7 @@ const ArticlePage: React.FC = () => {
                               className="edit-button-article"
                               onClick={() => setEditing(article)}
                             >
-                              ✏️ Edit
+                              ✏️ แก้ไข
                             </Button>
 
                             <Popconfirm
@@ -217,7 +217,7 @@ const ArticlePage: React.FC = () => {
                                 danger
                                 className="delete-button-article"
                               >
-                                🗑️ Delete
+                                🗑️ ลบ
                               </Button>
                             </Popconfirm>
                           </div>

@@ -45,8 +45,8 @@ const Notice: React.FC = () => {
       {isModalOpen && (
         <div className="modal-overlay-noti">
           <div className="modal-noti">
-            <h2 className="modal-title">Health Warning</h2>
-            <p className="modal-subtitle">You can fully customize it!</p>
+            <h2 className="modal-title">แจ้งเตือนสุขภาพ</h2>
+            <p className="modal-subtitle">สุขภาพของคุณสำคัญที่สุด</p>
 
             {/* เนื้อหาที่ scroll ได้ */}
             <div className="modal-body-noti">
@@ -54,16 +54,16 @@ const Notice: React.FC = () => {
               {/* Loop notifications */}
               {notifications.map((item, index) => {
                 const date = new Date(item.Timestamp);
-                const formattedDate = date.toLocaleDateString('en-US', {
+                const formattedDate = date.toLocaleDateString('th-TH', {
                   weekday: 'short',
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric'
                 });
-                const formattedTime = date.toLocaleTimeString('en-US', {
+                const formattedTime = date.toLocaleTimeString('th-TH', {
                   hour: '2-digit',
                   minute: '2-digit',
-                  hour12: true
+                  hour12: false
                 });
 
                 return (

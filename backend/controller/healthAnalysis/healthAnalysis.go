@@ -38,7 +38,6 @@ func GetHealthAnalysis(c *gin.Context) {
 	}
 
 	var analysis entity.HealthAnalysis
-
 	if err := config.DB().
 		Preload("HealthData").
 		Preload("RiskLevel").

@@ -32,52 +32,53 @@ const Slider: React.FC = () => {
     {
       icon: Heart,
       label: "อัตราการเต้นหัวใจ",
-      value: data.Bpm.toString(),
-      sub: findAnalysis(data, "Heart Rate")?.Interpretation || "ไม่มีข้อมูล",
+      value: String(data.Bpm),  // <-- ✅
+      sub: findAnalysis(data, "อัตราการเต้นหัวใจ")?.Interpretation || "ไม่มีข้อมูล",
       color: "#ef4444",
       bgGradient: "linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)"
     },
     {
       icon: Activity,
       label: "พลังงานที่ใช้ไป",
-      value: data.CaloriesBurned.toFixed(0),
-      sub: findAnalysis(data, "Calorie")?.Suggestion || "ไม่มีข้อมูล",
+      value: String(data.CaloriesBurned.toFixed(0)), // <-- ✅
+      sub: findAnalysis(data, "พลังงานที่ใช้ไป")?.Interpretation || "ไม่มีข้อมูล",
       color: "#f59e0b",
       bgGradient: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)"
     },
     {
       icon: Droplets,
       label: "ออกซิเจนในเลือด",
-      value: `${data.Spo2}%`,
-      sub: findAnalysis(data, "SPO2")?.Interpretation || "ไม่มีข้อมูล",
+      value: `${data.Spo2}%` as string, // <-- ✅
+      sub: findAnalysis(data, "ออกซิเจนในเลือด")?.Interpretation || "ไม่มีข้อมูล",
       color: "#3b82f6",
       bgGradient: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)"
     },
     {
       icon: Moon,
       label: "การนอนหลับ",
-      value: `${Math.floor(data.SleepHours)}h ${Math.round((data.SleepHours % 1) * 60)}m`,
-      sub: findAnalysis(data, "Sleep")?.Suggestion || "ไม่มีข้อมูล",
+      value: (data.SleepHours || "ไม่มีข้อมูล") as string, // <-- ✅ DB เก็บ string
+      sub: findAnalysis(data, "การนอนหลับ")?.Interpretation || "ไม่มีข้อมูล",
       color: "#6366f1",
       bgGradient: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)"
     },
     {
       icon: TrendingUp,
       label: "จำนวนก้าว",
-      value: data.Steps.toString(),
-      sub: findAnalysis(data, "Steps")?.Interpretation || "ไม่มีข้อมูล",
+      value: String(data.Steps), // <-- ✅
+      sub: findAnalysis(data, "จำนวนก้าว")?.Interpretation || "ไม่มีข้อมูล",
       color: "#10b981",
       bgGradient: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"
     },
     {
       icon: Thermometer,
       label: "อุณหภูมิร่างกาย",
-      value: `${data.BodyTemp.toFixed(1)}°C`,
-      sub: findAnalysis(data, "Body Temp")?.Interpretation || "ไม่มีข้อมูล",
+      value: `${data.BodyTemp.toFixed(1)}°C` as string, // <-- ✅
+      sub: findAnalysis(data, "อุณหภูมิร่างกาย")?.Interpretation || "ไม่มีข้อมูล",
       color: "#f97316",
       bgGradient: "linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)"
     }
   ];
+
 
   // โหลดข้อมูล health data
   useEffect(() => {
@@ -175,7 +176,7 @@ const Slider: React.FC = () => {
                   background: position === 'center' ? item.bgGradient : 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)'
                 }}
               >
-                <div 
+                <div
                   className={`card-icon-container ${position === 'center' ? 'icon-center' : 'icon-side'}`}
                   style={{
                     background: position === 'center'
@@ -183,7 +184,7 @@ const Slider: React.FC = () => {
                       : 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)'
                   }}
                 >
-                  <IconComponent 
+                  <IconComponent
                     className={`card-icon ${position === 'center' ? 'icon-center-size' : 'icon-side-size'}`}
                     style={{ color: position === 'center' ? item.color : '#6b7280' }}
                   />
@@ -234,7 +235,7 @@ const Slider: React.FC = () => {
 
         {/* Progress Bar */}
         <div className="progress-bar-container">
-          <div 
+          <div
             className="progress-bar"
             style={{
               background: `linear-gradient(90deg, ${healthItems[currentIndex].color} 0%, ${healthItems[currentIndex].color}80 100%)`

@@ -200,20 +200,20 @@ func SetupDatabase() {
 		Timestamp:      time.Now(),
         Bpm:            79,
 		Steps:          10000,
-		SleepHours:     10.00,
+		SleepHours:     "10 h. 30 m.",
 		CaloriesBurned: 3000,
 		Spo2:           97.0,
-        BodyTemp:       37.0,
+        //BodyTemp:       37.0,
         UserID:         2,
 	}
     healthData2 := entity.HealthData{
 		Timestamp:      time.Now(),
         Bpm:            70,
 		Steps:          2000,
-		SleepHours:     3.00,
+		SleepHours:     "3 h. 30 m.",
 		CaloriesBurned: 100,
 		Spo2:           90.0,
-        BodyTemp:       39.5,
+        //BodyTemp:       39.5,
         UserID:         3,
 	}
 	db.Create(&healthData1)
@@ -393,7 +393,7 @@ func SetupDatabase() {
     var statusRead, statusUnread, statusArchived entity.NotificationStatus
     notiStatus := []entity.NotificationStatus{
         {Status: "อ่านแล้ว"},
-        {Status: "ยังไม่ได้อ่าน"},
+        {Status: "ยังไม่อ่าน"},
         {Status: "เก็บถาวร"},
     }
     for i, status := range notiStatus {
@@ -458,7 +458,7 @@ func SetupDatabase() {
 	}
     noti3 := entity.Notification{
 		Timestamp:               time.Now(),
-        Title:                  "สรุปสุขภาพประจำเดือนสิงหาคม",
+        Title:                  "สรุปสุขภาพประจำสัปดาห์ (วันที่ 1-7 กันยายน 2568)",
 		Message:                "สุขภาพโดยรวมของคุณในเดือนนี้อยู่ในขั้นดี และดีขึ้นกว่าเดือนที่แล้ว",
 		UserID:                 2,
 		HealthTypeID:           htSafe.ID,
@@ -519,7 +519,7 @@ func SetupDatabase() {
 	}
     noti9 := entity.Notification{
 		Timestamp:              time.Now(),
-        Title:                  "สรุปสุขภาพประจำเดือนสิงหาคม",
+        Title:                  "สรุปสุขภาพประจำสัปดาห์ (วันที่ 1-7 กันยายน 2568)",
 		Message:                "สุขภาพโดยรวมของคุณในเดือนนี้อยู่ในขั้นอันตราย และแย่ลงกว่าเดือนที่แล้ว",
 		UserID:                 3,
 		HealthTypeID:           htDanger.ID,

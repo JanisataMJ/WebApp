@@ -1,20 +1,23 @@
+export interface NotificationStatusInterface {
+  ID: number;
+  Status: string;
+}
+
+export interface HealthTypeInterface {
+  ID: number;
+  Type: string;
+}
+
 export interface NotificationInterface {
-    ID:         number;       
-    Timestamp:  string;
-	Title:		string;
-	Message: 	string;
+  ID: number;       
+  Timestamp: string;
+  Title: string;
+  Message: string;
 
-	UserID:		            number;
-	HealthTypeID :	        number;
-	NotificationStatusID: 	number;
+  UserID: number;
+  HealthTypeID: number;
+  NotificationStatusID: number;
 
-    HealthType?: {
-        ID: number;
-        Type: string;
-    };
-
-    NotificationStatus?: {
-        ID: number;
-        Status: string;
-    };
+  HealthType?: HealthTypeInterface;
+  NotificationStatus?: NotificationStatusInterface;
 }

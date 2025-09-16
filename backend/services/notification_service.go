@@ -1,149 +1,40 @@
 package services
 
-import (
+/*import (
     "log"
     "time"
     "fmt"
+    "strconv"
     "net/http"
     "github.com/gin-gonic/gin"
 
     "github.com/JanisataMJ/WebApp/config"
     "github.com/JanisataMJ/WebApp/entity"
     "github.com/JanisataMJ/WebApp/utils"
-)
+)*/
 
-// SendPendingNotifications ดึง Notification ที่ยังไม่ส่ง (status = 1) และส่งอีเมล
-func SendPendingNotifications() {
-	var notifs []entity.Notification
-
-	// Preload ความสัมพันธ์ HealthAnalysis -> HealthData -> User
-	config.DB().
-		Preload("HealthAnalysis.HealthData.User").
-		Where("notification_status_id = ?", 1).
-		Find(&notifs)
-
-	for _, n := range notifs {
-		user := n.HealthAnalysis.HealthData.User
-		if user == nil {
-			log.Println("No user associated with notification ID:", n.ID)
-			continue
-		}
-
-		// ดึง HealthSummary และ HealthAnalysis ของผู้ใช้สำหรับส่งอีเมล
-		var summary entity.HealthSummary
-		var analyses []entity.HealthAnalysis
-
-		// สมมติคุณมีวิธีสร้าง HealthSummary จาก HealthData
-		summary = GenerateHealthSummary(n.HealthAnalysis.HealthData)
-
-		// analyses อาจเป็น slice ของ HealthAnalysis ที่เกี่ยวข้อง
-		analyses = append(analyses, *n.HealthAnalysis)
-
-		// ส่งอีเมล
-		err := utils.SendHealthNotificationEmail(*user, summary, analyses)
-		if err != nil {
-			log.Println("Failed to send email to:", user.Email, "Error:", err)
-			continue
-		}
-
-		// อัปเดตสถานะ Notification เป็นส่งแล้ว (2)
-		config.DB().Model(&n).Update("notification_status_id", 2)
-		log.Println("Notification sent to:", user.Email)
-	}
-}
 
 // ตัวอย่างฟังก์ชันสร้าง HealthSummary จาก HealthData
-func GenerateHealthSummary(data *entity.HealthData) entity.HealthSummary {
-	return entity.HealthSummary{
-		AvgBpm:      float64(data.Bpm),
-		MinBpm:      data.Bpm,
-		MaxBpm:      data.Bpm,
-		TotalSteps:  int(data.Steps),
-		AvgSleep:    data.SleepHours,
-		AvgCalories: data.CaloriesBurned,
-		AvgSpo2:     data.Spo2,
-		AvgBodyTemp: data.BodyTemp,
-		MinBodyTemp: data.BodyTemp,
-		MaxBodyTemp: data.BodyTemp,
-	}
-}
-
-
-// ส่งแจ้งเตือนอีเมล สรุปภาพรวมสุขภาพ ทุก 1 ชม.
-/*func SendHourlyHealthSummary() {
-    var users []entity.User
-    config.DB().Find(&users)
-
-    for _, u := range users {
-        if u.Email == "" {
-            continue
-        }
-
-        // ดึง HealthSummary ล่าสุดของ user
-        var summary entity.HealthSummary
-        config.DB().Where("user_id = ?", u.ID).
-            Order("period_end desc").First(&summary)
-
-        if summary.ID == 0 {
-            continue
-        }
-
-        // ทำสรุป
-        report := fmt.Sprintf(
-            "สรุปสุขภาพรอบชั่วโมง:\n" +
-                "HR: Avg %.1f (Min %d / Max %d)\n" +
-                "Steps: Avg %.1f, รวม %d\n" +
-                "Sleep: %.1f ชั่วโมง\n" +
-                "Calories: %.1f kcal\n" +
-                "SpO₂: %.1f%%\n" +
-                "Temp: Avg %.1f (%.1f - %.1f)",
-            summary.AvgBpm, summary.MinBpm, summary.MaxBpm,
-            summary.AvgSteps, summary.TotalSteps,
-            summary.AvgSleep,
-            summary.AvgCalories,
-            summary.AvgSpo2,
-            summary.AvgBodyTemp, summary.MinBodyTemp, summary.MaxBodyTemp,
-        )
-
-        utils.SendEmail(u.Email, "📊 รายงานสุขภาพรายชั่วโมง", report)
-
-        notif := entity.Notification{
-            UserID:               u.ID,
-            HealthSummaryID:      summary.ID,
-            Title:                "Health Summary",
-            Message:              report,
-            Timestamp:            time.Now(),
-            NotificationStatusID: 2,
-        }
-        config.DB().Create(&notif)
+/*func GenerateHealthSummary(data *entity.HealthData) entity.HealthSummary {
+    sleepFloat, err := strconv.ParseFloat(data.SleepHours, 64)
+    if err != nil {
+        log.Printf("error parsing sleep hours: %v", err)
+        sleepFloat = 0
     }
-}*/
-func SendHourlyHealthSummary() {
-	db := config.DB()
-	var users []entity.User
-	db.Preload("HealthData.HealthAnalysis").Find(&users) // preload analyses ผ่าน HealthData
 
-	for _, user := range users {
-		if user.Email == "" || len(user.HealthData) == 0 {
-			continue
-		}
-
-		// ดึง HealthData ล่าสุด
-		latestData := user.HealthData[len(user.HealthData)-1]
-
-		// ดึง HealthAnalysis ของ HealthData ล่าสุด
-		analyses := latestData.HealthAnalysis
-
-		// ถ้าอยากรวมสรุปค่าต่าง ๆ ต้องแปลง HealthData เป็น HealthSummary
-		summary := GenerateHealthSummary(&latestData)
-
-		err := utils.SendHealthNotificationEmail(user, summary, analyses)
-		if err != nil {
-			log.Println("Failed to send email to", user.Email, ":", err)
-		}
-	}
+    return entity.HealthSummary{
+        AvgBpm:      float64(data.Bpm),
+        MinBpm:      data.Bpm,
+        MaxBpm:      data.Bpm,
+        TotalSteps:  int(data.Steps),
+        AvgSleep:    sleepFloat,
+        AvgCalories: data.CaloriesBurned,
+        AvgSpo2:     data.Spo2,
+        AvgBodyTemp: data.BodyTemp,
+        MinBodyTemp: data.BodyTemp,
+        MaxBodyTemp: data.BodyTemp,
+    }
 }
-
 
 
 // แจ้งเตือนเมื่อสุขภาพผิดปกติ
@@ -202,3 +93,154 @@ func CheckAndNotifyAbnormalAnalysis(analysis *entity.HealthAnalysis) {
         config.DB().Create(&notif)
     }
 }
+
+
+func CheckAndNotifyRealtimeHealth(data *entity.HealthData) {
+    var user entity.User
+    config.DB().First(&user, data.UserID)
+    if user.Email == "" {
+        return
+    }
+
+    alerts := []string{}
+
+    // เงื่อนไขเสี่ยง
+    if data.Bpm > 120 {
+        alerts = append(alerts, fmt.Sprintf("⚠️ หัวใจเต้นเร็วเกินไป: %d bpm", data.Bpm))
+    } else if data.Bpm < 50 {
+        alerts = append(alerts, fmt.Sprintf("⚠️ หัวใจเต้นช้าเกินไป: %d bpm", data.Bpm))
+    }
+
+    if data.Spo2 < 90 {
+        alerts = append(alerts, fmt.Sprintf("⚠️ ค่าออกซิเจนในเลือดต่ำ: %.1f%%", data.Spo2))
+    }
+
+    if len(alerts) == 0 {
+        return
+    }
+
+    // ส่งทีละอัน
+    for _, alert := range alerts {
+        err := utils.SendEmail(user.Email, "🚨 Health Alert", alert)
+        if err != nil {
+            log.Println("Failed to send alert to", user.Email)
+        }
+
+        notif := entity.Notification{
+            UserID:               user.ID,
+            Title:                "Health Alert",
+            Message:              alert,
+            Timestamp:            time.Now(),
+            NotificationStatusID: 2,
+        }
+        config.DB().Create(&notif)
+    }
+}
+
+func SendWeeklyHealthSummary() {
+	db := config.DB()
+	var users []entity.User
+	db.Preload("HealthData").Find(&users)
+
+	now := time.Now()
+	year, week := now.ISOWeek() // หาเลขสัปดาห์ปัจจุบัน
+
+	for _, user := range users {
+		if user.Email == "" {
+			continue
+		}
+
+		// ตรวจว่ามีสรุปของสัปดาห์นี้แล้วหรือยัง
+		var existingSummary int64
+		db.Model(&entity.HealthSummary{}).
+			Where("user_id = ? AND strftime('%Y', period_start) = ? AND strftime('%W', period_start) = ?",
+				user.ID, fmt.Sprint(year), fmt.Sprint(week)).
+			Count(&existingSummary)
+
+		if existingSummary > 0 {
+			log.Println("✅ Weekly summary already sent for user", user.ID)
+			continue
+		}
+
+		// หา HealthData ของสัปดาห์นี้
+		weekStart := now.AddDate(0, 0, -int(now.Weekday())) // เริ่มต้นสัปดาห์
+		weekEnd := weekStart.AddDate(0, 0, 7)
+
+		var healthData []entity.HealthData
+		db.Where("user_id = ? AND timestamp >= ? AND timestamp < ?", user.ID, weekStart, weekEnd).
+			Find(&healthData)
+
+		if len(healthData) == 0 {
+			continue
+		}
+
+		// คำนวณ summary
+		var totalBpm, totalSteps uint
+		var totalSpo2, totalTemp, totalSleep, totalCalories float64
+		minBpm, minTemp, minSpo2 := uint(9999), 999.0, 999.0
+		maxBpm, maxTemp, maxSpo2 := uint(0), 0.0, 0.0
+
+		for _, d := range healthData {
+			totalBpm += d.Bpm
+			totalSteps += d.Steps
+			totalSpo2 += d.Spo2
+			totalTemp += d.BodyTemp
+			s, _ := strconv.ParseFloat(d.SleepHours, 64)
+			totalSleep += s
+			totalCalories += d.CaloriesBurned
+
+			if d.Bpm < minBpm { minBpm = d.Bpm }
+			if d.Bpm > maxBpm { maxBpm = d.Bpm }
+			if d.Spo2 < minSpo2 { minSpo2 = d.Spo2 }
+			if d.Spo2 > maxSpo2 { maxSpo2 = d.Spo2 }
+			if d.BodyTemp < minTemp { minTemp = d.BodyTemp }
+			if d.BodyTemp > maxTemp { maxTemp = d.BodyTemp }
+		}
+
+		count := float64(len(healthData))
+		summary := entity.HealthSummary{
+			PeriodStart:  weekStart,
+			PeriodEnd:    weekEnd,
+			AvgBpm:       float64(totalBpm)/count,
+			MinBpm:       minBpm,
+			MaxBpm:       maxBpm,
+			AvgSteps:     float64(totalSteps)/count,
+			TotalSteps:   int(totalSteps),
+			AvgSleep:     totalSleep / count,
+			AvgCalories:  totalCalories / count,
+			AvgSpo2:      totalSpo2 / count,
+			AvgBodyTemp:  totalTemp / count,
+			MinBodyTemp:  minTemp,
+			MaxBodyTemp:  maxTemp,
+			UserID:       user.ID,
+		}
+
+		if err := db.Create(&summary).Error; err != nil {
+			log.Println("❌ Failed to save health summary:", err)
+			continue
+		}
+
+		// ส่ง Email
+		msg := fmt.Sprintf(
+			"📊 Weekly Health Summary\nAvg BPM: %.1f\nMin BPM: %d\nMax BPM: %d\nTotal Steps: %d\nAvg SpO2: %.1f%%\nAvg Temp: %.1f°C",
+			summary.AvgBpm, summary.MinBpm, summary.MaxBpm, summary.TotalSteps, summary.AvgSpo2, summary.AvgBodyTemp,
+		)
+
+		if err := utils.SendEmail(user.Email, "📅 Weekly Health Summary", msg); err != nil {
+			log.Println("❌ Failed to send email:", err)
+		} else {
+			log.Println("✅ Weekly summary sent to:", user.Email)
+		}
+
+		// บันทึก Notification
+		noti := entity.Notification{
+			Title: "📅 Weekly Health Summary",
+			Message: msg,
+			UserID: user.ID,
+			Timestamp: time.Now(),
+			NotificationStatusID: 2,
+			HealthSummaryID: &summary.ID,
+		}
+		db.Create(&noti)
+	}
+}*/

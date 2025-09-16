@@ -1,30 +1,48 @@
 package utils
 
-import (
+/*import (
 	"fmt"
 	"os"
 	"strconv"
-	"gopkg.in/gomail.v2"
+
 	"github.com/JanisataMJ/WebApp/entity"
+	"gopkg.in/gomail.v2"
 )
 
-// ส่ง HTML email
-func SendHealthNotificationEmail(user entity.User, summary entity.HealthSummary, analyses []entity.HealthAnalysis) error {
-    m := gomail.NewMessage()
-    m.SetHeader("From", os.Getenv("EMAIL_USER"))
-    m.SetHeader("To", user.Email)
-    m.SetHeader("Subject", "Hourly Health Summary & Alerts")
+// ---------- ฟังก์ชันส่งอีเมลทั่วไป ----------
+/*func SendEmail(to, subject, body string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", os.Getenv("EMAIL_USER"))
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/plain", body)
 
-    body := GenerateHealthNotificationHTML(user.Username, summary, analyses)
-    m.SetBody("text/html", body)
-
-    port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
-    d := gomail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("EMAIL_USER"), os.Getenv("EMAIL_PASS"))
-    return d.DialAndSend(m)
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	d := gomail.NewDialer(
+		os.Getenv("SMTP_HOST"),
+		port,
+		os.Getenv("EMAIL_USER"),
+		os.Getenv("EMAIL_PASS"),
+	)
+	return d.DialAndSend(m)
 }
 
+// ---------- ฟังก์ชันส่ง Health Notification (HTML) ----------
+func SendHealthNotificationEmail(user entity.User, summary entity.HealthSummary, analyses []entity.HealthAnalysis) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", os.Getenv("EMAIL_USER"))
+	m.SetHeader("To", user.Email)
+	m.SetHeader("Subject", "Hourly Health Summary & Alerts")
 
-// สร้าง HTML email
+	body := GenerateHealthNotificationHTML(user.Username, summary, analyses)
+	m.SetBody("text/html", body)
+
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	d := gomail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("EMAIL_USER"), os.Getenv("EMAIL_PASS"))
+	return d.DialAndSend(m)
+}
+
+// ---------- ฟังก์ชันสร้าง HTML Template ----------
 func GenerateHealthNotificationHTML(username string, summary entity.HealthSummary, analyses []entity.HealthAnalysis) string {
 	alertRows := ""
 	if len(analyses) > 0 {
@@ -76,4 +94,4 @@ func GenerateHealthNotificationHTML(username string, summary entity.HealthSummar
 	</body>
 	</html>
 	`, username, alertRows, summaryHTML)
-}
+}*/

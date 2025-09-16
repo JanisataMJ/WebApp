@@ -20,6 +20,7 @@ type HealthSummary struct {
 	AvgBodyTemp 	float64
 	MinBodyTemp 	float64
 	MaxBodyTemp 	float64
+	WeekNumber		uint
 
 	UserID 			uint
 	User   			*User `gorm:"foreignKey: UserID"`

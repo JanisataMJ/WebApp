@@ -3,7 +3,7 @@ import { HealthDataInterface } from "../../../interface/health_data_interface/he
 
 const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
 
-const getRequestOptions = () => {
+/*= () => {
   const Authorization = localStorage.getItem("token");
   const Bearer = localStorage.getItem("token_type");
   return {
@@ -12,7 +12,17 @@ const getRequestOptions = () => {
       Authorization: `${Bearer} ${Authorization}`,
     },
   };
+};*/
+const getRequestOptions = () => {
+  const token = localStorage.getItem("token"); // token จริง
+  return {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // ใช้ Bearer ตรง ๆ
+    },
+  };
 };
+
 
 
 export const getHealthData = async (): Promise<HealthDataInterface[]> => {
@@ -44,5 +54,95 @@ export const getHealthDataByUserID = async (
     throw new Error(
       "Error fetching health data: " + (error as Error).message
     );
+  }
+};
+
+
+// ดึงข้อมูล Daily Heart Rate
+export const getDailyHeartRate = async (
+  userId: number,
+  withStats = false
+): Promise<any> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get(
+      `${apiUrl}/daily-heart-rate?userID=${userId}&withStats=${withStats}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching daily heart rate: " + (error as Error).message);
+  }
+};
+
+
+// ดึงข้อมูล Daily Steps
+export const getDailySteps = async (
+  userId: number,
+  withStats = false
+): Promise<any> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get(
+      `${apiUrl}/daily-steps?userID=${userId}&withStats=${withStats}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching daily steps: " + (error as Error).message);
+  }
+};
+
+
+// ดึงข้อมูล Daily Calories
+export const getDailyCalories = async (
+  userId: number,
+  withStats = false
+): Promise<any> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get(
+      `${apiUrl}/daily-calories?userID=${userId}&withStats=${withStats}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching daily calories: " + (error as Error).message);
+  }
+};
+
+
+// ดึงข้อมูล Daily Spo2
+export const getDailySpo2 = async (
+  userId: number,
+  withStats = false
+): Promise<any> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get(
+      `${apiUrl}/daily-spo2?userID=${userId}&withStats=${withStats}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching daily spo2: " + (error as Error).message);
+  }
+};
+
+
+// ดึงข้อมูล Daily Sleep
+export const getDailySleep = async (
+  userId: number,
+  withStats = false
+): Promise<any> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get(
+      `${apiUrl}/daily-sleep?userID=${userId}&withStats=${withStats}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching daily sleep: " + (error as Error).message);
   }
 };

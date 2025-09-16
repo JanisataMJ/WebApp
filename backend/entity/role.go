@@ -9,5 +9,4 @@ type Role struct {
 	Name string
 	
 	User 	[]User 	`gorm:"foreignKey:RoleID"`
-	Admin 	[]Admin `gorm:"foreignKey:RoleID"`
 }

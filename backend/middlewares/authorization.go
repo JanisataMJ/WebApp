@@ -3,6 +3,7 @@ package middlewares
 import (
    "net/http"
    "strings"
+   "gorm.io/gorm"
 
    "github.com/JanisataMJ/WebApp/services"
    "github.com/gin-gonic/gin"
@@ -41,4 +42,11 @@ func Authorizes() gin.HandlerFunc {
        }
        c.Next()
    }
+}
+
+func DBMiddleware(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("db", db) // ใส่ db ลง context
+		c.Next()
+	}
 }

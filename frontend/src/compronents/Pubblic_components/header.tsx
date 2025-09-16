@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';   
 import './header.css';
-import { Dropdown, Image, Modal } from 'react-bootstrap';
+import { Dropdown, Modal } from 'react-bootstrap';
 import { message, theme, Avatar } from 'antd';  
 import logo from '../../assets/Logo.jpg';
 import { GetUsersById, UpdateStatusWriterById } from '../../services/https/User/user';
 import { UsersInterface } from '../../interface/profile_interface/IProfile';
-import { IoPersonCircleOutline } from "react-icons/io5";
+//import { IoPersonCircleOutline } from "react-icons/io5";
 import Navbar from '../../compronents/Home_components/Navbar';
 import { UserOutlined } from '@ant-design/icons';
 
@@ -16,7 +16,7 @@ const TOP: React.FC = () => {
     const [users, setUser] = useState<UsersInterface | null>(null);
 
     const { token: { colorBgContainer } } = theme.useToken();
-
+ 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -98,39 +98,32 @@ const TOP: React.FC = () => {
         <>
             <div className="topbar">
                 {contextHolder}
-                
-                {/* Logo */}
                 <a href="/home">
                     <img id="Logo" src={logo} alt="Logo" />
                 </a>
-                
-                {/* Navbar ที่อยู่ใน topbar */}
                 <Navbar />
-                
                 {/* Profile dropdown */}
+                <b>
                 <div id='profile'>
                     <Dropdown align="end" onSelect={handleDropdownSelect}>
                         <Dropdown.Toggle variant="light" id="dropdown-profile" as="div" className="hindesometing">
                             <Avatar
-                                size={50}
-                                style={{
-                                    border: "3px solid #ffffffff",   // ขอบหนา 3px สีฟ้า
-                                    boxShadow: "0 0 8px rgba(0,0,0,0.2)" // เพิ่มเงาเล็กน้อยให้ดูเด่น
-                                }}
+                                size={40}
                                 src={users?.profile ? `http://localhost:8000/${users.profile}` : undefined}
                                 icon={!users?.profile && <UserOutlined />}
                             />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Item href="/profile">โปรไฟล์ของฉัน</Dropdown.Item>
-                            <Dropdown.Item eventKey="writer">งานเขียน</Dropdown.Item>
+                            {/*<Dropdown.Item eventKey="writer">งานเขียน</Dropdown.Item>
                             <Dropdown.Item href="/bookshelf">ชั้นหนังสือ</Dropdown.Item>
                             <Dropdown.Item href="/Payment">เหรียญ & ประวัติธุรกรรม</Dropdown.Item>
-                            <Dropdown.Item href="/settings">ตั้งค่า</Dropdown.Item>
+                            <Dropdown.Item href="/settings">ตั้งค่า</Dropdown.Item>*/}
                             <Dropdown.Item onClick={Logout}>ออกจากระบบ</Dropdown.Item>
                         </Dropdown.Menu> 
                     </Dropdown>
                 </div>
+                </b>
             </div>
 
             {/* Modal */}

@@ -1,358 +1,364 @@
-/* AdminDashboard.css */
 .health-dashboard-admin {
   min-height: 100vh;
-  width: 1000px;
+  width: 90vw;
+  max-width: 1400px;
   background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
-  padding: 20px;
-  margin-top: 130px;
-  margin-bottom: 20px;
+  padding: 30px;
+  margin: 130px auto 20px;
   border-radius: 10px;
-  
-}
-
-.admin-layout {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.admin-sider {
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-}
-
-.logo {
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 20px;
-}
-
-.logo-text {
-  color: white;
-  font-size: 18px;
-  font-weight: 600;
-  margin-left: 10px;
-}
-
-.admin-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  margin: 16px;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  height: 64px;
-}
-
-.header-title {
-  margin: 0 !important;
-  color: #333;
-}
-
-.admin-content {
-  margin: 0 16px 16px;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  overflow-x: auto;
   overflow-y: auto;
+  /* ซ่อน scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+.health-dashboard-admin::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
-.section-header h3 {
-  margin: 0 !important;
-}
-
-.stats-row {
+.dashboard-title-admin {
+  font-size: 2.2rem;
   margin-bottom: 32px;
-}
-
-.stats-row .ant-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.stats-row .ant-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.status-badge.published {
-  background-color: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
-}
-
-.status-badge.draft {
-  background-color: #fff7e6;
-  color: #fa8c16;
-  border: 1px solid #ffd591;
-}
-
-.status-badge.active {
-  background-color: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
-}
-
-.status-badge.inactive {
-  background-color: #fff2f0;
-  color: #ff4d4f;
-  border: 1px solid #ffb3b3;
-}
-
-.ant-table {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.ant-table-thead > tr > th {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  font-weight: 600;
-  border: none;
-}
-
-.ant-table-tbody > tr:hover > td {
-  background: #f0f7ff !important;
-}
-
-.ant-btn {
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.ant-btn:hover {
-  transform: translateY(-1px);
-}
-
-.ant-btn-primary {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  border: none;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-}
-
-.ant-btn-primary:hover {
-  background: linear-gradient(45deg, #5a6fd8, #6b42a6);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-}
-
-.ant-btn-danger {
-  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-  border: none;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-}
-
-.ant-btn-danger:hover {
-  background: linear-gradient(45deg, #ff5252, #e04848);
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-}
-
-.ant-modal .ant-modal-header {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 8px 8px 0 0;
-}
-
-.ant-modal .ant-modal-title {
-  color: white;
-  font-weight: 600;
-}
-
-.ant-modal .ant-modal-close {
-  color: white;
-}
-
-.ant-modal .ant-modal-close:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.ant-modal-content {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.modal-actions {
-  text-align: right;
-  margin-bottom: 0 !important;
-}
-
-.ant-form-item-label > label {
-  font-weight: 600;
-  color: #333;
-}
-
-.ant-input,
-.ant-input-password,
-.ant-select-selector,
-.ant-input[type="password"] {
-  border-radius: 6px;
-  border: 2px solid #e8e8e8;
-  transition: all 0.3s ease;
-}
-
-.ant-input:focus,
-.ant-input-password:focus,
-.ant-select-focused .ant-select-selector,
-.ant-input-focused,
-.ant-input[type="password"]:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-}
-
-.ant-card .ant-statistic-title {
-  color: #666;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.ant-card .ant-statistic-content {
+  color: #2d3748;
   font-weight: 700;
-}
-
-.ant-menu-dark {
-  background: transparent;
-}
-
-.ant-menu-dark .ant-menu-item {
-  color: rgba(255, 255, 255, 0.85);
-  margin: 4px 0;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.ant-menu-dark .ant-menu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  transform: translateX(4px);
-}
-
-.ant-menu-dark .ant-menu-item-selected {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  font-weight: 600;
-}
-
-.ant-menu-dark .ant-menu-item-selected::after {
-  border-right: 3px solid white;
-}
-
-.ant-layout-sider-trigger {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.ant-layout-sider-trigger:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.ant-pagination {
-  margin-top: 24px;
   text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  letter-spacing: -0.5px;
+  /* 🔧 ปรับปรุงการแสดงผลข้อความ */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
 }
 
-.ant-pagination .ant-pagination-item {
-  border-radius: 6px;
-  border-color: #e8e8e8;
+.dashboard-grid-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  width: max-content;    /* สำคัญ! ทำให้ grid ขยายตามจำนวน card */
+  min-width: 100%;       /* แต่ยังเต็ม container */
+  padding: 10px;
+  background: linear-gradient(135deg, #faf5ff);
+  border-radius: 10px;
 }
 
-.ant-pagination .ant-pagination-item-active {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  border-color: transparent;
+.dashboard-card-admin {
+  text-align: center;
+  border-radius: 20px;
+  padding: 28px 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  /* 🔧 ปรับปรุงการจัดการ overflow ของ card */
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
 }
 
-.ant-pagination .ant-pagination-item-active a {
+.dashboard-card-admin::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  pointer-events: none;
+}
+
+.dashboard-card-admin:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.dashboard-icon-admin {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  color: rgba(255,255,255,0.9);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  position: relative;
+  z-index: 1;
+}
+
+/* 🎨 New Color Theme Cards */
+.admin-card-admin {
+  background: linear-gradient(135deg, #934A5E, #d9718d);
   color: white;
 }
 
-.ant-table-pagination.ant-pagination {
-  margin: 24px 0 0 0;
+.user-card-admin {
+  background: linear-gradient(135deg, #57648E, #8190bf);
+  color: white;
 }
 
-/* Responsive Design */
+.article-card-admin {
+  background: linear-gradient(135deg, #846fa8, #C2B4D7);
+  color: #2d3748;
+}
+
+.dashboard-card-admin h3 {
+  margin: 12px 0 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  position: relative;
+  z-index: 1;
+  /* 🔧 ปรับปรุงการแสดงผลข้อความ */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+.dashboard-card-admin p {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  /* 🔧 ปรับปรุงการแสดงผลข้อความ */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+ 
+/* 🔧 สำหรับ ManageAdmin component */
+.manage-admin-container {
+  width: 100%;
+  /* 🔧 แก้ไข: ใช้ overflow-x เฉพาะในตารางที่ต้องการ */
+  overflow-x: visible;
+  margin-top: 50px;
+} 
+
+/* 🔧 แก้ไข: ให้ตารางมี horizontal scroll เฉพาะเมื่อจำเป็น */
+.manage-admin-container table,
+.manage-admin-container .ant-table-wrapper {
+  min-width: 600px;
+  overflow-x: auto;
+}
+
+/* 🔧 เพิ่ม: การจัดการ scroll เฉพาะในตาราง */
+.manage-admin-container .ant-table-content {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* ✅ Enhanced Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .dashboard-title-admin {
+    font-size: 2rem;
+    margin-bottom: 28px;
+  }
+  
+  .dashboard-grid-admin {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  
+  .dashboard-card-admin {
+    padding: 24px 18px;
+  }
+}
+
+@media (max-width: 992px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 30px;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 2.5rem;
+    margin-bottom: 14px;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.8rem;
+  }
+}
+
 @media (max-width: 768px) {
-  .admin-header {
-    margin: 8px;
-    padding: 0 16px;
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 30px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 90vw;
+    height: 90vh;
   }
-  
-  .admin-content {
-    margin: 0 8px 8px;
-    padding: 16px;
+
+  .dashboard-title-admin {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    padding: 0 10px;
   }
-  
-  .section-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+
+  .dashboard-grid-admin {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
-  
-  .stats-row .ant-col {
-    margin-bottom: 16px;
-  }
-  
-  .ant-table-wrapper {
-    overflow-x: auto;
-  }
-  
-  .ant-modal {
+
+  .dashboard-card-admin {
+    padding: 20px 16px;
+    border-radius: 16px;
     margin: 0;
-    max-width: 100vw;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
   }
   
-  .ant-modal-content {
-    margin: 20px;
+  .dashboard-card-admin h3 {
+    font-size: 1rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.6rem;
+  }
+
+}
+
+@media (max-width: 640px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 30px;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .dashboard-card-admin {
+    padding: 18px 14px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 2rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.5rem;
   }
 }
 
-@media (max-width: 576px) {
-  .logo {
-    padding: 16px;
+@media (max-width: 480px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 20px;
+    margin-left: 8px;
+    margin-right: 8px;
+    width: 90vw;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    text-align: center;
+    padding: 0 10px;
+  }
+
+  .dashboard-grid-admin {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-card-admin {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
   }
   
-  .logo-text {
-    font-size: 16px;
+  .dashboard-card-admin h3 {
+    font-size: 0.9rem;
+    margin: 8px 0 4px;
   }
   
-  .admin-header {
-    height: 56px;
-  }
-  
-  .header-title {
-    font-size: 16px !important;
-  }
-  
-  .section-header h3 {
-    font-size: 18px !important;
+  .dashboard-card-admin p {
+    font-size: 1.2rem;
+    line-height: 1.3;
   }
 }
 
-/* Animation Effects */
-@keyframes fadeIn {
+@media (max-width: 360px) {
+  .health-dashboard-admin {
+    margin-top: 120px;
+    padding: 20px;
+    margin-left: 6px;
+    margin-right: 6px;
+    width: 90vw;
+    height: 90vh;
+  }
+
+  .dashboard-title-admin {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    padding: 0 5px;
+  }
+
+  .dashboard-card-admin {
+    padding: 14px 10px;
+  }
+
+  .dashboard-icon-admin {
+    font-size: 1.6rem;
+  }
+  
+  .dashboard-card-admin h3 {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-card-admin p {
+    font-size: 1.3rem;
+  }
+}
+
+/* 🎭 Loading State */
+.loading-card {
+  background: linear-gradient(135deg, #E5E5E5, #f0f0f0);
+  color: #666;
+}
+
+.loading-card .dashboard-icon-admin {
+  color: #999;
+}
+
+/* 🌟 Animations */
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -360,139 +366,43 @@
   }
 }
 
-.admin-content > * {
-  animation: fadeIn 0.4s ease-out;
+.dashboard-card-admin {
+  animation: fadeInUp 0.6s ease-out;
 }
 
-.ant-card {
-  animation: fadeIn 0.3s ease-out;
+.dashboard-card-admin:nth-child(2) {
+  animation-delay: 0.1s;
 }
 
-.ant-table-wrapper {
-  animation: fadeIn 0.5s ease-out;
+.dashboard-card-admin:nth-child(3) {
+  animation-delay: 0.2s;
 }
 
-/* Loading States */
-.ant-spin-nested-loading {
-  position: relative;
-}
-
-.ant-spin {
-  color: #667eea;
-}
-
-/* Custom Scrollbar */
-.admin-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.admin-content::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-
-.admin-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  border-radius: 3px;
-}
-
-.admin-content::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #5a6fd8, #6b42a6);
-}
-
-/* Form Enhancements */
-.ant-form-item-explain-error {
-  color: #ff4d4f;
-  font-size: 12px;
-}
-
-.ant-form-item-has-error .ant-input,
-.ant-form-item-has-error .ant-input-password,
-.ant-form-item-has-error .ant-select-selector {
-  border-color: #ff4d4f;
-  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
-}
-
-/* Success States */
-.ant-form-item-has-success .ant-input,
-.ant-form-item-has-success .ant-input-password,
-.ant-form-item-has-success .ant-select-selector {
-  border-color: #52c41a;
-  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
-}
-
-/* Table Enhancements */
-.ant-table-thead > tr > th.ant-table-column-sort {
-  background: linear-gradient(135deg, #5a6fd8, #6b42a6);
-}
-
-.ant-table-column-sorters:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Popconfirm Styling */
-.ant-popover-inner {
-  border-radius: 8px;
-}
-
-.ant-popover-message {
-  padding: 12px 0 8px;
-}
-
-.ant-popover-buttons {
-  text-align: right;
-  padding: 8px 0 0;
-}
-
-/* Empty State */
-.ant-empty {
-  margin: 40px 0;
-}
-
-.ant-empty-description {
-  color: #999;
-}
-
-/* Loading Button States */
-.ant-btn-loading {
-  pointer-events: none;
-}
-
-/* Badge Animations */
-.status-badge {
-  transition: all 0.3s ease;
-}
-
-.status-badge:hover {
-  transform: scale(1.05);
-}
-
-/* Dark Mode Support (Optional) */
-@media (prefers-color-scheme: dark) {
-  .admin-layout {
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+/* 📱 Very Small Screens (Apple Watch, etc.) */
+@media (max-width: 280px) {
+  .health-dashboard-admin {
+    padding: 20px;
+    margin-top: 120px;
+    height: 90vh;
   }
   
-  .admin-header,
-  .admin-content {
-    background: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
+  .dashboard-title-admin {
+    font-size: 1rem;
   }
   
-  .header-title {
-    color: #ffffff;
+  .dashboard-card-admin {
+    padding: 12px 8px;
   }
   
-  .ant-table {
-    background: rgba(255, 255, 255, 0.02);
+  .dashboard-icon-admin {
+    font-size: 1.4rem;
   }
   
-  .ant-table-tbody > tr > td {
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+  .dashboard-card-admin h3 {
+    font-size: 0.85rem;
   }
   
-  .ant-table-tbody > tr:hover > td {
-    background: rgba(255, 255, 255, 0.05) !important;
+  .dashboard-card-admin p {
+    font-size: 1.2rem;
   }
 }

@@ -326,9 +326,21 @@
   }
   
   .floating-button {
-    bottom: 20px;
-    right: 20px;
+    bottom: 40px;
+    right: 40px;
     height: 56px;
     width: 56px;
   }
+}
+
+.test-button {
+  display: inline-block;   
+  color: #a855f7;
+  border: 2px solid #6b7280;  
+  border-radius: 8px;  
+  padding: 4px 12px;    
+  margin-bottom: 10px;
+  background-color: transparent;
+  cursor: pointer;   
+  font-size: 14px;            
 }

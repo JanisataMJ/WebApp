@@ -5,7 +5,7 @@ export interface HealthDataInterface {
     Timestamp:      string;           
     Bpm:            number;  
     Steps:          number;     
-    SleepHours:     number;    
+    SleepHours:     string;    
     CaloriesBurned: number;
     Spo2:           number;
     BodyTemp:       number;

@@ -191,18 +191,18 @@
 /* Card Content Styles */
 .card-label {
   font-weight: 700;
-  color: #374151;
+  color: #57648E;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .label-center {
-  font-size: 16px;
+  font-size: 24px;
 }
 
 .label-side {
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .card-value {

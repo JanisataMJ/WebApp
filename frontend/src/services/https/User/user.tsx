@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { UsersInterface ,SignInInterface,InterfaceStatusWriter,InterfaceIncome} from "../../../interface/user_interface/IUser";
 
 const apiUrl = "http://localhost:8000";
@@ -71,14 +71,24 @@ async function GetUsersById(id: string) {
     .catch((e) => e.response);
 }
 
-export async function UpdateUsersById(id: string, formData: FormData) {
+export async function UpdateUsersById(
+  id: string,
+  formData: FormData,
+  config?: AxiosRequestConfig
+) {
   try {
-    const response = await axios.put(`${apiUrl}/user/${id}`, formData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await axios.put(
+      `${apiUrl}/user/${id}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'multipart/form-data',
+          ...config?.headers, // รวม headers ที่ส่งมาเพิ่มเติม
+        },
+        ...config, // รวม config อื่น ๆ เช่น params, timeout
+      }
+    );
     return response;
   } catch (error: any) {
     return error.response;

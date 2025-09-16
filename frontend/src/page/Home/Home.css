@@ -15,17 +15,33 @@
     cursor: pointer;
 }
 
-.l1{ /*ส่วน bg-content*/
-    margin-top: 17%;
+
+.l1 {
+    margin-top: 100px; /* ระยะจาก header พอดี */
     border-radius: 10px;
     background-color: #E5E5E5;
     width: 100vw;
     height: auto;
+    padding: 20px 0; /* ให้เนื้อหาด้านบน-ล่างมีระยะ */
 }
-@media (min-width: 720px) {
+
+/* Responsive margin-top ให้ปรับตามหน้าจอ */
+@media (max-width: 1200px) {
     .l1 {
-        margin-top: 110px
+        margin-top: 10%;
     }
+}
+
+@media (max-width: 768px) {
+    .l1 {
+        margin-top: 40%;
+    }
+}
+
+@media (max-width: 600px) {
+  .l1 {
+    padding-top: 27%; /* เว้นระยะ header ตามจริง */
+  }
 }
 
 .l11 {
@@ -153,24 +169,57 @@
 }
 
 
-.l1_2{
+.l1_2 {
     display: flex;
     flex-wrap: wrap;
-    height: auto;
-    width: auto;
-    margin: 100px 80px 0; 
+    width: 100%;
+    margin: 40px 20px 0; /* เว้นระยะบนระหว่าง header ของแต่ละกราฟ */
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.headder{
+
+/* หัวข้อกราฟ */
+.headder {
     color: #57648E;
     width: 100%;
+    margin-bottom: 15px;
+}
+
+.headder h2 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: capitalize;
     margin-bottom: 10px;
 }
-.headder h2 {
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: capitalize;
-  margin-bottom: 10px;
+
+/* Responsive */
+@media (max-width: 768px) {
+    .l1_2 {
+        margin: 30px 10px 0;
+        padding: 15px;
+    }
+
+    .headder h2 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .l1 {
+        margin-top: 80px;
+    }
+
+    .l1_2 {
+        margin: 20px 5px 0;
+        padding: 10px;
+    }
+
+    .headder h2 {
+        font-size: 18px;
+    }
 }
 
 .category a{

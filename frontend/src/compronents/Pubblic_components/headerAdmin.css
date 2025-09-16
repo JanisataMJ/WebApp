@@ -1,0 +1,173 @@
+.topbar-headAdmin {
+    position: fixed;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    width: calc(100% - 10px);
+    z-index: 90;
+    background: linear-gradient(to right, #934A5E, #C2B4D7, #57648E); 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    top: 0;
+    left: 0;
+    padding: 0 20px;
+} 
+
+.logo-headAdmin {
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+.logo-img-headAdmin {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-left: 10px;
+    margin-right: 25px;
+}
+
+.header-link-headAdmin {
+    color: #ffffff;
+    font-weight: normal;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 8px; 
+    text-decoration: none;
+    font-size: 20px;
+    height: 40px;
+    line-height: 1;
+    white-space: nowrap;
+    margin: 0 10px;
+}
+
+.header-link-headAdmin:hover {
+    color: #934A5E;
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+}
+
+.header-link-headAdmin.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.profile-headAdmin {
+    width: 47px;
+    height: 47px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.avatar-toggle-headAdmin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 47px;
+    width: 47px;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.dropdown-menu {
+    width: 190px;
+    z-index: 2000;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 5px;
+}
+
+.custom-modal-headAdmin .modal-content-headAdmin {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+.confirmation-message-headAdmin {
+    position: relative;
+}
+
+.cancel-headAdmin {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.ready-headAdmin {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+}
+
+.text2-headAdmin {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.text1-headAdmin {
+    display: block;
+    margin-bottom: 20px;
+}
+
+#buttonin {
+    background-color: #934A5E;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#buttonin:hover {
+    background-color: #7a3a4b;
+}
+
+@media (max-width: 768px) {
+    .topbar-headAdmin {
+        padding: 0 10px;
+    }
+
+    .header-link-headAdmin {
+        font-size: 18px;
+        padding: 6px 10px;
+        height: 36px;
+    }
+
+    .logo-img-headAdmin {
+        width: 80px;
+        height: 80px;
+    }
+
+    .profile-headAdmin, .avatar-toggle-headAdmin {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* สีตัวหนังสือของหน้า active */
+.active-link-headAdmin {
+    background-color: rgba(255, 255, 255, 0.2); /* หรือสีที่ต้องการ */
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* hover ยังอยู่ */
+.header-link-headAdmin:hover {
+    color: #934A5E;
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+}

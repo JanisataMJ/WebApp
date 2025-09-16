@@ -1,7 +1,7 @@
 import axios from "axios";
 import { NotificationInterface } from "../../../interface/notification_interface/notification";
 
-const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
+const apiUrl = "http://localhost:8000"; // เปลี่ยนเป็น backend จริง
 
 const getRequestOptions = () => {
   const Authorization = localStorage.getItem("token");
@@ -14,51 +14,76 @@ const getRequestOptions = () => {
   };
 };
 
-const postRequestOptions = (body: any) => {
-  const Authorization = localStorage.getItem("token");
-  const Bearer = localStorage.getItem("token_type");
-  return {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `${Bearer} ${Authorization}`,
-    },
-    body: JSON.stringify(body),
-  };
-};
-
-
 // GET Notifications by user ID
 export const getNotificationByUserID = async (
   userId: number
 ): Promise<NotificationInterface[]> => {
-  try {
-    const requestOptions = getRequestOptions();
-    const response = await axios.get<NotificationInterface[]>(
-      `${apiUrl}/notification/${userId}`,
-      requestOptions
-    );
-    return response.data;
-  } catch (error) {
-    throw new Error("Error fetching notifications: " + (error as Error).message);
-  }
+  const requestOptions = getRequestOptions();
+  const response = await axios.get<NotificationInterface[]>(
+    `${apiUrl}/notification/${userId}`,
+    requestOptions
+  );
+  return response.data;
 };
-
 
 // CREATE Notification
 export const createNotification = async (
   noti: Omit<NotificationInterface, "ID">
 ): Promise<NotificationInterface> => {
+  const requestOptions = getRequestOptions();
+  const response = await axios.post<NotificationInterface>(
+    `${apiUrl}/create-notification`,
+    noti,
+    requestOptions
+  );
+  return response.data;
+};
+
+
+
+interface NotificationStatusUpdate {
+  status: number; // ID ของ NotificationStatus
+}
+
+export const updateNotificationStatusByID = async (
+  id: number,
+  data: NotificationStatusUpdate
+): Promise<NotificationInterface | any> => {
   try {
-    const requestOptions = postRequestOptions(noti);
-    const response = await fetch(`${apiUrl}/create-notification`, requestOptions);
-    if (!response.ok) {
-      throw new Error("Error creating notification");
-    }
-    const data: NotificationInterface = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error creating notification:", error);
-    throw new Error("Error creating notification: " + (error as Error).message);
+    const res = await axios.patch(
+      `${apiUrl}/notification/${id}/status`,
+      data,
+      getRequestOptions() // ใช้ฟังก์ชันนี้
+    );
+    return res.data;
+  } catch (error: any) {
+    return error.response;
+  }
+};
+
+export const sendWeeklySummary = async (): Promise<string | any> => {
+  try {
+    const res = await axios.get<{ message: string }>(
+      `${apiUrl}/notification/send-weekly-summary`,
+      getRequestOptions()
+    );
+    return res.data.message;
+  } catch (error: any) {
+    console.error("Failed to send weekly summary:", error);
+    return error.response;
+  }
+};
+
+export const sendRealtimeAlert = async (healthData: any): Promise<string | any> => {
+  try {
+    const res = await axios.post<{ message: string }>(
+      `${apiUrl}/notification/check-realtime-alert`,
+      healthData,
+      getRequestOptions()
+    );
+    return res.data.message;
+  } catch (error: any) {
+    console.error("Failed to send realtime alert:", error);
+    return error.response;
   }
 };

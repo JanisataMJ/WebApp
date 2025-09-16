@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './profile.css';
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { GetUsersById } from '../../services/https/User/user';
 //import { UsersInterface } from '../../interface/profile_interface/IProfile';
 import { UsersInterface } from '../../interface/user_interface/IUser';
@@ -83,78 +84,93 @@ const Profile: React.FC = () => {
     <>
       {contextHolder}
       <Headers />
-      <div className="profile-container">
-        <h1 className="profile-title">Profile Information</h1>
-
-        {loading ? (
-          <Spin />
-        ) : (
-          <div className="profile-box">
-            <Link to="/editProfile" className="editProfile">
-              Edit
-            </Link>
-
-            <div className="profile-header">
-              {users?.Profile ? (
-                <img
-                  src={users.Profile}
-                  alt="Profile"
-                  className="profile-picture"
-                />
-              ) : (
-                <div className="no-profile-picture">No profile picture</div>
-              )}
-              <h2 style={{ color: 'black' }}>
-                {users?.Username || 'Username not found'}
-              </h2>
-            </div>
-
-            <div className="profile-content">
-              <div className="item">
-                <span className="label">Full Name</span>
-                <span className="value">{users ? `${users.FirstName} ${users.LastName}` : '-'}</span>
-
-                <span className="label">Email</span>
-                <span className="value">{users?.Email || '-'}</span>
-              </div>
-
-              <div className="item">
-                <span className="label">Gender</span>
-                <span className="value">{getGenderName(users?.GenderID)}</span>
-
-                <span className="label">Birth Date</span>
-                <span className="value">
-                  {users?.BirthDay ? dayjs(users.BirthDay).format('DD/MM/YYYY') : '-'}
-                </span>
-              </div>
-
-              <div className="item">
-                <span className="label">Phone</span>
-                <span className="value">{users?.Phonenumber || '-'}</span>
-
-                <span className="label">Weight</span>
-                <span className="value">{users?.Weight ? `${users.Weight} kg` : 'Not specified'}</span>
-              </div>
-
-              <div className="item">
-                <span className="label">Height</span>
-                <span className="value">{users?.Height ? `${users.Height} cm` : 'Not specified'}</span>
-
-                <span className="label">Bust</span>
-                <span className="value">{users?.Bust ? `${users.Bust} cm` : 'Not specified'}</span>
-              </div>
-
-              <div className="item">
-                <span className="label">Waist</span>
-                <span className="value">{users?.Waist ? `${users.Waist} cm` : 'Not specified'}</span>
-
-                <span className="label">Hip</span>
-                <span className="value">{users?.Hip ? `${users.Hip} cm` : 'Not specified'}</span>
-              </div>
-            </div>
+      <div className='profile-wrapper'>
+        <div className="profile-title-section">
+            <button
+              className="profile-back-button"
+              onClick={() => navigate('/admin/home')}
+              type="button"
+              aria-label="Go Back"
+            >
+              <ArrowLeftOutlined />
+            </button>
+            <h1 className="profile-title-back">กลับหน้าหลัก</h1>
           </div>
-        )}
-      </div>
+
+          <div className='profile-container'>
+
+          {loading ? (
+            <Spin />
+          ) : (
+            <div className="profile-box">
+              <h1 className="profile-title">ข้อมูลส่วนตัว</h1>
+              <Link to="/editProfile" className="editProfile">
+                แก้ไข
+              </Link>
+
+              <div className="profile-header">
+                {users?.Profile ? (
+                  <img
+                    src={users.Profile}
+                    alt="Profile"
+                    className="profile-picture"
+                  />
+                ) : (
+                  <div className="no-profile-picture">ไม่มีรูปโปรไฟล์</div>
+                )}
+                <h2 style={{ color: 'black' }}>
+                  {users?.Username || 'Username not found'}
+                </h2>
+              </div>
+
+              <div className="profile-content">
+                <div className="item">
+                  <span className="label">ชื่อ:</span>
+                  <span className="value">{users ? `${users.FirstName} ${users.LastName}` : '-'}</span>
+
+                  <span className="label">อีเมล:</span>
+                  <span className="value">{users?.Email || '-'}</span>
+                </div>
+
+                <div className="item">
+                  <span className="label">เพศ:</span>
+                  <span className="value">{getGenderName(users?.GenderID)}</span>
+
+                  <span className="label">วันเกิด:</span>
+                  <span className="value">
+                    {users?.BirthDay ? dayjs(users.BirthDay).format('DD/MM/YYYY') : '-'}
+                  </span>
+                </div>
+
+                <div className="item">
+                  <span className="label">เบอร์โทรศัพท์:</span>
+                  <span className="value">{users?.Phonenumber || '-'}</span>
+
+                  <span className="label">น้ำหนัก:</span>
+                  <span className="value">{users?.Weight ? `${users.Weight} กก.` : 'ไม่ระบุ'}</span>
+                </div>
+
+                <div className="item">
+                  <span className="label">ส่วนสูง:</span>
+                  <span className="value">{users?.Height ? `${users.Height} ซม.` : 'ไม่ระบุ'}</span>
+
+                  <span className="label">รอบอก:</span>
+                  <span className="value">{users?.Bust ? `${users.Bust} ซม.` : 'ไม่ระบุ'}</span>
+                </div>
+
+                <div className="item">
+                  <span className="label">เอว:</span>
+                  <span className="value">{users?.Waist ? `${users.Waist} ซม.` : 'ไม่ระบุ'}</span>
+
+                  <span className="label">สะโพก:</span>
+                  <span className="value">{users?.Hip ? `${users.Hip} ซม.` : 'ไม่ระบุ'}</span>
+                </div>
+              </div>
+            </div>
+          )}
+          </div>
+        </div>
+
     </>
   );
 };

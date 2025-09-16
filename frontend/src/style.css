@@ -23,7 +23,7 @@
 
 /* ปรับสีของ background ของ scrollbar */
 ::-webkit-scrollbar-track {
-    background-color: #181717;
+    background-color: #c0c0c0;
     /* background: linear-gradient(to bottom, #1c1111, #1c1111,#4C0505,#AD4F4F,#440303,#1E0303); */
     border-radius: 10px;
 }
@@ -31,18 +31,18 @@
 /* ปรับสีของ thumb (ส่วนที่เลื่อนได้) ของ scrollbar */
 ::-webkit-scrollbar-thumb {
     /* background: linear-gradient(to bottom, #1c1111, #731010); */
-    background-color: #454343;
+    background-color: #57648E;
     border-radius: 10px;
 }
 
 /* ปรับสีของ scrollbar เมื่อ hover */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #545353;
+    background-color: #C2B4D7;
     /* background: linear-gradient(to bottom, #160a0a, #000000); */
 }
 
 /* ปรับสีของ scrollbar เมื่อ active (กำลังถูกคลิก) */
 ::-webkit-scrollbar-thumb:active {
-    background-color: #3a3737;
+    background-color: #57648E;
     /* background: linear-gradient(to bottom, #260c0c, #ffe6de); */
 }

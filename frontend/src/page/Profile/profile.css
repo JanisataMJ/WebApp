@@ -1,3 +1,12 @@
+.profile-wrapper {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow-x: hidden;
+  padding-top: 80px;
+}
+
 .profile-container {
   background: linear-gradient(135deg, #667eea, #764ba2);
   min-height: 100vh;
@@ -5,23 +14,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 20px;
+  padding: auto;
   color: #fff;
-  box-sizing: border-box;
+  box-sizing: border-box; 
 }
 
 .profile-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: bold;
   margin-top: 2rem;
+  margin-bottom: 2rem;
   text-align: center;
-  color: #fff;
+  color: #57648E;
 }
 
 .profile-box {
   background-color: #fefefe;
   border-radius: 20px;
-  padding: 40px;
+  padding: 10px 40px 30px;
   width: 100%;
   max-width: 700px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -102,7 +112,6 @@
   width: 120px; /* กำหนดความกว้างเท่ากันทุก label */
 }
 
-
 .value {
   color: #000000;
   font-size: 16px;
@@ -110,9 +119,68 @@
   text-align: left; /* หรือ right ตามต้องการ */
 }
 
+
+.profile-title-section {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  gap: 1rem;
+  margin-top: 30px;
+  position: relative;
+  z-index: 5;
+}
+
+.profile-back-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0.8rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+}
+
+.profile-back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-2px);
+}
+
+.profile-title-back {
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  flex-shrink: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
 @keyframes fadeInUp {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+
+@media (max-width: 768px) {
+  .item {
+    margin-bottom: 12px;
+  }
+
+  .label {
+    font-size: 13px;
+    width: 80px;
+  }
+
+  .value {
+    font-size: 13px;
   }
 }

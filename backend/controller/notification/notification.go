@@ -1,38 +1,35 @@
 package notification
 
 import (
-	"log"
 	"net/http"
 	"time"
-	"fmt"
 
 	"github.com/JanisataMJ/WebApp/config"
 	"github.com/JanisataMJ/WebApp/entity"
-	"github.com/JanisataMJ/WebApp/utils"
 	"github.com/gin-gonic/gin"
 )
 
-func SendNotificationEmail(notificationID uint) error {
-    var notif entity.Notification
+/*func SendNotificationEmail(notificationID uint) error {
+	var notif entity.Notification
 
-    // ดึง Notification พร้อม User
-    if err := config.DB().Preload("User").First(&notif, notificationID).Error; err != nil {
-        return err
-    }
+	// ดึง Notification พร้อม User
+	if err := config.DB().Preload("User").First(&notif, notificationID).Error; err != nil {
+		return err
+	}
 
-    if notif.User == nil {
-        return fmt.Errorf("user not found")
-    }
+	if notif.User == nil {
+		return fmt.Errorf("user not found")
+	}
 
-    // ส่ง email
-    if err := utils.SendEmail(notif.User.Email, notif.Title, notif.Message); err != nil {
-        log.Println("Failed to send email:", err)
-        return err
-    }
+	// ส่ง email
+	if err := utils.SendEmail(notif.User.Email, notif.Title, notif.Message); err != nil {
+		log.Println("Failed to send email:", err)
+		return err
+	}
 
-    log.Println("Email sent to:", notif.User.Email)
-    return nil
-}
+	log.Println("Email sent to:", notif.User.Email)
+	return nil
+}*/
 
 func CreateNotification(c *gin.Context) {
 	var input struct {
@@ -42,8 +39,8 @@ func CreateNotification(c *gin.Context) {
 		UserID               uint      `json:"user_id"`
 		HealthTypeID         uint      `json:"health_type_id"`
 		NotificationStatusID uint      `json:"notification_status_id"`
-		HealthSummaryID      *uint      `json:"health_summary_id"`
-		HealthAnalysisID     *uint      `json:"health_analysis_id"`
+		HealthSummaryID      *uint     `json:"health_summary_id"`
+		HealthAnalysisID     *uint     `json:"health_analysis_id"`
 		TrendsID             uint      `json:"trends_id"`
 	}
 
@@ -152,4 +149,69 @@ func DeleteNotification(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Notification deleted"})
+}
+
+func UpdateNotificationStatusByID(c *gin.Context) {
+	// ดึง ID ของ Notification จาก URL param
+	id := c.Param("id")
+
+	// สร้าง struct สำหรับรับ JSON body
+	var body struct {
+		Status uint `json:"status"` // Status ID ตรง ๆ
+	}
+
+	// Bind JSON
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db := config.DB()
+
+	// ค้นหา Notification
+	var noti entity.Notification
+	if err := db.First(&noti, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Notification not found"})
+		return
+	}
+
+	// ตรวจสอบ Status ที่ส่งมาว่ามีอยู่ใน DB หรือไม่
+	var newStatus entity.NotificationStatus
+	if err := db.First(&newStatus, body.Status).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status ID"})
+		return
+	}
+
+	// อัปเดต NotificationStatusID
+	if err := db.Model(&noti).Update("notification_status_id", newStatus.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update notification"})
+		return
+	}
+
+	// โหลด Notification ที่อัปเดตพร้อม relation
+	if err := db.Preload("NotificationStatus").
+		Preload("HealthType").
+		First(&noti, noti.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch updated notification"})
+		return
+	}
+
+	// ส่ง response กลับ
+	c.JSON(http.StatusOK, gin.H{
+		"ID":                   noti.ID,
+		"Timestamp":            noti.Timestamp.Format(time.RFC3339),
+		"Title":                noti.Title,
+		"Message":              noti.Message,
+		"UserID":               noti.UserID,
+		"HealthTypeID":         noti.HealthTypeID,
+		"NotificationStatusID": noti.NotificationStatusID,
+		"HealthType": map[string]interface{}{
+			"ID":   noti.HealthType.ID,
+			"Type": noti.HealthType.Type,
+		},
+		"NotificationStatus": map[string]interface{}{
+			"ID":     noti.NotificationStatus.ID,
+			"Status": noti.NotificationStatus.Status,
+		},
+	})
 }

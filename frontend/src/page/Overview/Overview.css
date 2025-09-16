@@ -8,15 +8,15 @@
 }
 
 /* Main Dashboard Container */
-.health-dashboard {
+.health-dashboard-overview {
   min-height: 100vh;
-  width: 1000px;
+  width: 90vw; /* ใช้ % เพื่อ responsive กับหน้าจอ */
+  max-width: 1000px;
   background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
-  padding: 20px;
-  margin-top: 130px;
-  margin-bottom: 20px;
+  padding: 30px;
+  margin: 140px auto 20px auto; /* จัดกึ่งกลางแนวนอน */
   border-radius: 20px;
-  
+  box-sizing: border-box;
 }
 
 .dashboard-container {
@@ -408,8 +408,9 @@
 }
 
 @media (max-width: 768px) {
-  .health-dashboard {
-    padding: 12px;
+  .health-dashboard-overview {
+    padding: 16px;
+    margin: 340px auto 20px auto;
   }
   
   .dashboard-header {

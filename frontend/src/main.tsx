@@ -15,11 +15,11 @@ import Register from './page/authentication/Register/register';
 import Income from './page/writer/Income';
 import Overview from './page/Overview/Overview';
 import Tips from './page/Tips/Tips';
+import TipsDetail from './page/Tips/detail/TipsDetail';
 import Calendar from './page/calendar/calendar';
 import MoodTracker from './page/Mood/MoodTracker';
 import AdminHome from './page/Admin/AdminHome';
 import Articles from './page/Admin/Article/article';
-import ManageAdmin from './page/Admin/manage_admin/manage_admin';
 
 const router = createBrowserRouter([
   { path: "/home", element: <Home /> },
@@ -32,12 +32,12 @@ const router = createBrowserRouter([
   { path: "/register", element: <Register /> },
   { path: "/overview", element: <Overview />},
   { path: "/tips", element: <Tips />},
+  { path: "/tips/:id", element: <TipsDetail />},
   { path: "/calendar", element: <Calendar />},
   { path: "/moodtracker", element: <MoodTracker />},
   { path: "/admin/login", element: <AdminLogin /> },
   { path: "/admin/home", element: <AdminHome /> },
   { path: "/admin/article", element: <Articles /> },
-  { path: "/admin/manageAdmin", element: <ManageAdmin /> },
 ]);
 
 

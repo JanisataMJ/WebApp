@@ -7,9 +7,14 @@ import (
 
 type Article struct {
 	gorm.Model
-	Article 	string
-	CreateDate 	time.Time
+	Title			string
+	Information 	string
+	Reference		string
+	Image			string
+	Order			uint
+	PublishDate 	*time.Time
+	Published    	bool `gorm:"default:false"` // ยังไม่เผยแพร่
 	
-	AdminID 	uint
-	Admin   	*Admin `gorm:"foreignKey: AdminID"`
+	UserID 	uint
+	User   	*User `gorm:"foreignKey: UserID"`
 }

@@ -16,10 +16,10 @@
   font-variation-settings:"wdth" 100;
 }
 /* ปรับขนาดของ scrollbar */
-::-webkit-scrollbar {
-    width: 10px; /* ความกว้างของ scrollbar */
-    height: 10px; /* ความสูงของ scrollbar (กรณีเป็น scrollbar แนวนอน) */
-}
+/* ::-webkit-scrollbar {
+    width: 10px; ความกว้างของ scrollbar
+    height: 10px; ความสูงของ scrollbar (กรณีเป็น scrollbar แนวนอน)
+} */
 
 /* ปรับสีของ background ของ scrollbar */
 ::-webkit-scrollbar-track {

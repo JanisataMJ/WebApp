@@ -4,12 +4,11 @@ import Headers from '../../compronents/Pubblic_components/headerselect';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Slider from '../../compronents/Home_components/slideshow';
 import Notification from '../../compronents/Home_components/Notifiation/notice';
-import Graph1 from '../../compronents/Home_components/GroupGraph/temp';
-import Graph2 from '../../compronents/Home_components/GroupGraph/heartrate';
-import Graph3 from '../../compronents/Home_components/GroupGraph/calorie';
-import Graph4 from '../../compronents/Home_components/GroupGraph/spo2';
-import Graph5 from '../../compronents/Home_components/GroupGraph/steps';
-import Graph6 from '../../compronents/Home_components/GroupGraph/sleep';
+import DairyHeartRate from '../../compronents/Home_components/GroupGraph/heartrate';
+import DairyCalorie from '../../compronents/Home_components/GroupGraph/calorie';
+import DairySpo2 from '../../compronents/Home_components/GroupGraph/spo2';
+import DairySteps from '../../compronents/Home_components/GroupGraph/steps';
+import DairySleep from '../../compronents/Home_components/GroupGraph/sleep';
 import SLoader from '../../compronents/Loading_components/simpleLoader';
 
 const Home: React.FC = () => {
@@ -39,52 +38,44 @@ const Home: React.FC = () => {
           <Slider />
         </div>
 
-        <a id='chart1' className='hide'>4</a>
+        <a id='chart1' className='hide'>5</a>
         <div className='l1_2'>
           <div className='headder'>
-            <h2>Temperature</h2>
+            <h2>Heartrate</h2>
           </div>
-          <Graph1 />
+          <DairyHeartRate />
         </div>
 
-        <a id='chart2' className='hide'>5</a>
-        <div className='l1_2'>
-          <div className='headder'>
-            <h2>Heart Rate</h2>
-          </div>
-          <Graph2 />
-        </div>
-
-        <a id='chart3' className='hide'>6</a>
+        <a id='chart2' className='hide'>6</a>
         <div className='l1_2'>
           <div className='headder'>
             <h2>Calorie</h2>
           </div>
-          <Graph3 />
+          <DairyCalorie />
         </div>
 
-        <a id='chart4' className='hide'>7</a>
-        <div className='l1_2'>
-          <div className='headder'>
-            <h2>SPO2</h2>
-          </div>
-          <Graph4 />
-        </div>
-
-        <a id='chart5' className='hide'>8</a>
+        <a id='chart3' className='hide'>7</a>
         <div className='l1_2'>
           <div className='headder'>
             <h2>Steps</h2>
           </div>
-          <Graph5 />
+          <DairySteps />
         </div>
 
-        <a id='chart6' className='hide'>9</a>
+        <a id='chart4' className='hide'>8</a>
+        <div className='l1_2'>
+          <div className='headder'>
+            <h2>SPO2</h2>
+          </div>
+          <DairySpo2 />
+        </div>
+
+        <a id='chart5' className='hide'>9</a>
         <div className='l1_2'>
           <div className='headder'>
             <h2>Sleep</h2>
           </div>
-          <Graph6 />
+          <DairySleep />
         </div>
 
           <Notification />

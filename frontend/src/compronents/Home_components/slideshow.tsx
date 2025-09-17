@@ -69,14 +69,6 @@ const Slider: React.FC = () => {
       color: "#10b981",
       bgGradient: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"
     },
-    {
-      icon: Thermometer,
-      label: "อุณหภูมิร่างกาย",
-      value: `${data.BodyTemp.toFixed(1)}°C` as string, // <-- ✅
-      sub: findAnalysis(data, "อุณหภูมิร่างกาย")?.Interpretation || "ไม่มีข้อมูล",
-      color: "#f97316",
-      bgGradient: "linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)"
-    }
   ];
 
 
@@ -233,7 +225,7 @@ const Slider: React.FC = () => {
           ))}
         </div>
 
-        {/* Progress Bar */}
+       {/* Progress Bar */}
         <div className="progress-bar-container">
           <div
             className="progress-bar"
@@ -241,7 +233,7 @@ const Slider: React.FC = () => {
               background: `linear-gradient(90deg, ${healthItems[currentIndex].color} 0%, ${healthItems[currentIndex].color}80 100%)`
             }}
           />
-        </div>
+        </div> 
 
         {/* Quick Stats */}
         <div className="quick-stats">

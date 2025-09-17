@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 20px;
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -41,7 +41,7 @@
   font-size: 1.75rem;
   font-weight: 800;
   color: #1f2937;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -52,6 +52,9 @@
 .date-container {
   text-align: center;
   margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 .date {
@@ -64,21 +67,24 @@
 }
 
 .time {
-  font-size: 17px;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: 19px;
+  font-weight: 700;
+  color: #6b7078;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* Cards Container */
 .cards-container {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 230px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: visible;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 /* Health Card Base Styles */
@@ -103,8 +109,8 @@
 
 /* Card Position Styles */
 .card-center {
-  width: 320px;
-  height: 320px;
+  width: 250px;
+  height: 250px;
   z-index: 30;
   transform: scale(1);
   opacity: 1;
@@ -112,37 +118,37 @@
 }
 
 .card-left {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   z-index: 20;
-  transform: translateX(-300px) scale(0.75);
+  transform: translateX(-250px) scale(0.75);
   opacity: 0.7;
   border-color: #d1d5db !important;
 }
 
 .card-right {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   z-index: 20;
-  transform: translateX(300px) scale(0.75);
+  transform: translateX(250px) scale(0.75);
   opacity: 0.7;
   border-color: #d1d5db !important;
 }
 
 .card-far-left {
-  width: 140px;
-  height: 140px;
+  width: 100px;
+  height: 100px;
   z-index: 10;
-  transform: translateX(-450px) scale(0.5);
+  transform: translateX(-370px) scale(0.5);
   opacity: 0.4;
   border-color: #d1d5db !important;
 }
 
 .card-far-right {
-  width: 140px;
-  height: 140px;
+  width: 100px;
+  height: 100px;
   z-index: 10;
-  transform: translateX(450px) scale(0.5);
+  transform: translateX(370px) scale(0.5);
   opacity: 0.4;
   border-color: #d1d5db !important;
 }
@@ -158,7 +164,7 @@
 
 /* Icon Container */
 .card-icon-container {
-  padding: 16px;
+  padding: 10px;
   border-radius: 50%;
   margin-bottom: 12px;
   transition: all 0.3s ease;
@@ -166,11 +172,11 @@
 }
 
 .icon-center .card-icon-container {
-  padding: 20px;
+  padding: 10px;
 }
 
 .icon-side .card-icon-container {
-  padding: 12px;
+  padding: 8px;
 }
 
 /* Icon Styles */
@@ -179,13 +185,13 @@
 }
 
 .icon-center-size {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 }
 
 .icon-side-size {
-  width: 28px;
-  height: 28px;
+  width: 23px;
+  height: 23px;
 }
 
 /* Card Content Styles */
@@ -198,7 +204,7 @@
 }
 
 .label-center {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .label-side {
@@ -212,7 +218,7 @@
 }
 
 .value-center {
-  font-size: 48px;
+  font-size: 45px;
 }
 
 .value-side {
@@ -223,7 +229,6 @@
   font-size: 14px;
   font-weight: 600;
   text-align: center;
-  margin-top: 8px;
 }
 
 /* Status Indicator */
@@ -247,7 +252,7 @@
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .nav-dot {
@@ -271,7 +276,7 @@
   background: #e5e7eb;
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .progress-bar {

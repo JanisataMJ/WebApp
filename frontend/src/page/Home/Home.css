@@ -47,7 +47,7 @@
 .l11 {
   padding: 20px;
   background: #C2B4D7;
-  width: 100vw;
+  /* width: 100vw; */
 }
 
 
@@ -172,17 +172,17 @@
 .l1_2 {
     display: flex;
     flex-wrap: wrap;
-    width: 100%;
-    margin: 40px 20px 0; /* เว้นระยะบนระหว่าง header ของแต่ละกราฟ */
-    padding: 20px;
-    background: #fff;
+    /* width: 100%; */
+    margin: 0px 40px 0; /* เว้นระยะบนระหว่าง header ของแต่ละกราฟ */ 
+    padding: 50px 100px 50px;
+    background: #fff; 
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* หัวข้อกราฟ */
 .headder {
-    color: #57648E;
+    color: #ffffff;
     width: 100%;
     margin-bottom: 15px;
 }

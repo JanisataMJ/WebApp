@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar } from 'recharts';
 import './steps.css';
+import { getDailySteps } from '../../../services/https/DataHealth/healthData';
 
 interface StepsData {
   time: string;
@@ -25,109 +26,107 @@ interface StepsSummary {
   peakSteps: number;
 }
 
-interface HourlyActivity {
-  hour: string;
-  steps: number;
-  activity: string;
-  intensity: 'low' | 'moderate' | 'high' | 'very_high';
-}
-
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{
-    value: number;
-    payload?: StepsData;
-    [key: string]: any;
-  }>;
+  payload?: Array<{ value: number; payload?: StepsData }>;
   label?: string;
 }
 
-const Graph5: React.FC = () => {
-  const TARGET_STEPS = 10000;
+const STEP_LENGTH_M = 0.75; // ความยาวก้าวเฉลี่ย (เมตร)
+const USER_WEIGHT_KG = 60; // น้ำหนักผู้ใช้ (kg)
+const TARGET_STEPS = 10000;
 
-  // สร้างข้อมูลการเดินตัวอย่าง
-  const generateStepsData = (): StepsData[] => {
-    const data: StepsData[] = [];
-    let cumulativeSteps = 0;
-    
-    const activities = [
-      { time: '06:00', activity: 'ตื่นนอน', baseSteps: 50, intensity: 'low' as const },
-      { time: '07:00', activity: 'เตรียมตัว', baseSteps: 300, intensity: 'moderate' as const },
-      { time: '08:00', activity: 'เดินทางไปทำงาน', baseSteps: 800, intensity: 'high' as const },
-      { time: '09:00', activity: 'ทำงาน', baseSteps: 150, intensity: 'low' as const },
-      { time: '10:00', activity: 'ทำงาน', baseSteps: 200, intensity: 'low' as const },
-      { time: '11:00', activity: 'เดินไปประชุม', baseSteps: 400, intensity: 'moderate' as const },
-      { time: '12:00', activity: 'เดินไปทานข้าว', baseSteps: 600, intensity: 'high' as const },
-      { time: '13:00', activity: 'ทานข้าวกลางวัน', baseSteps: 100, intensity: 'low' as const },
-      { time: '14:00', activity: 'กลับที่ทำงาน', baseSteps: 500, intensity: 'moderate' as const },
-      { time: '15:00', activity: 'ทำงาน', baseSteps: 180, intensity: 'low' as const },
-      { time: '16:00', activity: 'เดินไปซื้อกาแฟ', baseSteps: 350, intensity: 'moderate' as const },
-      { time: '17:00', activity: 'ทำงาน', baseSteps: 120, intensity: 'low' as const },
-      { time: '18:00', activity: 'เดินทางกลับบ้าน', baseSteps: 900, intensity: 'very_high' as const },
-      { time: '19:00', activity: 'ออกกำลังกาย', baseSteps: 1200, intensity: 'very_high' as const },
-      { time: '20:00', activity: 'อาบน้ำ เตรียมข้าว', baseSteps: 400, intensity: 'moderate' as const },
-      { time: '21:00', activity: 'ทานข้าวเย็น', baseSteps: 200, intensity: 'low' as const },
-      { time: '22:00', activity: 'พักผ่อน', baseSteps: 150, intensity: 'low' as const },
-      { time: '23:00', activity: 'เตรียมนอน', baseSteps: 100, intensity: 'low' as const }
-    ];
+const DairySteps: React.FC = () => {
+  const [data, setData] = useState<StepsData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const UserID = Number(localStorage.getItem("id"));
 
-    activities.forEach((activity, index) => {
-      const [hour, minute] = activity.time.split(':').map(Number);
-      
-      // เพิ่มความแปรปรวน
-      const variation = (Math.random() - 0.5) * 200;
-      const steps = Math.max(0, Math.round(activity.baseSteps + variation));
-      cumulativeSteps += steps;
-      
-      // คำนวณแคลอรี่และระยะทาง
-      const calories = Math.round(steps * 0.04); // ประมาณ 0.04 แคลอรี่ต่อก้าว
-      const distance = Math.round((steps * 0.0008) * 100) / 100; // ประมาณ 0.8 เมตรต่อก้าว แปลงเป็น กิโลเมตร
-      
-      data.push({
-        time: activity.time,
-        steps: steps,
-        cumulativeSteps: cumulativeSteps,
-        hour: hour,
-        activity: activity.activity,
-        calories: calories,
-        distance: distance,
-        intensity: activity.intensity
-      });
-    });
-    
-    return data;
-  };
+  useEffect(() => {
+    const fetchStepsData = async () => {
+      setLoading(true);
+      try {
+        const response = await getDailySteps(UserID);
+        const rawSteps: Partial<StepsData>[] = Array.isArray(response) ? response : response.data || [];
 
-  const data = generateStepsData();
-  
-  // คำนวณสถิติ
-  const calculateStepsSummary = (): StepsSummary => {
+        // Map data และคำนวณ cumulative, distance, calories
+        const stepsArray: StepsData[] = rawSteps.map((item: any, index: number) => {
+          const prevCumulative = index === 0 ? 0 : rawSteps[index - 1].cumulativeSteps || 0;
+          const steps = index === 0
+            ? item.steps || 0
+            : (item.steps || 0) - (rawSteps[index - 1].steps || 0);
+          const cumulativeSteps = item.steps || 0;
+          const distance = steps * STEP_LENGTH_M / 1000;
+          const calories = distance * USER_WEIGHT_KG * 0.5;
+
+          return {
+            time: item.time || '',
+            steps,
+            cumulativeSteps,
+            hour: item.hour || 0,
+            activity: item.activity || '',
+            calories,
+            distance,
+            intensity: item.intensity || 'low'
+          };
+        });
+
+        setData(stepsArray);
+      } catch (error) {
+        console.error('Error fetching steps:', error);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStepsData();
+  }, []);
+
+  if (loading) return <div>กำลังโหลดข้อมูล...</div>;
+  if (!data || data.length === 0) return <div>ไม่พบข้อมูลการเดินของวันนี้</div>;
+
+  // สร้าง hourlyData
+  const hourlyData = data.map(item => ({
+    hour: item.time,
+    steps: item.steps,
+    activity: item.activity,
+    intensity: item.intensity
+  }));
+
+  // สรุปข้อมูลวัน
+  const stepsSummary: StepsSummary = (() => {
+    if (!data || data.length === 0) return {
+      totalSteps: 0,
+      targetSteps: TARGET_STEPS,
+      completionPercentage: 0,
+      totalDistance: 0,
+      totalCalories: 0,
+      activeMinutes: 0,
+      averageStepsPerHour: 0,
+      peakHour: '',
+      peakSteps: 0
+    };
+
     const totalSteps = data[data.length - 1]?.cumulativeSteps || 0;
-    const totalDistance = data.reduce((sum, item) => sum + item.distance, 0);
-    const totalCalories = data.reduce((sum, item) => sum + item.calories, 0);
-    
-    // หาช่วงเวลาที่เดินมากที่สุด
-    const peakData = data.reduce((max, item) => item.steps > max.steps ? item : max, data[0]);
-    
-    // นับจำนวนชั่วโมงที่มีกิจกรรม (> 100 ก้าว)
-    const activeHours = data.filter(item => item.steps > 100).length;
-    
+    const totalDistance = data.reduce((sum, d) => sum + d.distance, 0);
+    const totalCalories = data.reduce((sum, d) => sum + d.calories, 0);
+    const peakData = data.reduce((max, d) => d.steps > max.steps ? d : max, data[0]);
+    const activeHours = data.filter(d => d.steps > 100).length;
+
     return {
       totalSteps,
       targetSteps: TARGET_STEPS,
       completionPercentage: (totalSteps / TARGET_STEPS) * 100,
       totalDistance: Math.round(totalDistance * 100) / 100,
-      totalCalories,
+      totalCalories: Math.round(totalCalories),
       activeMinutes: activeHours * 60,
       averageStepsPerHour: Math.round(totalSteps / data.length),
       peakHour: peakData.time,
       peakSteps: peakData.steps
     };
-  };
+  })();
 
-  const stepsSummary = calculateStepsSummary();
-  
-  // ข้อมูลสำหรับ Intensity Distribution
+  // intensity distribution
   const intensityData = data.reduce((acc, item) => {
     acc[item.intensity] = (acc[item.intensity] || 0) + item.steps;
     return acc;
@@ -143,25 +142,17 @@ const Graph5: React.FC = () => {
     percentage: (item.value / stepsSummary.totalSteps) * 100
   })).filter(item => item.value > 0);
 
-  // ข้อมูลสำหรับ Progress Radial Chart
+  // progress radial
   const progressData = [
     {
       name: 'Progress',
       value: Math.min(stepsSummary.completionPercentage, 100),
-      fill: stepsSummary.completionPercentage >= 100 ? '#10b981' : 
-            stepsSummary.completionPercentage >= 70 ? '#f59e0b' : '#ef4444'
+      fill: stepsSummary.completionPercentage >= 100 ? '#10b981' :
+        stepsSummary.completionPercentage >= 70 ? '#f59e0b' : '#ef4444'
     }
   ];
 
-  // ข้อมูลสำหรับ Hourly Bar Chart
-  const hourlyData = data.map(item => ({
-    hour: item.time,
-    steps: item.steps,
-    activity: item.activity,
-    intensity: item.intensity
-  }));
-
-  const getIntensityColor = (intensity: string): string => {
+  const getIntensityColor = (intensity: string) => {
     switch (intensity) {
       case 'low': return '#10b981';
       case 'moderate': return '#f59e0b';
@@ -171,7 +162,7 @@ const Graph5: React.FC = () => {
     }
   };
 
-  const getIntensityText = (intensity: string): string => {
+  const getIntensityText = (intensity: string) => {
     switch (intensity) {
       case 'low': return '🟢 ผ่อนคลาย';
       case 'moderate': return '🟡 ปานกลาง';
@@ -181,16 +172,15 @@ const Graph5: React.FC = () => {
     }
   };
 
-  const getProgressStatus = (percentage: number): { text: string; emoji: string; color: string } => {
+  const getProgressStatus = (percentage: number) => {
     if (percentage >= 100) return { text: 'เป้าหมายสำเร็จ!', emoji: '🎉', color: '#10b981' };
     if (percentage >= 80) return { text: 'ใกล้เป้าหมายแล้ว', emoji: '💪', color: '#f59e0b' };
     if (percentage >= 50) return { text: 'กำลังดี', emoji: '👍', color: '#3b82f6' };
     return { text: 'ต้องเดินเพิ่ม', emoji: '🚶‍♂️', color: '#ef4444' };
   };
 
-  const formatNumber = (num: number): string => {
-    return num.toLocaleString('th-TH');
-  };
+  const progress = getProgressStatus(stepsSummary.completionPercentage);
+  const formatNumber = (num: number) => num.toLocaleString('th-TH');
 
   const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
     if (active && payload && payload.length && payload[0].payload) {
@@ -198,53 +188,37 @@ const Graph5: React.FC = () => {
       return (
         <div className="steps-tooltip">
           <p className="tooltip-time-step">{`${label} - ${data.activity}`}</p>
-          <div className="tooltip-steps">
-            <span>👣 จำนวนก้าว: {formatNumber(payload[0].value)}</span>
-          </div>
+          <div className="tooltip-steps">👣 จำนวนก้าว: {formatNumber(payload[0].value)}</div>
           <div className="tooltip-intensity-step">
             <span className="intensity-indicator-step" style={{ backgroundColor: getIntensityColor(data.intensity) }}></span>
             {getIntensityText(data.intensity)}
           </div>
-          <p className="tooltip-calories-step">🔥 แคลอรี่: {data.calories} cal</p>
-          <p className="tooltip-distance-step">📏 ระยะทาง: {data.distance} km</p>
+          <p className="tooltip-calories-step">🔥 แคลอรี่: {Math.round(data.calories)} cal</p>
+          <p className="tooltip-distance-step">📏 ระยะทาง: {data.distance.toFixed(2)} km</p>
         </div>
       );
     }
     return null;
   };
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }: any) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
     if (percent < 0.05) return null;
-
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="bold"
-      >
-        {`${(percent * 100).toFixed(1)}%`}
+      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={12} fontWeight="bold">
+        {(percent * 100).toFixed(1)}%
       </text>
     );
   };
 
-  const progress = getProgressStatus(stepsSummary.completionPercentage);
-
   return (
     <div className="steps-container">
       <div className="header-section-step">
-        <h2 className="title-step">
-          👣 การติดตามจำนวนก้าวเดิน วันนี้ ({new Date().toLocaleDateString('th-TH')})
-        </h2>
-        
+        <h2 className="title-step">จำนวนก้าว</h2>
+
         {/* สถิติสรุป */}
         <div className="steps-stats-grid">
           <div className="steps-stat-card total">
@@ -275,11 +249,11 @@ const Graph5: React.FC = () => {
           <div className="progress-container-step">
             <div className="radial-progress-step">
               <ResponsiveContainer width="100%" height={200}>
-                <RadialBarChart 
-                  cx="50%" 
-                  cy="50%" 
-                  innerRadius="60%" 
-                  outerRadius="90%" 
+                <RadialBarChart
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="60%"
+                  outerRadius="90%"
                   data={progressData}
                   startAngle={90}
                   endAngle={-270}
@@ -289,11 +263,11 @@ const Graph5: React.FC = () => {
                     cornerRadius={10}
                     fill={progress.color}
                   />
-                  <text 
-                    x="50%" 
-                    y="50%" 
-                    textAnchor="middle" 
-                    dominantBaseline="middle" 
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
                     className="radial-text"
                   >
                     <tspan x="50%" dy="-10" fontSize="28" fontWeight="bold" fill={progress.color}>
@@ -328,12 +302,12 @@ const Graph5: React.FC = () => {
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="time" 
+              <XAxis
+                dataKey="time"
                 stroke="#666"
                 tick={{ fontSize: 12 }}
               />
-              <YAxis 
+              <YAxis
                 stroke="#666"
                 tick={{ fontSize: 12 }}
                 label={{ value: 'ก้าวสะสม', angle: -90, position: 'insideLeft' }}
@@ -348,9 +322,9 @@ const Graph5: React.FC = () => {
               />
               <defs>
                 <linearGradient id="stepsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.6}/>
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.4}/>
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
+                  <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
                 </linearGradient>
               </defs>
             </AreaChart>
@@ -363,19 +337,19 @@ const Graph5: React.FC = () => {
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={hourlyData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="hour" 
+              <XAxis
+                dataKey="hour"
                 stroke="#666"
                 tick={{ fontSize: 12 }}
               />
-              <YAxis 
+              <YAxis
                 stroke="#666"
                 tick={{ fontSize: 12 }}
                 label={{ value: 'จำนวนก้าว', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip />
-              <Bar 
-                dataKey="steps" 
+              <Bar
+                dataKey="steps"
                 fill="#3b82f6"
                 radius={[4, 4, 0, 0]}
               />
@@ -405,20 +379,20 @@ const Graph5: React.FC = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip 
+              <Tooltip
                 formatter={(value: number, name: string, props: any) => [
-                  `${formatNumber(value)} ก้าว (${props.payload.percentage.toFixed(1)}%)`, 
+                  `${formatNumber(value)} ก้าว (${props.payload.percentage.toFixed(1)}%)`,
                   name
                 ]}
               />
             </PieChart>
           </ResponsiveContainer>
-          
+
           <div className="pie-legend-step">
             {intensityDistribution.map((item, index) => (
               <div key={index} className="legend-item-step">
-                <div 
-                  className="legend-color-step" 
+                <div
+                  className="legend-color-step"
                   style={{ backgroundColor: item.color }}
                 ></div>
                 <span className="legend-text-step">
@@ -518,4 +492,4 @@ const Graph5: React.FC = () => {
   );
 };
 
-export default Graph5;
+export default DairySteps;

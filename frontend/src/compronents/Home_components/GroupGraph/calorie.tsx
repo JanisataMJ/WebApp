@@ -27,17 +27,16 @@ const macroData: MacroData[] = [
   { name: 'ไขมัน', value: 30, color: '#f59e0b' },
 ];
 
-const Graph3: React.FC = () => {
+const DairyCalorie: React.FC = () => {
   const [data, setData] = useState<CalorieData[]>([]);
   const [stats, setStats] = useState<{ avg: number; min: number; max: number } | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const userID = Number(localStorage.getItem("id")) || 1;
+  const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res: DailyCalorieResponse = await getDailyCalories(userID, true);
+        const res: DailyCalorieResponse = await getDailyCalories(UserID);
         setData(res.data);
         if (res.stats) setStats(res.stats);
       } catch (err) {
@@ -49,10 +48,10 @@ const Graph3: React.FC = () => {
       }
     };
     fetchData();
-  }, [userID]);
+  }, [UserID]);
 
-  if (loading) return <div>Loading calories...</div>;
-  if (data.length === 0) return <div>No calorie data for today</div>;
+  if (loading) return <div>กำลังโหลดข้อมูล...</div>;
+  if (data.length === 0) return <div>ไม่พบข้อมูลพลังงานที่ใช้ไปของวันนี้</div>;
 
   // คำนวณค่าต่างๆ
   const totalCalories = data.reduce((sum, item) => sum + item.calories, 0);
@@ -97,14 +96,12 @@ const Graph3: React.FC = () => {
   return (
     <div className="calorie-container">
       <div className="header-section-cal">
-        <h2 className="title-cal">
-          🔥 Calorie Intake วันนี้ ({new Date().toLocaleDateString('th-TH')})
-        </h2>
+        <h2 className="title-cal">พลังงานที่ใช้ไป</h2>
 
         {/* สถิติสรุป */}
         <div className="stats-grid-cal">
           <div className="stat-card-cal">
-            <div className="stat-value total-cal">{totalCalories.toFixed(2)}</div>
+            <div className="stat-value-cal total">{totalCalories.toFixed(2)}</div>
             <div className="stat-label-cal">รวมทั้งหมด (kcal)</div>
           </div>
           <div className="stat-card-cal">
@@ -137,7 +134,7 @@ const Graph3: React.FC = () => {
             />
           </div>
           <div className="progress-info-cal">
-            <span>{totalCalories} kcal</span>
+            <span>{totalCalories.toFixed(2)} kcal</span>
             <span>เป้าหมาย: {targetCalories} kcal</span>
           </div>
         </div>
@@ -200,4 +197,4 @@ const Graph3: React.FC = () => {
   );
 };
 
-export default Graph3;
+export default DairyCalorie;

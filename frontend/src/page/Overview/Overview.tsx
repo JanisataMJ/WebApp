@@ -65,8 +65,8 @@ const Overview = () => {
       <div className="dashboard-container"> 
         <div className="dashboard-header">
           <div className="header-content">
-            <h1 className="dashboard-title">Health Dashboard</h1>
-            <p className="dashboard-subtitle">Track your health metrics and wellness progress</p>
+            <h1 className="dashboard-title">ภาพรวมสุขภาพ</h1>
+            <p className="dashboard-subtitle">ติดตามสุขภาพและความก้าวหน้าในการดูแลตัวเอง</p>
           </div>
           <div className="header-controls">
             <select 

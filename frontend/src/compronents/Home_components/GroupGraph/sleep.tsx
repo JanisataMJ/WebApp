@@ -1,6 +1,7 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar } from 'recharts';
+import React, { useEffect, useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, RadialBarChart, RadialBar } from 'recharts';
 import './sleep.css';
+import { getDailySleep } from '../../../services/https/DataHealth/healthData'; // ตัวอย่าง service function
 
 interface SleepData {
   time: string;
@@ -39,95 +40,53 @@ interface CustomTooltipProps {
   label?: string;
 }
 
-const Graph6: React.FC = () => {
-  // สร้างข้อมูลการนอนตัวอย่าง
-  const generateSleepData = (): SleepData[] => {
-    const data: SleepData[] = [];
-    
-    // เวลาเข้านอน 22:30 - ตื่น 06:30 (8 ชั่วโมง)
-    const sleepPattern = [
-      // 22:30 - 23:30: Light sleep (เข้าสู่การนอน)
-      { timeRange: [22.5, 23.5], stages: ['awake', 'light'] },
-      // 23:30 - 01:00: Deep sleep (ช่วงแรก)
-      { timeRange: [23.5, 1], stages: ['light', 'deep'] },
-      // 01:00 - 02:30: REM sleep (ฝันครั้งแรก)
-      { timeRange: [1, 2.5], stages: ['deep', 'rem', 'light'] },
-      // 02:30 - 04:00: Deep sleep (ช่วงที่สอง)
-      { timeRange: [2.5, 4], stages: ['light', 'deep'] },
-      // 04:00 - 05:30: REM sleep (ฝันครั้งที่สอง)
-      { timeRange: [4, 5.5], stages: ['deep', 'rem', 'light'] },
-      // 05:30 - 06:30: Light sleep + ตื่น
-      { timeRange: [5.5, 6.5], stages: ['light', 'awake'] }
-    ];
+const DairySleep: React.FC = () => {
+  const [data, setData] = useState<SleepData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const UserID = Number(localStorage.getItem("id"));
 
-    // สร้างข้อมูลทุก 15 นาที
-    for (let hour = 22.5; hour <= 30.5; hour += 0.25) {
-      const actualHour = hour > 24 ? hour - 24 : hour;
-      const timeStr = `${Math.floor(actualHour).toString().padStart(2, '0')}:${((actualHour % 1) * 60).toString().padStart(2, '0')}`;
-      
-      // หาช่วงที่เหมาะสม
-      let currentStage: 'awake' | 'light' | 'deep' | 'rem' = 'awake';
-      let stageValue = 0;
-      
-      for (const pattern of sleepPattern) {
-        if (hour >= pattern.timeRange[0] && hour < pattern.timeRange[1]) {
-          // เลือก stage แบบสุ่มจากช่วงนั้น
-          const stages = pattern.stages as ('awake' | 'light' | 'deep' | 'rem')[];
-          currentStage = stages[Math.floor(Math.random() * stages.length)];
-          break;
-        }
+  useEffect(() => {
+    const fetchSleepData = async () => {
+      try {
+        const res = await getDailySleep(UserID);
+        const mappedData: SleepData[] = res.data.map((d: any) => {
+          const [hourStr, minStr] = d.time.split(':').map(Number);
+          const hour = hourStr + minStr / 60;
+          return {
+            ...d,
+            hour
+          };
+        });
+        setData(mappedData);
+      } catch (err) {
+        console.error('Error fetching sleep data:', err);
+        setData([]);
+      } finally {
+        setLoading(false);
       }
-      
-      // กำหนดค่า stage value
-      switch (currentStage) {
-        case 'awake': stageValue = 4; break;
-        case 'light': stageValue = 3; break;
-        case 'rem': stageValue = 2; break;
-        case 'deep': stageValue = 1; break;
-      }
-      
-      // เพิ่มความแปรปรวนเล็กน้อย
-      const heartRate = currentStage === 'deep' ? 55 + Math.random() * 10 :
-                       currentStage === 'rem' ? 70 + Math.random() * 15 :
-                       currentStage === 'light' ? 60 + Math.random() * 10 :
-                       65 + Math.random() * 20;
-      
-      const movement = currentStage === 'deep' ? Math.random() * 2 :
-                      currentStage === 'rem' ? Math.random() * 5 :
-                      currentStage === 'light' ? Math.random() * 10 :
-                      Math.random() * 20;
-      
-      data.push({
-        time: timeStr,
-        sleepStage: currentStage,
-        stageValue: stageValue,
-        hour: actualHour,
-        heartRate: Math.round(heartRate),
-        movement: Math.round(movement)
-      });
-    }
-    
-    return data;
-  };
+    };
+    fetchSleepData();
+  }, []);
 
-  const data = generateSleepData();
-  
-  // คำนวณสถิติการนอน
+  if (loading) return <div>กำลังโหลดข้อมูล...</div>;
+  if (data.length === 0) return <div>ไม่พบข้อมูลการนอนหลับของวันนี้</div>;
+
+  // คำนวณสรุปการนอน
   const calculateSleepSummary = (): SleepSummary => {
     const stageCounts = data.reduce((acc, item) => {
       acc[item.sleepStage] = (acc[item.sleepStage] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-    
+
     const totalDataPoints = data.length;
-    const minutesPerPoint = 15; // ทุก 15 นาที
-    
+    const minutesPerPoint = 15;
+
     const deepSleep = (stageCounts.deep || 0) * minutesPerPoint;
     const lightSleep = (stageCounts.light || 0) * minutesPerPoint;
     const remSleep = (stageCounts.rem || 0) * minutesPerPoint;
     const awakeTime = (stageCounts.awake || 0) * minutesPerPoint;
     const totalSleep = deepSleep + lightSleep + remSleep;
-    
+
     return {
       totalSleep,
       deepSleep,
@@ -135,13 +94,13 @@ const Graph6: React.FC = () => {
       remSleep,
       awakeTime,
       sleepEfficiency: totalSleep > 0 ? (totalSleep / (totalSleep + awakeTime)) * 100 : 0,
-      fallAsleepTime: 15 // สมมติใช้เวลาหลับ 15 นาที
+      fallAsleepTime: 15 // สมมติ
     };
   };
 
   const sleepSummary = calculateSleepSummary();
-  
-  // ข้อมูลสำหรับ Pie Chart
+
+  // Pie chart
   const sleepStageDistribution: SleepStageDistribution[] = [
     { 
       name: 'การนอนหลับลึก', 
@@ -173,7 +132,7 @@ const Graph6: React.FC = () => {
     }
   ].filter(item => item.duration > 0);
 
-  // ข้อมูลสำหรับ Sleep Efficiency Radial Chart
+  // RadialBar Sleep Efficiency
   const efficiencyData = [
     {
       name: 'Sleep Efficiency',
@@ -183,13 +142,14 @@ const Graph6: React.FC = () => {
     }
   ];
 
-  const formatDuration = (minutes: number): string => {
+  const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}ช ${mins}น`;
   };
 
-  const getSleepStageColor = (stage: string): string => {
+  // ฟังก์ชันช่วยเหลือ
+  const getSleepStageColor = (stage: string) => {
     switch (stage) {
       case 'deep': return '#1e40af';
       case 'light': return '#3b82f6';
@@ -198,8 +158,7 @@ const Graph6: React.FC = () => {
       default: return '#6b7280';
     }
   };
-
-  const getSleepStageText = (stage: string): string => {
+  const getSleepStageText = (stage: string) => {
     switch (stage) {
       case 'deep': return '😴 นอนลึก';
       case 'light': return '💤 นอนเบา';
@@ -208,8 +167,7 @@ const Graph6: React.FC = () => {
       default: return 'ไม่ทราบ';
     }
   };
-
-  const getSleepQuality = (efficiency: number): { text: string; emoji: string; color: string } => {
+  const getSleepQuality = (efficiency: number) => {
     if (efficiency >= 85) return { text: 'ดีเยี่ยม', emoji: '🌟', color: '#10b981' };
     if (efficiency >= 70) return { text: 'ดี', emoji: '😊', color: '#f59e0b' };
     if (efficiency >= 50) return { text: 'พอใช้', emoji: '😐', color: '#f97316' };
@@ -221,41 +179,27 @@ const Graph6: React.FC = () => {
       const data = payload[0].payload;
       return (
         <div className="sleep-tooltip">
-          <p className="tooltip-time-sleep">{`${label}`}</p>
+          <p className="tooltip-time-sleep">{label}</p>
           <div className="tooltip-stage-sleep">
             <span className="stage-indicator-sleep" style={{ backgroundColor: getSleepStageColor(data.sleepStage) }}></span>
             {getSleepStageText(data.sleepStage)}
           </div>
-          {data.heartRate && (
-            <p className="tooltip-heart-rate-sleep">{`💓 อัตราการเต้นหัวใจ: ${data.heartRate} bpm`}</p>
-          )}
-          {data.movement !== undefined && (
-            <p className="tooltip-movement-sleep">{`🏃 การเคลื่อนไหว: ${data.movement}`}</p>
-          )}
+          {data.heartRate && <p>💓 {data.heartRate} bpm</p>}
+          {data.movement !== undefined && <p>🏃 {data.movement}</p>}
         </div>
       );
     }
     return null;
   };
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }: any) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
     if (percent < 0.05) return null;
-
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="bold"
-      >
+      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={12} fontWeight="bold">
         {`${(percent * 100).toFixed(1)}%`}
       </text>
     );
@@ -266,9 +210,7 @@ const Graph6: React.FC = () => {
   return (
     <div className="sleep-container">
       <div className="header-section-sleep">
-        <h2 className="title-sleep">
-          🌙 การวิเคราะห์การนอนหลับ วันนี้ ({new Date().toLocaleDateString('th-TH')})
-        </h2>
+        <h2 className="title-sleep">การนอนหลับ</h2>
         
         {/* สถิติสรุปการนอน */}
         <div className="sleep-stats-grid">
@@ -533,4 +475,4 @@ const Graph6: React.FC = () => {
   );
 };
 
-export default Graph6;
+export default DairySleep;

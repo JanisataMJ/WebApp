@@ -24,15 +24,16 @@ interface DailyHeartRateResponse {
 }
 
 
-const Graph2: React.FC = () => {
+const DairyHeartRate: React.FC = () => {
   const [data, setData] = useState<HeartRatePoint[]>([]);
   const [stats, setStats] = useState<{ avg: number; min: number; max: number } | null>(null);
   const [loading, setLoading] = useState(true);
+  const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getDailyHeartRate(1, true); // userID = 1, withStats = true
+        const res = await getDailyHeartRate(UserID);
 
         // map data ให้ตรงกับ interface
         const heartData: HeartRatePoint[] = res.data.map((d: any) => ({
@@ -56,8 +57,8 @@ const Graph2: React.FC = () => {
   }, []);
 
 
-  if (loading) return <div>Loading...</div>;
-  if (data.length === 0) return <div>No heart rate data for today</div>;
+  if (loading) return <div>กำลังโหลดข้อมูล...</div>;
+  if (data.length === 0) return <div>ไม่พบข้อมูลอัตราการเต้นหัวใจของวันนี้</div>;
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -73,7 +74,7 @@ const Graph2: React.FC = () => {
 
   return (
     <div className="heartrate-container">
-      <h2>📊 Heart Rate วันนี้</h2>
+      <h2 className="text-header-hr">อัตราการเต้นหัวใจ</h2>
 
       {/* Stats */}
       {stats && (
@@ -119,4 +120,4 @@ const Graph2: React.FC = () => {
   );
 };
 
-export default Graph2;
+export default DairyHeartRate;

@@ -72,7 +72,6 @@ func SeedHealthData(db *gorm.DB) {
 			Steps:          int64(500 + rand.Intn(2000)),
 			CaloriesBurned: 100 + rand.Float64()*50,
 			Spo2:           95 + float64(rand.Intn(4)),
-			BodyTemp:       36.5 + rand.Float64()*1.0,
 			SleepHours:     "0",
 			UserID:         userID,
 		}
@@ -81,7 +80,6 @@ func SeedHealthData(db *gorm.DB) {
 			hd.Bpm = uint(50 + rand.Intn(10))
 			hd.Steps = 0
 			hd.Spo2 = 96
-			hd.BodyTemp = 36.8
 			hd.SleepHours = fmt.Sprintf("%d h.", hour+1)
 		}
 
@@ -126,14 +124,6 @@ func SeedHealthData(db *gorm.DB) {
 				Interpretation: interpretSpo2(hd.Spo2),
 				Suggestion:     suggestSpo2(hd.Spo2),
 				RiskLevelID:    mapRiskLevelSpo2(hd.Spo2, lGood, lNormal, lBad),
-				HealthDataID:   hd.ID,
-			},
-			{
-				Category:       "อุณหภูมิร่างกาย",
-				Value:          fmt.Sprintf("%.1f °C", hd.BodyTemp),
-				Interpretation: interpretBodyTemp(hd.BodyTemp),
-				Suggestion:     suggestBodyTemp(hd.BodyTemp),
-				RiskLevelID:    mapRiskLevelBodyTemp(hd.BodyTemp, lGood, lNormal, lBad),
 				HealthDataID:   hd.ID,
 			},
 		}

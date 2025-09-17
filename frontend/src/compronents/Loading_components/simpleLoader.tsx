@@ -21,7 +21,7 @@ const HealthLoader = () => {
         </div>
         
         <div className="loading-text">
-          <p>loading...</p>
+          <p>กำลังโหลดข้อมูล...</p>
         </div>
         
         <div className="progress-bar">

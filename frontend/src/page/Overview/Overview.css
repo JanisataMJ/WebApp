@@ -29,9 +29,15 @@
 .dashboard-header {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
   margin-bottom: 24px;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
 }
 
 .header-content h1.dashboard-title {

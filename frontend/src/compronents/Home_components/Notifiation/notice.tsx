@@ -13,11 +13,10 @@ const Notice: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [notifications, setNotifications] = useState<NotificationInterface[]>([]);
+  const UserID = Number(localStorage.getItem('id'));
 
   const showModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  const UserID = Number(localStorage.getItem('id'));
+  const closeModal = () => setIsModalOpen(false);  
 
   // โหลดข้อมูลแจ้งเตือน
   useEffect(() => {

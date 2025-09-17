@@ -8,12 +8,11 @@ import (
 type HealthData struct {
 	gorm.Model
 	Timestamp 		time.Time
-	Bpm 			uint 	// ดึงได้
-	Steps 			int64  	// ดึงได้
-	SleepHours 		string	// ดึงได้
-	CaloriesBurned 	float64	// ดึงได้
-	Spo2 			float64 // ดึงได้
-	BodyTemp 		float64
+	Bpm 			uint 	
+	Steps 			int64  	
+	SleepHours 		string	
+	CaloriesBurned 	float64	
+	Spo2 			float64 
 
 	UserID 			uint
 	User   			*User `gorm:"foreignKey: UserID"`

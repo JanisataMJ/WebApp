@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+/*import React, { useEffect, useState } from 'react';
 import { GetPublicNovels } from '../../../services/https/Novel/novel';
 import CardT from '../cardTrand';
 import { IGroupCard } from '../../../interface/home_interface/IGroupCard';
@@ -44,5 +44,5 @@ const Trand: React.FC = () => {
   );
 };
 
-export default Trand;
+export default Trand;*/
 

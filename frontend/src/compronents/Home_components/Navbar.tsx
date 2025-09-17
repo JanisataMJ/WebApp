@@ -70,12 +70,11 @@ const Navbar: React.FC = () => {
           {isInPage && showSubmenu && (
           <div className="sub-nav">
             {[
-              { id: 'chart1', label: 'อุณหภูมิร่างกาย' },
-              { id: 'chart2', label: 'อัตราการเต้นหัวใจ' }, 
-              { id: 'chart3', label: 'พลังงานที่ใช้ไป' },
+              { id: 'chart1', label: 'อัตราการเต้นหัวใจ' }, 
+              { id: 'chart2', label: 'พลังงานที่ใช้ไป' },
+              { id: 'chart3', label: 'จำนวนก้าว' },
               { id: 'chart4', label: 'ออกซิเจนในเลือด' },
-              { id: 'chart5', label: 'จำนวนก้าว' },
-              { id: 'chart6', label: 'การนอนหลับ' },
+              { id: 'chart5', label: 'การนอนหลับ' },
             ].map((item) => (
               <a
                 key={item.id}

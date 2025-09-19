@@ -58,30 +58,28 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
   };
 
   const onFinish = async (values: any) => {
-  try {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('username', values.user_name);
-    formData.append('password', values.password);
-    formData.append('email', values.email);
-    formData.append('firstName', values.first_name);
-    formData.append('lastName', values.last_name);
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('username', values.user_name);
+      formData.append('password', values.password);
+      formData.append('email', values.email);
+      formData.append('firstName', values.first_name);
+      formData.append('lastName', values.last_name);
 
-    if (values.birthdate) {
-      const birth = values.birthdate.format
-        ? values.birthdate.format('YYYY-MM-DD')
-        : moment(values.birthdate).format('YYYY-MM-DD');
-      formData.append('birthdate', birth);
-    }
+      if (values.birthdate) {
+        formData.append('birthdate', values.birthdate); // เป็น string yyyy-mm-dd จาก input
+      }
 
-    formData.append('genderID', values.gender.toString());
-    formData.append('phonenumber', values.phonnumber || '');
 
-    if (fileList.length > 0 && fileList[0].originFileObj) {
-      formData.append('profile', fileList[0].originFileObj);
-    }
+      formData.append('genderID', values.gender.toString());
+      formData.append('phonenumber', values.phonnumber || '');
 
-    const res = await CreateAdmin(formData);
+      if (fileList.length > 0 && fileList[0].originFileObj) {
+        formData.append('profile', fileList[0].originFileObj);
+      }
+
+      const res = await CreateAdmin(formData);
       if (res.status === 201) {
         messageApi.success('Admin created successfully!');
         setTimeout(() => {
@@ -123,6 +121,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
         centered
         className="addadmin-modal-create-ad"
         destroyOnClose
+        maskClosable={false}
       >
         <div className="addadmin-container-create-ad">
           <Card className="addadmin-card-register-create-ad">
@@ -151,12 +150,12 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Username"
+                    label="ชื่อผู้ใช้"
                     name="user_name"
-                    rules={[{ required: true, message: 'Please enter username!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกชื่อผู้ใช้' }]}
                     className="form-item-create-ad"
                   >
-                    <Input placeholder="Enter username" className="form-input-create-ad" />
+                    <Input placeholder="กรอกชื่อผู้ใช้" className="form-input-create-ad" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -164,22 +163,22 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
               <Row gutter={24} className="form-row-create-ad">
                 <Col span={12}>
                   <Form.Item
-                    label="First Name"
+                    label="ชื่อ"
                     name="first_name"
-                    rules={[{ required: true, message: 'Please enter first name!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกชื่อจริง' }]}
                     className="form-item-create-ad"
                   >
-                    <Input placeholder="Enter first name" className="form-input-create-ad" />
+                    <Input placeholder="กรอกชื่อจริง" className="form-input-create-ad" />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Last Name"
+                    label="นามสกุล"
                     name="last_name"
-                    rules={[{ required: true, message: 'Please enter last name!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกนามสกุล' }]}
                     className="form-item-create-ad"
                   >
-                    <Input placeholder="Enter last name" className="form-input-create-ad" />
+                    <Input placeholder="กรอกนามสกุล" className="form-input-create-ad" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -187,11 +186,11 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
               <Row gutter={24} className="form-row-create-ad">
                 <Col span={12}>
                   <Form.Item
-                    label="Email"
+                    label="อีเมล"
                     name="email"
                     rules={[
-                      { type: 'email', message: 'Invalid email format!' },
-                      { required: true, message: 'Please enter email!' },
+                      { type: 'email', message: 'รูปแบบอีเมลผิด' },
+                      { required: true, message: 'กรุณากรอกอีเมล' },
                     ]}
                     className="form-item-create-ad"
                   >
@@ -200,24 +199,24 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Password"
+                    label="รหัสผ่าน"
                     name="password"
-                    rules={[{ required: true, message: 'Please enter password!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกรหัสผ่าน' }]}
                     className="form-item-create-ad"
                   >
-                    <Input.Password placeholder="Enter password" className="form-input-create-ad" />
+                    <Input.Password placeholder="กรอกรหัสผ่าน" className="form-input-create-ad" />
                   </Form.Item>
                 </Col>
               </Row>
 
               <Row gutter={24} className="form-row-create-ad">
-                
+
                 <Col span={12}>
                   <Form.Item
-                    label="Phone Number"
+                    label="เบอร์โทรศัพท์"
                     name="phonnumber"
                     rules={[
-                      { required: true, message: 'Please enter phone number!' },
+                      { required: true, message: 'กรุณากรอกเบอร์โทรศัพท์' },
                       {
                         pattern: /^\d{10}$/, // ตัวเลข 10 หลักพอดี
                         message: 'Phone number must be exactly 10 digits!',
@@ -226,7 +225,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                     className="form-item-create-ad"
                   >
                     <Input
-                      placeholder="Enter phone number"
+                      placeholder="กรอกเบอร์โทรศัพท์"
                       className="form-input-create-ad"
                       maxLength={10} // ป้องกันกรอกเกิน
                     />
@@ -240,37 +239,44 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                       {
                         validator: (_, value) => {
                           if (!value) return Promise.reject(new Error('Please select birth date!'));
+
+                          const birthDate = new Date(value);
+                          const today = new Date();
+
+                          let age = today.getFullYear() - birthDate.getFullYear(); // ใช้ let แทน const
+                          const m = today.getMonth() - birthDate.getMonth();
+                          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                            age--; // ตอนนี้แก้ค่าได้
+                          }
+
+                          if (age < 18) return Promise.reject(new Error('Admin must be at least 18 years old!'));
                           return Promise.resolve();
                         },
                       },
                     ]}
                     className="form-item-create-ad"
                   >
-                    <DatePicker
-                      style={{ width: '100%' }}
-                      placeholder="Select birth date"
-                      className="date-picker-create-ad"
-                      disabledDate={(current) => {
-                        const today = moment();
-                        const cutoff = today.clone().subtract(18, 'years').endOf('day');
-                        return current && (current > cutoff || current > moment().endOf('day'));
-                      }}
+                    <input
+                      type="date"
+                      className="form-input-create-ad"
+                      max={new Date().toISOString().split("T")[0]} // ป้องกันเลือกวันในอนาคต
                     />
                   </Form.Item>
                 </Col>
+
               </Row>
 
               <Row gutter={24} className="form-row-create-ad">
                 <Col span={24}>
                   <Form.Item
-                    label="Gender"
+                    label="เพศ"
                     name="gender"
-                    rules={[{ required: true, message: 'Please select gender!' }]}
+                    rules={[{ required: true, message: 'กรุณาเลือกเพศของคุณ' }]}
                     className="form-item-create-ad"
                   >
                     <Radio.Group className="radio-group-create-ad">
-                      <Radio value={1}>Male</Radio>
-                      <Radio value={2}>Female</Radio>
+                      <Radio value={1}>ผู้ชาย</Radio>
+                      <Radio value={2}>ผู้หญิง</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </Col>
@@ -283,7 +289,7 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                     className="cancel-btn-create-ad"
                     disabled={loading}
                   >
-                    Cancel
+                    ยกเลิก
                   </Button>
                   <Button
                     type="primary"

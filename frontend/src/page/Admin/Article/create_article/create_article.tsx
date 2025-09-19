@@ -84,6 +84,7 @@ const AddArticle: React.FC<AddArticleModalProps> = ({ adminID, onSuccess }) => {
         centered
         className="add-article-modal"
         closeIcon={false}
+        maskClosable={false}
       >
         <div className="add-article-modal-content">
           {/* Header */}

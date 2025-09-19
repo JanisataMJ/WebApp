@@ -109,6 +109,7 @@ const ViewUser: React.FC<ViewUserProps> = ({ open, onCancel, userData }) => {
       centered
       className="view-user-modal"
       closeIcon={false}
+      maskClosable={false}
     >
       <div className="view-user-modal-content">
         {/* Header */}

@@ -27,7 +27,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5); /* พื้นหลังโปร่งแสง */
-  z-index: 1000; /* ทำให้ popup อยู่เหนือองค์ประกอบอื่น */
+  /* z-index: 1000;  *//* ทำให้ popup อยู่เหนือองค์ประกอบอื่น */
   display: flex;
   justify-content: center; /* จัดกึ่งกลางแนวนอน */
   align-items: center; /* จัดกึ่งกลางแนวตั้ง */

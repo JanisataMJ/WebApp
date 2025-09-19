@@ -65,6 +65,7 @@ const EditArticle: React.FC<Props> = ({ article, visible, onClose, onSuccess }) 
       width={680}
       okButtonProps={{ className: "ok-button-edit-article" }}
       cancelButtonProps={{ className: "cancel-button-edit-article" }}
+      maskClosable={false}
     >
       <div className="modal-content-edit-article">
         <Form form={form} layout="vertical" className="form-edit-article">

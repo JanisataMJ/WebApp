@@ -21,6 +21,9 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [birthdate, setBirthdate] = useState<string>(
+    adminData.birthdate ? moment(adminData.birthdate).format('YYYY-MM-DD') : ''
+  );
 
   useEffect(() => {
     if (adminData) {
@@ -108,13 +111,14 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
       formData.append("email", values.email);
       formData.append("phonenumber", values.phonenumber);
       formData.append("genderID", values.gender.toString());
-      if (values.birthdate) formData.append("birthdate", values.birthdate.format('YYYY-MM-DD'));
+      if (birthdate) formData.append("birthdate", birthdate); // <-- ใช้ state ตรงนี้
 
       if (fileList[0]?.originFileObj) {
         formData.append("profile", fileList[0].originFileObj);
       }
 
       await UpdateUsersById(String(adminData.ID), formData);
+
       messageApi.success("แก้ไขข้อมูลสำเร็จ");
       form.resetFields();
       setFileList([]);
@@ -129,6 +133,7 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
     }
   };
 
+
   return (
     <>
       {contextHolder}
@@ -142,6 +147,7 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
         destroyOnClose
         className="edit-admin-modal"
         closeIcon={<CloseOutlined style={{ fontSize: "18px", color: "#fff" }} />}
+        maskClosable={false}
       >
         <div className="edit-admin-modal-content">
           {/* Header */}
@@ -149,7 +155,7 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
             <div className="edit-admin-header-content">
               <h2 className="edit-admin-modal-title">จัดการข้อมูลแอดมิน</h2>
             </div>
-          </div> 
+          </div>
 
           {/* Body */}
           <div className="edit-admin-modal-body">
@@ -242,19 +248,31 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                     >
                       <Input className="edit-admin-form-input" placeholder="เบอร์โทรศัพท์" maxLength={10} />
                     </Form.Item>
-                    <Form.Item
+                    {/* <Form.Item
                       label="วันเกิด"
                       name="birthdate"
                       className="edit-admin-form-item"
                       rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
                     >
-                      <DatePicker
-                        className="edit-admin-form-input"
-                        placeholder="เลือกวันเกิด"
-                        style={{ width: '100%' }}
-                        disabledDate={(current) => current && current > moment().subtract(18, 'years').endOf('day')}
+                      <input
+                        type="date"
+                        className="form-input"
+                        max={new Date().toISOString().split("T")[0]} // ปิดวันที่อนาคต
+                      />
+                    </Form.Item> */}
+                    <Form.Item
+                      label="วันเกิด"
+                      rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
+                    >
+                      <input
+                        type="date"
+                        className="form-input"
+                        max={new Date().toISOString().split("T")[0]}
+                        value={birthdate}
+                        onChange={(e) => setBirthdate(e.target.value)}
                       />
                     </Form.Item>
+
                   </div>
 
                   <div className="edit-admin-form-row">
@@ -264,10 +282,10 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                       className="edit-admin-form-item"
                       rules={[{ required: true, message: 'กรุณาเลือกเพศ' }]}
                     >
-                      <Select placeholder="เลือกเพศ" className="edit-admin-form-select">
-                        <Select.Option value={1}>ชาย</Select.Option>
-                        <Select.Option value={2}>หญิง</Select.Option>
-                      </Select>
+                      <select className="form-input">
+                        <option value="Male">ผู้ชาย</option>
+                        <option value="Female">ผู้หญิง</option>
+                      </select>
                     </Form.Item>
                   </div>
                 </div>

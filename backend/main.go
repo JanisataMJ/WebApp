@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"context"
 
 	"github.com/gin-gonic/gin"
 
@@ -76,7 +77,8 @@ func main() {
 	{
 		router.Use(middlewares.Authorizes())
 
-		r.Static("/uploads", "./uploads")
+	
+	r.Static("/uploads", "./uploads")
 
 		// User Route
 		router.PUT("/user/:id", users.Update)
@@ -121,6 +123,8 @@ func main() {
 		//healthAnalysis Route
 		router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
+// ✅ Endpoint สำหรับเรียก Gemini on-demand
+		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
 
 		//HealthData Route
 		router.GET("/list-healthData", healthData.ListHealthData)
@@ -148,6 +152,10 @@ func main() {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
+    // ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
+    // ให้แน่ใจว่าได้เพิ่มบรรทัดนี้ลงไปแล้ว
+
+    go healthAnalysis.CheckForCriticalAlerts(context.Background())
 	// Run the server
 	r.Run("localhost:" + PORT)
 }

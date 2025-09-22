@@ -94,13 +94,13 @@ const Profile: React.FC = () => {
         <div className="profile-title-section">
           <button
             className="profile-back-button"
-            onClick={() => navigate('/admin/home')}
+            onClick={() => navigate(-1)}
             type="button"
             aria-label="Go Back"
           >
             <ArrowLeftOutlined />
           </button>
-          <h1 className="profile-title-back">กลับหน้าหลัก</h1>
+          <h1 className="profile-title-back">ย้อนกลับ</h1>
         </div>
 
         <div className='profile-container'>

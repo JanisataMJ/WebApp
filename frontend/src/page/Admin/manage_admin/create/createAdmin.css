@@ -513,3 +513,17 @@
   color: var(--primary-dark);
   border-radius: 8px;
 }
+
+.date-input-wrapper {
+  display: flex;
+}
+
+.date-input-wrapper input[type="date"] {
+  flex: 1;
+  height: 48px;          /* same as other inputs */
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 2px solid var(--neutral-light);
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}

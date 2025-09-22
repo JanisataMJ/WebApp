@@ -21,6 +21,8 @@ import MoodTracker from './page/Mood/MoodTracker';
 import AdminHome from './page/Admin/AdminHome';
 import Articles from './page/Admin/Article/article';
 
+import TestSelect from './page/Profile/testdropdown';
+
 const router = createBrowserRouter([
   { path: "/home", element: <Home /> },
   { path: "/profile", element: <Profile /> },
@@ -38,6 +40,8 @@ const router = createBrowserRouter([
   { path: "/admin/login", element: <AdminLogin /> },
   { path: "/admin/home", element: <AdminHome /> },
   { path: "/admin/article", element: <Articles /> },
+
+  { path: "/TestSelect", element: <TestSelect /> },
 ]);
 
 

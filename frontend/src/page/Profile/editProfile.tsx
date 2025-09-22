@@ -10,6 +10,8 @@ import dayjs from 'dayjs';
 import type { UploadFile, UploadProps } from 'antd';
 import './editProfile.css';
 
+import TestSelect from './testdropdown';
+
 const { Option } = Select;
 
 interface FormData {
@@ -38,6 +40,8 @@ const EditProfile: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [profileDeleted, setProfileDeleted] = useState(false);
+    const [birthDate, setBirthDate] = useState<string | null>(null);
+    const [roleID, setRoleID] = useState<number | null>(null); // state สำหรับ roleID
 
     const getBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
@@ -78,6 +82,7 @@ const EditProfile: React.FC = () => {
 
                 if (res?.data) {
                     const userData = res.data;
+                    setRoleID(userData.RoleID); // <-- เก็บ roleID
 
                     form.setFieldsValue({
                         user_name: userData.username,
@@ -94,6 +99,10 @@ const EditProfile: React.FC = () => {
                         hip: userData.hip ?? undefined,
                     });
 
+                    if (userData.birthdate) {
+                        setBirthDate(dayjs(userData.birthdate).format('YYYY-MM-DD'));
+                    }
+
                     if (userData.picture) {
                         setFileList([{
                             uid: '-1',
@@ -102,6 +111,11 @@ const EditProfile: React.FC = () => {
                             url: userData.picture,
                         }]);
                     }
+
+                    setRoleID(Number(userData.RoleID));
+                    console.log('roleID:', Number(userData.RoleID));
+
+
                 } else {
                     messageApi.error('Failed to fetch user data');
                 }
@@ -147,7 +161,7 @@ const EditProfile: React.FC = () => {
         formData.append("lastName", values.last_name);
         formData.append("email", values.email);
         formData.append("genderID", values.gender === 'Male' ? "1" : values.gender === 'Female' ? "2" : "3");
-        formData.append("birthdate", values.birth_date ? values.birth_date.format('YYYY-MM-DD') : "");
+        formData.append("birthdate", birthDate ?? "");
         formData.append("weight", values.weight?.toString() ?? "");
         formData.append("height", values.height?.toString() ?? "");
         formData.append("phonenumber", values.phonenumber);
@@ -260,11 +274,11 @@ const EditProfile: React.FC = () => {
                                                 name="first_name"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'Please enter your first name' },
-                                                    { min: 2, message: 'First name must be at least 2 characters' }
+                                                    { required: true, message: 'กรุณากรอกชื่อจริง' },
+                                                    { min: 3, message: 'ชื่อควรมีอย่างน้อย 2 ตัวอักษร' },
                                                 ]}
                                             >
-                                                <Input className="form-input" placeholder="Enter first name" maxLength={50} />
+                                                <Input className="form-input" placeholder="กรอกชื่อจริง" maxLength={50} />
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
@@ -273,11 +287,11 @@ const EditProfile: React.FC = () => {
                                                 name="last_name"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'Please enter your last name' },
-                                                    { min: 2, message: 'Last name must be at least 2 characters' }
+                                                    { required: true, message: 'กรุณากรอกนามสกุล' },
+                                                    { min: 3, message: 'นามสกุลควรมีอย่างน้อย 2 ตัวอักษร' },
                                                 ]}
                                             >
-                                                <Input className="form-input" placeholder="Enter last name" maxLength={50} />
+                                                <Input className="form-input" placeholder="กรอกนามสกุล" maxLength={50} />
                                             </Form.Item>
                                         </div>
                                     </div>
@@ -289,26 +303,26 @@ const EditProfile: React.FC = () => {
                                             <Form.Item
                                                 name="gender"
                                                 className="form-item"
-                                                rules={[{ required: true, message: 'Please select gender' }]}
+                                                rules={[{ required: true, message: 'กรุณาเลือกเพศ' }]}
                                             >
-                                                <Select placeholder="Select gender" allowClear>
-                                                    <Option value="Male">ผู้ชาย</Option>
-                                                    <Option value="Female">ผู้หญิง</Option>
-                                                </Select>
+                                                <select className="form-input">
+                                                    <option value="Male">ผู้ชาย</option>
+                                                    <option value="Female">ผู้หญิง</option>
+                                                </select>
                                             </Form.Item>
                                         </div>
                                         <div className="form-group">
                                             <label>วันเกิด</label>
                                             <Form.Item
-                                                name="birth_date"
-                                                className="form-item"
-                                                rules={[{ required: true, message: 'Please select your birthday' }]}
+                                                label="วันเกิด"
+                                                rules={[{ required: true, message: 'กรุณาเลือกวันเกิด' }]}
                                             >
-                                                <DatePicker
+                                                <input
+                                                    type="date"
                                                     className="form-input"
-                                                    placeholder="Select birthday"
-                                                    format="DD/MM/YYYY"
-                                                    disabledDate={(current) => current && current > dayjs().endOf('day')}
+                                                    max={new Date().toISOString().split("T")[0]}
+                                                    value={birthDate || ""}
+                                                    onChange={(e) => setBirthDate(e.target.value)}
                                                 />
                                             </Form.Item>
                                         </div>
@@ -318,49 +332,61 @@ const EditProfile: React.FC = () => {
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>เบอร์โทรศัพท์</label>
-                                            <Form.Item name="phonenumber">
-                                                <Input placeholder="Enter phone number" style={{ width: '100%', height: '50px' }} />
+                                            <Form.Item
+                                                name="phonenumber"
+                                                className="form-item"
+                                                rules={[
+                                                    { required: true, message: 'กรุณากรอกเบอร์โทร' },
+                                                    { pattern: /^\d{10}$/, message: 'เบอร์โทรต้องมี 10 ตัว' }
+                                                ]}
+                                            >
+                                                <Input className="form-input" placeholder="เบอร์โทรศัพท์" maxLength={10} />
                                             </Form.Item>
                                         </div>
                                     </div>
 
                                     {/* Body Measurements */}
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>น้ำหนัก</label>
-                                            <Form.Item name="weight">
-                                                <InputNumber placeholder="kg" style={{ width: '100%' }} />
-                                            </Form.Item>
-                                        </div>
-                                        <div className="form-group">
-                                            <label>ส่วนสูง</label>
-                                            <Form.Item name="height">
-                                                <InputNumber placeholder="cm" style={{ width: '100%' }} />
-                                            </Form.Item>
-                                        </div>
-                                    </div>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>รอบอก</label>
-                                            <Form.Item name="bust" rules={[{ type: 'number', message: 'Please enter a number' }]}>
-                                                <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
-                                            </Form.Item>
-                                        </div>
-                                        <div className="form-group">
-                                            <label>เอว</label>
-                                            <Form.Item name="waist" rules={[{ type: 'number', message: 'Please enter a number' }]}>
-                                                <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
-                                            </Form.Item>
-                                        </div>
-                                    </div>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>สะโพก</label>
-                                            <Form.Item name="hip" rules={[{ type: 'number', message: 'Please enter a number' }]}>
-                                                <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
-                                            </Form.Item>
-                                        </div>
-                                    </div>
+                                    {roleID !== 1 && (
+                                        <>
+                                            <div className="form-row">
+                                                <div className="form-group">
+                                                    <label>น้ำหนัก</label>
+                                                    <Form.Item name="weight">
+                                                        <InputNumber placeholder="kg" style={{ width: '100%' }} />
+                                                    </Form.Item>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>ส่วนสูง</label>
+                                                    <Form.Item name="height">
+                                                        <InputNumber placeholder="cm" style={{ width: '100%' }} />
+                                                    </Form.Item>
+                                                </div>
+                                            </div>
+                                            <div className="form-row">
+                                                <div className="form-group">
+                                                    <label>รอบอก</label>
+                                                    <Form.Item name="bust" rules={[{ type: 'number', message: 'Please enter a number' }]}>
+                                                        <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
+                                                    </Form.Item>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>เอว</label>
+                                                    <Form.Item name="waist" rules={[{ type: 'number', message: 'Please enter a number' }]}>
+                                                        <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
+                                                    </Form.Item>
+                                                </div>
+                                            </div>
+                                            <div className="form-row">
+                                                <div className="form-group">
+                                                    <label>สะโพก</label>
+                                                    <Form.Item name="hip" rules={[{ type: 'number', message: 'Please enter a number' }]}>
+                                                        <InputNumber min={0} placeholder="cm" style={{ width: '100%' }} />
+                                                    </Form.Item>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
                                 </div>
 
                                 {/* Account Info */}
@@ -372,13 +398,13 @@ const EditProfile: React.FC = () => {
                                                 name="user_name"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'Please enter a username' },
-                                                    { min: 3, message: 'Username must be at least 3 characters' },
-                                                    { max: 20, message: 'Username cannot exceed 20 characters' },
+                                                    { required: true, message: 'กรุณากรอกชื่อผู้ใช้' },
+                                                    { min: 3, message: 'ชื่อผู้ใช้ควรมีอย่างน้อย 3 ตัวอักษร' },
+                                                    { max: 20, message: 'ชื่อผู้ใช้ไม่ควรมีมากกว่า 20 ตัวอักษร' },
                                                     { pattern: /^[a-zA-Z0-9_]+$/, message: 'Username can only contain letters, numbers, and _' }
                                                 ]}
                                             >
-                                                <Input className="form-input" placeholder="Enter username" prefix={<UserOutlined />} />
+                                                <Input className="form-input" placeholder="กรอกชื่อผู้ใช้" prefix={<UserOutlined />} />
                                             </Form.Item>
                                         </div>
                                     </div>
@@ -390,11 +416,11 @@ const EditProfile: React.FC = () => {
                                                 name="email"
                                                 className="form-item"
                                                 rules={[
-                                                    { required: true, message: 'Please enter email' },
-                                                    { type: 'email', message: 'Invalid email format' }
+                                                    { required: true, message: 'กรุณากรอกอีเมล' },
+                                                    { type: 'email', message: 'รูปแบบอีเมลผิด' }
                                                 ]}
                                             >
-                                                <Input className="form-input" placeholder="Enter email" type="email" />
+                                                <Input className="form-input" placeholder="กรอกอีเมล" type="email" />
                                             </Form.Item>
                                         </div>
                                     </div>

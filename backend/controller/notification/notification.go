@@ -9,27 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/*func SendNotificationEmail(notificationID uint) error {
-	var notif entity.Notification
-
-	// ดึง Notification พร้อม User
-	if err := config.DB().Preload("User").First(&notif, notificationID).Error; err != nil {
-		return err
-	}
-
-	if notif.User == nil {
-		return fmt.Errorf("user not found")
-	}
-
-	// ส่ง email
-	if err := utils.SendEmail(notif.User.Email, notif.Title, notif.Message); err != nil {
-		log.Println("Failed to send email:", err)
-		return err
-	}
-
-	log.Println("Email sent to:", notif.User.Email)
-	return nil
-}*/
 
 func CreateNotification(c *gin.Context) {
 	var input struct {
@@ -41,7 +20,6 @@ func CreateNotification(c *gin.Context) {
 		NotificationStatusID uint      `json:"notification_status_id"`
 		HealthSummaryID      *uint     `json:"health_summary_id"`
 		HealthAnalysisID     *uint     `json:"health_analysis_id"`
-		TrendsID             uint      `json:"trends_id"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -54,11 +32,11 @@ func CreateNotification(c *gin.Context) {
 		Message:              input.Message,
 		Timestamp:            input.Timestamp,
 		UserID:               input.UserID,
-		HealthTypeID:         input.HealthTypeID,
+		//HealthTypeID:         input.HealthTypeID,
 		NotificationStatusID: input.NotificationStatusID,
 		HealthSummaryID:      input.HealthSummaryID,
 		HealthAnalysisID:     input.HealthAnalysisID,
-		TrendsID:             input.TrendsID,
+		//TrendsID:             input.TrendsID,
 	}
 
 	db := config.DB()
@@ -83,7 +61,6 @@ func GetNotificationsByUserID(c *gin.Context) {
 		Preload("NotificationStatus").
 		Preload("HealthSummary").
 		Preload("HealthAnalysis").
-		Preload("Trends").
 		Where("user_id = ?", userID).
 		Order("timestamp desc").
 		Find(&notifications)
@@ -198,18 +175,18 @@ func UpdateNotificationStatusByID(c *gin.Context) {
 
 	// ส่ง response กลับ
 	c.JSON(http.StatusOK, gin.H{
-		"ID":                   noti.ID,
-		"Timestamp":            noti.Timestamp.Format(time.RFC3339),
-		"Title":                noti.Title,
-		"Message":              noti.Message,
-		"UserID":               noti.UserID,
-		"HealthTypeID":         noti.HealthTypeID,
-		"NotificationStatusID": noti.NotificationStatusID,
-		"HealthType": map[string]interface{}{
-			"ID":   noti.HealthType.ID,
-			"Type": noti.HealthType.Type,
-		},
-		"NotificationStatus": map[string]interface{}{
+		"ID":        noti.ID,
+		"Timestamp": noti.Timestamp.Format(time.RFC3339),
+		"Title":     noti.Title,
+		"Message":   noti.Message,
+		"UserID":    noti.UserID,
+		"HealthType": func() interface{} {
+			if noti.HealthType != nil {
+				return gin.H{"ID": noti.HealthType.ID, "Type": noti.HealthType.Type}
+			}
+			return nil
+		}(),
+		"NotificationStatus": gin.H{
 			"ID":     noti.NotificationStatus.ID,
 			"Status": noti.NotificationStatus.Status,
 		},

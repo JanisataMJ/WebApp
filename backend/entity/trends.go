@@ -8,5 +8,5 @@ type Trends struct {
 	gorm.Model
 	Trend string
 	
-	Notification []Notification `gorm:"foreignKey:TrendsID"`
+	HealthSummary []HealthSummary `gorm:"foreignKey:TrendsID"`
 }

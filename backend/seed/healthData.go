@@ -1,45 +1,15 @@
 package seed
 
 import (
+	"fmt"
+	"log"
 	"math/rand"
 	"time"
-	"fmt"
 
-	"gorm.io/gorm"
+	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/entity"
+	"gorm.io/gorm"
 )
-
-/*func SeedHealthData(db *gorm.DB) {
-	userID := uint(1)
-
-	now := time.Now().Truncate(24 * time.Hour)
-	data := []entity.HealthData{}
-
-	rand.Seed(time.Now().UnixNano())
-
-	for hour := 0; hour < 24; hour++ {
-		d := entity.HealthData{
-			Timestamp:      now.Add(time.Duration(hour) * time.Hour),
-			Bpm:            uint(50 + rand.Intn(40)),
-			Steps:          int64(100 + rand.Intn(500)),
-			CaloriesBurned: 40 + rand.Float64()*30,
-			Spo2:           95 + float64(rand.Intn(4)),
-			SleepHours:     "0",
-			UserID:         userID,
-		}
-
-		if hour >= 0 && hour < 6 {
-			d.Bpm = uint(50 + rand.Intn(10))
-			d.Steps = 0
-			d.Spo2 = 96
-			d.SleepHours = "1"
-		}
-
-		data = append(data, d)
-	}
-
-	db.Create(&data)
-}*/
 
 func SeedHealthData(db *gorm.DB) {
 	// ---------------------------
@@ -130,12 +100,67 @@ func SeedHealthData(db *gorm.DB) {
 
 		db.Create(&analyses)
 	}
+
+	// ---------------------------
+	// HealthSummary (weekly) for UserID = 1 only
+	// ---------------------------
+	var user entity.User
+	if err := db.First(&user, 1).Error; err != nil {
+		log.Printf("ไม่พบ user id=1: %v", err)
+		return
+	}
+
+	start := now.Truncate(24 * time.Hour)               // เริ่มต้นวันนี้
+	end := start.AddDate(0, 0, 1).Add(-time.Nanosecond) // สิ้นสุดวันนี้
+
+	var healthDatas []entity.HealthData
+	db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", user.ID, start, end).Find(&healthDatas)
+
+	var totalSleep float64
+	for _, hd := range healthDatas {
+		totalSleep += healthSummary.ParseSleepHours(hd.SleepHours)
+	}
+	avgSleep := 0.0
+	if len(healthDatas) > 0 {
+		avgSleep = totalSleep / float64(len(healthDatas))
+	}
+
+	summary := entity.HealthSummary{
+		PeriodStart: time.Now().AddDate(0, 0, -7),
+		PeriodEnd:   time.Now(),
+		AvgBpm:      75.0,
+		MinBpm:      60,
+		MaxBpm:      120,
+		AvgSteps:    8000,
+		TotalSteps:  56000,
+		AvgSleep:    avgSleep,
+		AvgCalories: 2500,
+		AvgSpo2:     97,
+		WeekNumber:  35,
+		UserID:      user.ID, // fix id=1
+		TrendsID:    1,
+		RiskLevelID: lGood.ID,
+	}
+	db.Create(&summary)
+
+	// ถ้าต้องการ Seed Notification
+	notif := entity.Notification{
+		Timestamp:            time.Now(),
+		Title:                "Weekly Health Summary",
+		Message:              "ตัวอย่างข้อความสรุปสุขภาพ",
+		UserID:               user.ID,
+		HealthSummaryID:      &summary.ID,
+		HealthTypeID:         1, // ✅ กำหนดประเภท เช่น 1 = Weekly Summary
+		//TrendsID:             2,
+		NotificationStatusID: 2,
+	}
+	db.Create(&notif)
+
 }
 
 // ---------------------------
 // RiskLevel Mapping Functions
 // ---------------------------
-
 func mapRiskLevelHeartRate(bpm uint, lGood, lNormal, lBad entity.RiskLevel) uint {
 	if bpm < 60 {
 		return lBad.ID
@@ -182,7 +207,6 @@ func mapRiskLevelBodyTemp(temp float64, lGood, lNormal, lBad entity.RiskLevel) u
 // ---------------------------
 // Helper Functions
 // ---------------------------
-
 func interpretHeartRate(bpm uint) string {
 	if bpm < 60 {
 		return "หัวใจเต้นช้า"

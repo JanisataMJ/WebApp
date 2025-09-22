@@ -152,7 +152,7 @@
 
 /* Dropdown Menu - สำคัญที่สุด! */
 .sort-dropdown-menu-tips {
-  z-index: 99999 !important;
+  /* z-index: 99999 !important; */
   border-radius: var(--border-radius) !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
   border: 1px solid var(--light-purple) !important;
@@ -364,7 +364,7 @@
 
 /* Global Override for Ant Design - สำคัญที่สุด! */
 .ant-select-dropdown {
-  z-index: 99999 !important;/*tips.css*/
+  /* z-index: 99999 !important; *//*tips.css*/
 /* Main Container */
 .health-dashboard-tips {
   min-height: 100vh;
@@ -787,7 +787,7 @@
 }
 
 body .sort-dropdown-menu-tips {
-  z-index: 99999 !important;
+  /* z-index: 99999 !important; */
 }
 
 /* Ensure all parent containers allow dropdown visibility */
@@ -803,7 +803,7 @@ body .sort-dropdown-menu-tips {
 /* Force dropdown to appear above everything */
 body .ant-select-dropdown.sort-dropdown-menu-tips {
   position: fixed !important;
-  z-index: 99999 !important;
+  /* z-index: 99999 !important; */
 }
 
 /* Responsive Design */

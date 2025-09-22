@@ -14,6 +14,7 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const [roleID, setRoleID] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,6 +54,11 @@ const Profile: React.FC = () => {
               : undefined,
             GenderID: userData.genderID || undefined
           });
+
+          // แปลง roleID เป็น number
+          const numericRoleID = userData.RoleID ? Number(userData.RoleID) : null;
+          setRoleID(numericRoleID);
+
         } else {
           messageApi.error('Unable to fetch user data');
         }
@@ -86,18 +92,18 @@ const Profile: React.FC = () => {
       <Headers />
       <div className='profile-wrapper'>
         <div className="profile-title-section">
-            <button
-              className="profile-back-button"
-              onClick={() => navigate('/admin/home')}
-              type="button"
-              aria-label="Go Back"
-            >
-              <ArrowLeftOutlined />
-            </button>
-            <h1 className="profile-title-back">กลับหน้าหลัก</h1>
-          </div>
+          <button
+            className="profile-back-button"
+            onClick={() => navigate('/admin/home')}
+            type="button"
+            aria-label="Go Back"
+          >
+            <ArrowLeftOutlined />
+          </button>
+          <h1 className="profile-title-back">กลับหน้าหลัก</h1>
+        </div>
 
-          <div className='profile-container'>
+        <div className='profile-container'>
 
           {loading ? (
             <Spin />
@@ -145,31 +151,38 @@ const Profile: React.FC = () => {
                 <div className="item">
                   <span className="label">เบอร์โทรศัพท์:</span>
                   <span className="value">{users?.Phonenumber || '-'}</span>
-
-                  <span className="label">น้ำหนัก:</span>
-                  <span className="value">{users?.Weight ? `${users.Weight} กก.` : 'ไม่ระบุ'}</span>
                 </div>
 
-                <div className="item">
-                  <span className="label">ส่วนสูง:</span>
-                  <span className="value">{users?.Height ? `${users.Height} ซม.` : 'ไม่ระบุ'}</span>
+                {roleID !== 1 && (
+                  <>
+                    <div className="item">
+                      <span className="label">น้ำหนัก:</span>
+                      <span className="value">{users?.Weight ? `${users.Weight} กก.` : 'ไม่ระบุ'}</span>
 
-                  <span className="label">รอบอก:</span>
-                  <span className="value">{users?.Bust ? `${users.Bust} ซม.` : 'ไม่ระบุ'}</span>
-                </div>
+                      <span className="label">ส่วนสูง:</span>
+                      <span className="value">{users?.Height ? `${users.Height} ซม.` : 'ไม่ระบุ'}</span>
+                    </div>
 
-                <div className="item">
-                  <span className="label">เอว:</span>
-                  <span className="value">{users?.Waist ? `${users.Waist} ซม.` : 'ไม่ระบุ'}</span>
+                    <div className="item">
+                      <span className="label">รอบอก:</span>
+                      <span className="value">{users?.Bust ? `${users.Bust} ซม.` : 'ไม่ระบุ'}</span>
 
-                  <span className="label">สะโพก:</span>
-                  <span className="value">{users?.Hip ? `${users.Hip} ซม.` : 'ไม่ระบุ'}</span>
-                </div>
+                      <span className="label">เอว:</span>
+                      <span className="value">{users?.Waist ? `${users.Waist} ซม.` : 'ไม่ระบุ'}</span>
+                    </div>
+
+                    <div className="item">
+                      <span className="label">สะโพก:</span>
+                      <span className="value">{users?.Hip ? `${users.Hip} ซม.` : 'ไม่ระบุ'}</span>
+                    </div>
+                  </>
+                )}
+
               </div>
             </div>
           )}
-          </div>
         </div>
+      </div>
 
     </>
   );

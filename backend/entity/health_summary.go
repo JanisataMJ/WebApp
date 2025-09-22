@@ -17,13 +17,16 @@ type HealthSummary struct {
 	AvgSleep		float64
 	AvgCalories		float64
 	AvgSpo2 		float64
-	AvgBodyTemp 	float64
-	MinBodyTemp 	float64
-	MaxBodyTemp 	float64
 	WeekNumber		uint
 
 	UserID 			uint
 	User   			*User `gorm:"foreignKey: UserID"`
+
+	TrendsID 				uint
+	Trends   				*Trends `gorm:"foreignKey: TrendsID"` 
+
+	RiskLevelID				uint
+	RiskLevel   			*RiskLevel `gorm:"foreignKey: RiskLevelID"`
 
 	Notification	[]Notification 	`gorm:"foreignKey:HealthSummaryID"`
 }

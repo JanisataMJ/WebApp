@@ -351,6 +351,21 @@ func SetupDatabase() {
     db.Create(&healthAnalysis12)
     
 
+    //Trends
+    var trend1, trend2, trend3 entity.Trends
+    trend := []entity.Trends{
+        {Trend: "ดีขึ้น"},
+        {Trend: "คงที่"},
+        {Trend: "แย่ลง"},
+    }
+    for i, ttrend := range trend {
+        db.FirstOrCreate(&trend[i], entity.Trends{Trend: ttrend.Trend})
+    }
+    trend1 = trend[0]
+    trend2 = trend[1]
+    trend3 = trend[2]
+
+
     //HealthSummary
     healthSum1 := entity.HealthSummary{
 		PeriodStart:    time.Now().Add(-720 * time.Hour), 
@@ -363,10 +378,9 @@ func SetupDatabase() {
         AvgSleep:       8.0,
         AvgCalories:    500.0,
         AvgSpo2:        94.0,
-        AvgBodyTemp:    37.0,
-        MinBodyTemp:    36.0, 
-        MaxBodyTemp:    37.5, 
         UserID:         2,	
+        TrendsID:       trend1.ID,
+        RiskLevelID:    lNormal.ID,
 	}
     healthSum2 := entity.HealthSummary{
 		PeriodStart:    time.Now().Add(-720 * time.Hour), 
@@ -379,14 +393,29 @@ func SetupDatabase() {
         AvgSleep:       4.0,
         AvgCalories:    500.0,
         AvgSpo2:        94.0,
-        AvgBodyTemp:    37.0,
-        MinBodyTemp:    35.0, 
-        MaxBodyTemp:    39.5, 
         UserID:         3,	
+        TrendsID:       trend2.ID,
+        RiskLevelID:    lGood.ID,
+	}
+    healthSum3 := entity.HealthSummary{
+		PeriodStart:    time.Now().Add(-720 * time.Hour), 
+        PeriodEnd:      time.Now(), 
+        AvgBpm:         79.0,
+        MinBpm:         75, 
+        MaxBpm:         81,
+        AvgSteps:       7999.0, 
+        TotalSteps:     15000, 
+        AvgSleep:       4.0,
+        AvgCalories:    500.0,
+        AvgSpo2:        94.0,
+        UserID:         3,	
+        TrendsID:       trend3.ID,
+        RiskLevelID:    lBad.ID,
 	}
 
 	db.Create(&healthSum1)
 	db.Create(&healthSum2)
+    db.Create(&healthSum3)
 
 
     // NotificatonStatus
@@ -418,21 +447,6 @@ func SetupDatabase() {
     htWarning = healthTypes[1]
     htDanger = healthTypes[2]
 
-
-    //Trends
-    var trend1, trend2, trend3 entity.Trends
-    trend := []entity.Trends{
-        {Trend: "ดีขึ้น"},
-        {Trend: "คงที่"},
-        {Trend: "แย่ลง"},
-    }
-    for i, ttrend := range trend {
-        db.FirstOrCreate(&trend[i], entity.Trends{Trend: ttrend.Trend})
-    }
-    trend1 = trend[0]
-    trend2 = trend[1]
-    trend3 = trend[2]
-
     
     // Notifications
     // user id = 2
@@ -444,7 +458,7 @@ func SetupDatabase() {
 		HealthTypeID:           htWarning.ID,
 		NotificationStatusID:   statusArchived.ID,
         HealthAnalysisID:       &healthAnalysis3.HealthDataID,
-        TrendsID:               trend3.ID,
+        //TrendsID:               trend3.ID,
 	}
 	noti2 := entity.Notification{
 		Timestamp:              time.Now().Add(-2 * time.Hour),
@@ -454,7 +468,7 @@ func SetupDatabase() {
 		HealthTypeID:           htWarning.ID,
 		NotificationStatusID:   statusRead.ID,
         HealthAnalysisID:       &healthAnalysis4.HealthDataID,
-        TrendsID:               trend1.ID,
+        //TrendsID:               trend1.ID,
 	}
     noti3 := entity.Notification{
 		Timestamp:               time.Now(),
@@ -464,7 +478,7 @@ func SetupDatabase() {
 		HealthTypeID:           htSafe.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthSummaryID:        &healthSum1.ID,
-        TrendsID:               trend1.ID,
+        //TrendsID:               trend1.ID,
 	}
     // user id = 3
     noti4 := entity.Notification{
@@ -475,7 +489,7 @@ func SetupDatabase() {
 		HealthTypeID:           htWarning.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthAnalysisID:       &healthAnalysis8.HealthDataID,
-        TrendsID:               trend2.ID,
+        //TrendsID:               trend2.ID,
 	}
     noti5 := entity.Notification{
 		Timestamp:              time.Now().Add(-12 * time.Hour),
@@ -485,7 +499,7 @@ func SetupDatabase() {
 		HealthTypeID:           htDanger.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthAnalysisID:       &healthAnalysis9.HealthDataID,
-        TrendsID:               trend2.ID,
+        //TrendsID:               trend2.ID,
 	}
     noti6 := entity.Notification{
 		Timestamp:              time.Now().Add(-12 * time.Hour),
@@ -495,7 +509,7 @@ func SetupDatabase() {
 		HealthTypeID:           htWarning.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthAnalysisID:       &healthAnalysis10.HealthDataID,
-        TrendsID:               trend2.ID,
+        //TrendsID:               trend2.ID,
 	}
     noti7 := entity.Notification{
 		Timestamp:              time.Now().Add(-6 * time.Hour),
@@ -505,7 +519,7 @@ func SetupDatabase() {
 		HealthTypeID:           htDanger.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthAnalysisID:       &healthAnalysis11.HealthDataID,
-        TrendsID:               trend3.ID,
+        //TrendsID:               trend3.ID,
 	}
     noti8 := entity.Notification{
 		Timestamp:              time.Now().Add(-2 * time.Hour),
@@ -515,7 +529,7 @@ func SetupDatabase() {
 		HealthTypeID:           htDanger.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthAnalysisID:       &healthAnalysis12.HealthDataID,
-        TrendsID:               trend3.ID,
+        //TrendsID:               trend3.ID,
 	}
     noti9 := entity.Notification{
 		Timestamp:              time.Now(),
@@ -525,7 +539,7 @@ func SetupDatabase() {
 		HealthTypeID:           htDanger.ID,
 		NotificationStatusID:   statusUnread.ID,
         HealthSummaryID:        &healthSum2.ID,
-        TrendsID:               trend3.ID,
+        //TrendsID:               trend3.ID,
 	}
     // user id = 2
 	db.Create(&noti1)

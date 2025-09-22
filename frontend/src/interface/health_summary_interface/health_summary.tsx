@@ -1,17 +1,15 @@
 export interface HealthSummaryInterface {
     ID:             number;       
-    PeriodStart:    string;    
-    PeriodEnd:      string;           
-    AvgBpm:         number;  
-    MinBpm:         number;     
-    MaxBpm:         number;    
-    AvgSteps:       number;
-    TotalSteps:     number;
-    AvgSleep:       number;
-    AvgCalories:    number;
-    AvgSpo2:        number;
-    AvgBodyTemp:    number;
-    MinBodyTemp:    number;
-    MaxBodyTemp:    number;
-    UserID?:        number;  
+    period_start:    string;    
+    period_end:      string;           
+    avg_bpm:         number;  
+    min_bpm:         number;     
+    max_bpm:         number;    
+    avg_steps:       number;
+    total_steps:     number;
+    avg_sleep:       number;
+    avg_calories:    number;
+    avg_spo2:        number;
+    risk_level:      string; 
+    UserID?:         number;  
 }

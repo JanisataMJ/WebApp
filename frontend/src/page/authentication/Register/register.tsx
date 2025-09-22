@@ -9,6 +9,7 @@ import logo from '../../../assets/Logo.jpg';
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const [form] = Form.useForm();
 
   const onFinish = async (values: any) => {
     // Map form values to backend payload
@@ -18,8 +19,10 @@ const Register: React.FC = () => {
       Email: values.email,
       FirstName: values.first_name,
       LastName: values.last_name,
-      Birthdate: values.birth_date ? values.birth_date.toISOString() : undefined,
       GenderID: values.gender, // 1, 2, 3
+      Birthdate: values.birth_date
+        ? moment(values.birth_date, 'YYYY-MM-DD').toISOString()
+        : undefined
     };
 
     console.log('Data to send to API:', formattedValues);
@@ -46,87 +49,99 @@ const Register: React.FC = () => {
 
       <div className="signup-page-wrapper">
         <a href="/">
-          <img id="Logo" src={logo} alt="Logo"/>
+          <img id="Logo" src={logo} alt="Logo" />
         </a>
-        <h1 className="signup-title">Sign Up</h1>
+        <h1 className="signup-title">สมัครบัญชีผู้ใช้ใหม่</h1>
         <div className="signup-container">
           <Card className="signup-card-register" style={{ width: '100%', maxWidth: 600 }}>
             <Form name="register" layout="vertical" onFinish={onFinish}>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
-                    label="First Name"
+                    label="ชื่อ"
                     name="first_name"
-                    rules={[{ required: true, message: 'Please enter your first name!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกชื่อจริง' }]}
                   >
-                    <Input placeholder="Enter your first name" />
+                    <Input placeholder="กรอกชื่อจริง" />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Last Name"
+                    label="นามสกุล"
                     name="last_name"
-                    rules={[{ required: true, message: 'Please enter your last name!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกนามสกุล' }]}
                   >
-                    <Input placeholder="Enter your last name" />
+                    <Input placeholder="กรอกนามสกุล" />
                   </Form.Item>
                 </Col>
               </Row>
+
+              <Form.Item
+                label="ชื่อผู้ใช้"
+                name="user_name"
+                rules={[{ required: true, message: 'กรุณากรอกชื่อผู้ใช้' }]}
+              >
+                <Input placeholder="กรอกชื่อผู้ใช้" />
+              </Form.Item>
 
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
-                    label="Username"
-                    name="user_name"
-                    rules={[{ required: true, message: 'Please enter your username!' }]}
+                    label="อีเมล"
+                    name="email"
+                    rules={[
+                      { type: 'email', message: 'รูปแบบอีเมลผิด' },
+                      { required: true, message: 'กรุณากรอกอีเมล' },
+                    ]}
                   >
-                    <Input placeholder="Enter your username" />
+                    <Input placeholder="กรอกอีเมล" />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Password"
+                    label="รหัสผ่าน"
                     name="password"
-                    rules={[{ required: true, message: 'Please enter your password!' }]}
+                    rules={[{ required: true, message: 'กรุณากรอกรหัสผ่าน' }]}
                   >
-                    <Input.Password placeholder="Enter your password" />
+                    <Input.Password placeholder="กรอกรหัสผ่าน" />
                   </Form.Item>
                 </Col>
               </Row>
 
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  { type: 'email', message: 'Invalid email format!' },
-                  { required: true, message: 'Please enter your email!' },
-                ]}
-              >
-                <Input placeholder="Enter your email" />
-              </Form.Item>
 
-              <Form.Item
-                label="Gender"
-                name="gender"
-                rules={[{ required: true, message: 'Please select your gender!' }]}
-              >
-                <Radio.Group>
-                  <Radio value={1}>Male</Radio>
-                  <Radio value={2}>Female</Radio>
-                </Radio.Group>
-              </Form.Item>
-
-              <Form.Item
-                label="Birth Date"
-                name="birth_date"
-                rules={[{ required: true, message: 'Please select your birth date!' }]}
-              >
-                <DatePicker style={{ width: '100%' }} placeholder="Select your birth date" />
-              </Form.Item>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Gender"
+                    name="gender"
+                    rules={[{ required: true, message: 'Please select your gender!' }]}
+                  >
+                    <Radio.Group>
+                      <Radio value={1}>Male</Radio>
+                      <Radio value={2}>Female</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Birth Date"
+                    name="birth_date"
+                    rules={[{ required: true, message: 'Please select your birth date!' }]}
+                  >
+                    <input
+                      type="date"
+                      max={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => {
+                        form.setFieldsValue({ birth_date: e.target.value }); // yyyy-mm-dd
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" className="signup-submit-btn">
-                  Confirm
+                  ยืนยัน
                 </Button>
               </Form.Item>
             </Form>

@@ -1,15 +1,9 @@
-import { HealthAnalysisInterface } from "../health_analysis_interface/health_analysis";
-
 export interface HealthDataInterface {
     ID:             number;       
-    Timestamp:      string;           
-    Bpm:            number;  
-    Steps:          number;     
-    SleepHours:     string;    
-    CaloriesBurned: number;
-    Spo2:           number;
-    BodyTemp:       number;
-    UserID?:        number;  
-
-    HealthAnalysis?: HealthAnalysisInterface[];  
+    date:           string;       
+    avg_bpm:        number;
+    steps:          number;
+    sleep_hours:    number;
+    calories:       number;
+    avg_spo2:       number;
 }

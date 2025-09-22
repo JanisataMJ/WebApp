@@ -26,6 +26,6 @@ type Notification struct {
 	HealthAnalysisID 		*uint
 	HealthAnalysis   		*HealthAnalysis `gorm:"foreignKey: HealthAnalysisID"`
 
-	TrendsID 				uint
-	Trends   				*Trends `gorm:"foreignKey: TrendsID"`
+	/* TrendsID 				uint
+	Trends   				*Trends `gorm:"foreignKey: TrendsID"` */
 }

@@ -7,7 +7,7 @@ import {
   updateNotificationStatusByID,
 } from '../../../services/https/Notification/notification';
 import { NotificationInterface } from '../../../interface/notification_interface/notification';
-import TestSummaryButton from './testSumButton';
+//import TestSummaryButton from './testSumButton';
 
 const Notice: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,7 +116,7 @@ const Notice: React.FC = () => {
             <h2 className="modal-title">แจ้งเตือนสุขภาพ</h2>
             <p className="modal-subtitle">สุขภาพของคุณสำคัญที่สุด</p>
 
-            {/* ปุ่มส่ง Weekly Summary */}
+            {/*
             <div className="test-button">
               <TestSummaryButton
                 onSent={async () => {
@@ -139,7 +139,7 @@ const Notice: React.FC = () => {
                   setNotifications(safeNotifications);
                 }}
               />
-            </div>
+            </div> */}
 
             {/* เนื้อหาที่ scroll ได้ */}
             <div className="modal-body-noti">

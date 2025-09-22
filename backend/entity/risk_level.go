@@ -9,4 +9,6 @@ type RiskLevel struct {
 	Rlevel string
 	
 	HealthAnalysis []HealthAnalysis `gorm:"foreignKey:RiskLevelID"`
+
+	HealthSummary []HealthSummary `gorm:"foreignKey:RiskLevelID"`
 }

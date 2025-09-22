@@ -233,37 +233,20 @@ const AddAdmin: React.FC<AddAdminProps> = ({ open, onCancel, onSuccess }) => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Birth Date"
+                    label="วันเกิด"
                     name="birthdate"
-                    rules={[
-                      {
-                        validator: (_, value) => {
-                          if (!value) return Promise.reject(new Error('Please select birth date!'));
-
-                          const birthDate = new Date(value);
-                          const today = new Date();
-
-                          let age = today.getFullYear() - birthDate.getFullYear(); // ใช้ let แทน const
-                          const m = today.getMonth() - birthDate.getMonth();
-                          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                            age--; // ตอนนี้แก้ค่าได้
-                          }
-
-                          if (age < 18) return Promise.reject(new Error('Admin must be at least 18 years old!'));
-                          return Promise.resolve();
-                        },
-                      },
-                    ]}
+                    rules={[{ required: true, message: 'กรุณาเลือกวันเกิดของคุณ' }]}
                     className="form-item-create-ad"
                   >
-                    <input
-                      type="date"
-                      className="form-input-create-ad"
-                      max={new Date().toISOString().split("T")[0]} // ป้องกันเลือกวันในอนาคต
-                    />
+                    <div className="date-input-wrapper">
+                      <input
+                        type="date"
+                        className="form-input-create-ad"
+                        max={new Date().toISOString().split("T")[0]}
+                      />
+                    </div>
                   </Form.Item>
                 </Col>
-
               </Row>
 
               <Row gutter={24} className="form-row-create-ad">

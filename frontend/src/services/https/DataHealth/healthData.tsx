@@ -146,3 +146,22 @@ export const getDailySleep = async (
     throw new Error("Error fetching daily sleep: " + (error as Error).message);
   }
 };
+
+export const GetWeeklyHealthData = async (
+  userId: number,
+  mode: "weekly" | "last7days" | "lastweek" = "weekly"
+): Promise<HealthDataInterface[]> => {
+  try {
+    const requestOptions = getRequestOptions();
+    const response = await axios.get<HealthDataInterface[]>(
+      `${apiUrl}/healthData/weekly/${userId}?mode=${mode}`,
+      requestOptions
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      "Error fetching health data: " + (error as Error).message
+    );
+  }
+};
+

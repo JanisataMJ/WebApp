@@ -15,7 +15,7 @@ const getRequestOptions = () => {
 
 
 
-export const getHealthAnalysis = async (): Promise<HealthSummaryInterface[]> => {
+export const getHealthSummary = async (): Promise<HealthSummaryInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
     const response = await axios.get<HealthSummaryInterface[]>(
@@ -29,7 +29,7 @@ export const getHealthAnalysis = async (): Promise<HealthSummaryInterface[]> => 
 };
 
 
-export const getHealthAnalysisByUserID = async (
+export const getHealthSummaryByUserID = async (
   userId: number
 ): Promise<HealthSummaryInterface[]> => {
   try {
@@ -42,4 +42,15 @@ export const getHealthAnalysisByUserID = async (
   } catch (error) {
     throw new Error("Error fetching health summary: " + (error as Error).message);
   }
+};
+
+export const GetWeeklySummary = async (
+  userId: number
+): Promise<HealthSummaryInterface> => {   // 👈 ไม่ต้องเป็น array
+  const requestOptions = getRequestOptions();
+  const response = await axios.get<HealthSummaryInterface>(
+    `${apiUrl}/healthSummary/weekly/${userId}`,
+    requestOptions
+  );
+  return response.data;
 };

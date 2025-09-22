@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -11,12 +12,12 @@ import (
 	"github.com/JanisataMJ/WebApp/controller/admin_count"
 	"github.com/JanisataMJ/WebApp/controller/article"
 	"github.com/JanisataMJ/WebApp/controller/gender"
+	"github.com/JanisataMJ/WebApp/controller/gmail"
 	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
-	"github.com/JanisataMJ/WebApp/controller/email"
 
 	"github.com/JanisataMJ/WebApp/controller/user"
 
@@ -56,7 +57,8 @@ func main() {
 	config.SetupDatabase()
 
 	// Seed ข้อมูล HealthData //////////////////////////////////////
-    seed.SeedHealthData(config.DB())
+	seed.SeedHealthData(config.DB())
+	seed.SeedHealthDataTwoWeeks(config.DB())
 	//////////////////////////////////////////////////////////////
 
 	r := gin.Default()
@@ -65,18 +67,11 @@ func main() {
 	// ✅ Middleware ใส่ DB ลง context
 	r.Use(middlewares.DBMiddleware(config.DB()))
 
-
 	// Auth Route
 	r.POST("/signup", users.SignUp)
 	r.POST("/signin", users.SignIn)
 	r.POST("/create-admin", users.CreateAdmin)
 
-	r.GET("/send-test-email/:userID", func(c *gin.Context) {
-		userID := c.Param("userID")
-		email.SendWeeklySummary(c) // หรือ SendRealtimeAlert แล้วแต่กรณี
-		c.JSON(200, gin.H{"message": "Test email triggered for user " + userID})
-	})
-	    
 	router := r.Group("/")
 	{
 		router.Use(middlewares.Authorizes())
@@ -97,12 +92,15 @@ func main() {
 		//Notification Route
 		router.POST("/create-notification/:id", notification.CreateNotification)
 		router.GET("/notification/:id", notification.GetNotificationsByUserID)
-    	router.PATCH("/notification/:id/status", notification.UpdateNotificationStatusByID)
+		router.PATCH("/notification/:id/status", notification.UpdateNotificationStatusByID)
 
 		// Email Route
-		router.GET("/send-weekly-summary", email.SendWeeklySummary)
-		router.POST("/check-realtime-alert", email.SendRealtimeAlert)
-	
+		router.GET("/send-weekly-summary/:userID", func(c *gin.Context) {
+			id, _ := strconv.Atoi(c.Param("userID"))
+			go gmail.SendWeeklySummary(config.DB(), uint(id))
+			c.JSON(200, gin.H{"message": "Weekly summary email process started", "userID": id})
+		})
+		router.POST("/check-realtime-alert", gmail.SendRealtimeAlert)
 
 		//Article Route
 		router.POST("/create-article/:id", article.CreateArticle)
@@ -118,6 +116,7 @@ func main() {
 		//healthSummary Route
 		router.GET("/list-healthSummary", healthSummary.ListHealthSummary)
 		router.GET("/healthSummary/:id", healthSummary.GetHealthSummary)
+		router.GET("/healthSummary/weekly/:id", healthSummary.GetWeeklySummary)
 
 		//healthAnalysis Route
 		router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
@@ -126,6 +125,7 @@ func main() {
 		//HealthData Route
 		router.GET("/list-healthData", healthData.ListHealthData)
 		router.GET("/healthData/:id", healthData.GetHealthDataByUserID)
+		router.GET("/healthData/weekly/:id", healthData.GetWeeklyHealthData)
 
 		// Daily APIs
 		router.GET("/daily-heart-rate", healthData.GetDailyHeartRate)

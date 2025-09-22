@@ -79,7 +79,7 @@ func toUint(s string) uint {
 
 
 // ✅ Get All Articles
-func ListArticles(c *gin.Context) {
+func ListArticles(c *gin.Context) { 
 	var articles []entity.Article
 
 	if err := config.DB().

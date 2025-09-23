@@ -49,24 +49,24 @@ const ViewUser: React.FC<ViewUserProps> = ({ open, onCancel, userData }) => {
   const personalInfo = [
     {
       label: "ชื่อผู้ใช้",
-      value: userData.username || "N/A",
+      value: userData.username || "ไม่พบข้อมูล",
       icon: <UserOutlined />
     },
     {
       label: "อีเมล",
-      value: userData.email || "N/A",
+      value: userData.email || "ไม่พบข้อมูล",
       icon: <MailOutlined />
     },
     {
       label: "เบอร์โทร",
-      value: userData.phonenumber || "N/A",
+      value: userData.phonenumber || "ไม่พบข้อมูล",
       icon: <PhoneOutlined />
     },
     {
       label: "วันเกิด",
       value: userData.birthdate
         ? dayjs(userData.birthdate).format("DD/MM/YYYY")
-        : "N/A",
+        : "ไม่พบข้อมูล",
       icon: <CalendarOutlined />
     }
   ];
@@ -74,27 +74,27 @@ const ViewUser: React.FC<ViewUserProps> = ({ open, onCancel, userData }) => {
   const physicalInfo = [
     {
       label: "ส่วนสูง",
-      value: userData.height ? `${userData.height} cm` : "N/A",
+      value: userData.height ? `${userData.height} cm` : "ไม่พบข้อมูล",
       icon: <RadiusUprightOutlined  />
     },
     {
       label: "น้ำหนัก",
-      value: userData.weight ? `${userData.weight} kg` : "N/A",
+      value: userData.weight ? `${userData.weight} kg` : "ไม่พบข้อมูล",
       icon: <RadiusUprightOutlined  />
     },
     {
       label: "รอบอก",
-      value: userData.bust ? `${userData.bust} cm` : "N/A",
+      value: userData.bust ? `${userData.bust} cm` : "ไม่พบข้อมูล",
       icon: <RadiusUprightOutlined  />
     },
     {
       label: "รอบเอว",
-      value: userData.waist ? `${userData.waist} cm` : "N/A",
+      value: userData.waist ? `${userData.waist} cm` : "ไม่พบข้อมูล",
       icon: <RadiusUprightOutlined  />
     },
     {
       label: "รอบสะโพก",
-      value: userData.hip ? `${userData.hip} cm` : "N/A",
+      value: userData.hip ? `${userData.hip} cm` : "ไม่พบข้อมูล",
       icon: <RadiusUprightOutlined  />
     }
   ];
@@ -185,7 +185,7 @@ const ViewUser: React.FC<ViewUserProps> = ({ open, onCancel, userData }) => {
                 <h4 className="view-user-section-title">ข้อมูลทางกาย</h4>
                 <div className="view-user-info-grid">
                   {physicalInfo.map((item, index) => (
-                    item.value !== "N/A" && (
+                    item.value !== "ไม่พบข้อมูล" && (
                       <div key={index} className="view-user-info-item">
                         <div className="view-user-info-label">
                           {item.icon}

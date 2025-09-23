@@ -28,6 +28,7 @@ function ManageAdmin() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<UsersInterface | null>(null);
+  const [users, setUser] = useState<UsersInterface | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [roleFilter, setRoleFilter] = useState<number | undefined>(undefined);
 
@@ -58,15 +59,19 @@ function ManageAdmin() {
       width: "8%",
       render: (text, record) => (
         <div className="profile-image-container-manageadmin">
-          <img
-            src={record.profile ? `http://localhost:8000/${record.profile}` : '/default-avatar.png'}
-            className="profile-image-manageadmin"
-            alt="Profile"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/default-avatar.png';
-            }}
-          />
+          {record.profile ? (
+            <img
+              src={`http://localhost:8000/${record.profile}`}
+              className="profile-image-manageadmin"
+              alt="Profile"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = '/default-avatar.png';
+              }}
+            />
+          ) : (
+            <UserOutlined style={{ fontSize: 32, color: '#C2B4D7' }} />
+          )}
         </div>
       ),
     },
@@ -77,7 +82,7 @@ function ManageAdmin() {
       width: "12%",
       render: (username) => (
         <span style={{ fontWeight: 600, color: '#57648E' }}>
-          {username || "N/A"}
+          {username || "ไม่พบข้อมูล"}
         </span>
       ),
     },
@@ -98,7 +103,7 @@ function ManageAdmin() {
       width: "16%",
       render: (email) => (
         <span style={{ color: '#666' }}>
-          {email || "N/A"}
+          {email || "ไม่พบข้อมูล"}
         </span>
       ),
     },
@@ -107,14 +112,14 @@ function ManageAdmin() {
       dataIndex: "phonenumber",
       key: "phonenumber",
       width: "10%",
-      render: (phone) => phone || "N/A",
+      render: (phone) => phone || "ไม่พบข้อมูล",
     },
     {
       title: <span className="table-header-manageadmin">วันเกิด</span>,
       dataIndex: "birthdate",
       key: "birthdate",
       width: "10%",
-      render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "N/A",
+      render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "ไม่พบข้อมูล",
     },
     {
       title: <span className="table-header-manageadmin">เพศ</span>,
@@ -131,7 +136,7 @@ function ManageAdmin() {
           <span style={{ color: config.color, fontWeight: 600 }}>
             {config.text}
           </span>
-        ) : "N/A";
+        ) : "ไม่พบข้อมูล";
       },
     },
     {
@@ -157,7 +162,7 @@ function ManageAdmin() {
             {config.icon}
             {config.text}
           </span>
-        ) : "N/A";
+        ) : "ไม่พบข้อมูล";
       },
     },
     {

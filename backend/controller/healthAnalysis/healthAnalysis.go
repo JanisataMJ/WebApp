@@ -59,6 +59,26 @@ func GetHealthAnalysis(c *gin.Context) {
 	c.JSON(http.StatusOK, analysis)
 }
 
+// GET /sleep-analysis/:userId
+func GetSleepAnalysisByUser(c *gin.Context) {
+    userId := c.Param("userId")
+
+    var analyses []entity.HealthAnalysis
+    if err := config.DB().
+    Model(&entity.HealthAnalysis{}).
+    Joins("JOIN health_data ON health_data.id = health_analysis.health_data_id").
+    Where("health_analysis.category = ? AND health_data.user_id = ?", "การนอนหลับ", userId).
+    Preload("HealthData").
+    Preload("RiskLevel").
+    Find(&analyses).Error; err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+    return
+}
+
+    c.JSON(http.StatusOK, analyses)
+}
+
+
 // วิเคราะห์ข้อมูลสุขภาพโดยใช้ Gemini สำหรับผู้ใช้เฉพาะราย
 func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint) error {
 	apiKey := os.Getenv("GEMINI_API_KEY")

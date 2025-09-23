@@ -1,15 +1,15 @@
 package healthData
 
 import (
-	"net/http"
-	"time"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
+	"time"
+	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/JanisataMJ/WebApp/entity"
+	"github.com/gin-gonic/gin"
 )
-
 
 // 🔹 ฟังก์ชันหลักใช้ร่วมกัน
 func getDailyMetric(c *gin.Context, field string, alias string) {
@@ -54,15 +54,18 @@ func getDailyMetric(c *gin.Context, field string, alias string) {
 		case "Spo2":
 			value = d.Spo2
 		case "SleepHours":
-			// สมมติ SleepHours เก็บเป็น string เช่น "7.5"
-			if parsed, err := time.ParseDuration(d.SleepHours + "h"); err == nil {
-				value = parsed.Hours()
+			// สมมติ SleepHours เก็บเป็นชั่วโมง (string -> float)
+			if d.SleepHours != "" {
+				if parsed, err := strconv.ParseFloat(d.SleepHours, 64); err == nil {
+					value = parsed
+				}
 			}
+
 		}
 
 		response = append(response, map[string]interface{}{
-			"time":  d.Timestamp.Format("15:04"),
-			alias:   value,
+			"time": d.Timestamp.Format("15:04"),
+			alias:  value,
 		})
 
 		total += value

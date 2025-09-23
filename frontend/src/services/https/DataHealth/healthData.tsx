@@ -147,9 +147,10 @@ export const getDailySleep = async (
   }
 };
 
+
 export const GetWeeklyHealthData = async (
   userId: number,
-  mode: "weekly" | "last7days" | "lastweek" = "weekly"
+  mode: "weekly" | "last7days" | "lastweek" | "last2weeks" = "weekly"
 ): Promise<HealthDataInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
@@ -164,4 +165,3 @@ export const GetWeeklyHealthData = async (
     );
   }
 };
-

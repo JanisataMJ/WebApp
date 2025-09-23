@@ -181,11 +181,6 @@
   opacity: 0.6;
 }
 
-.edit-admin-upload-text {
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
 .edit-admin-upload-hint {
   font-size: 0.8rem;
   color: var(--text-light);

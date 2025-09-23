@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"strconv"
-	"context"
 
 	"github.com/gin-gonic/gin"
 
@@ -77,8 +77,7 @@ func main() {
 	{
 		router.Use(middlewares.Authorizes())
 
-	
-	r.Static("/uploads", "./uploads")
+		r.Static("/uploads", "./uploads")
 
 		// User Route
 		router.PUT("/user/:id", users.Update)
@@ -111,7 +110,7 @@ func main() {
 		router.PUT("/update-article/:id", article.UpdateArticle)
 		router.DELETE("/delete-article/:id", article.DeleteArticle)
 
-		router.PUT("/order-articles", article.UpdateArticleOrder)
+		/* router.PUT("/order-articles", article.UpdateArticleOrder) */
 		router.PUT("/article/:id/publishArticleNow", article.PublishArticleNow)
 		router.PUT("/article/:id/unpublishArticle", article.UnpublishArticle)
 
@@ -123,7 +122,8 @@ func main() {
 		//healthAnalysis Route
 		router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
-// ✅ Endpoint สำหรับเรียก Gemini on-demand
+		router.GET("/sleep-analysis/:id", healthAnalysis.GetSleepAnalysisByUser)
+		// ✅ Endpoint สำหรับเรียก Gemini on-demand
 		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
 
 		//HealthData Route
@@ -152,10 +152,10 @@ func main() {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
-    // ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
-    // ให้แน่ใจว่าได้เพิ่มบรรทัดนี้ลงไปแล้ว
+	// ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
+	// ให้แน่ใจว่าได้เพิ่มบรรทัดนี้ลงไปแล้ว
 
-    go healthAnalysis.CheckForCriticalAlerts(context.Background())
+	go healthAnalysis.CheckForCriticalAlerts(context.Background())
 	// Run the server
 	r.Run("localhost:" + PORT)
 }

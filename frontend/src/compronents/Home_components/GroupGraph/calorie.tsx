@@ -34,24 +34,27 @@ const DairyCalorie: React.FC = () => {
   const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res: DailyCalorieResponse = await getDailyCalories(UserID);
-        setData(res.data);
-        if (res.stats) setStats(res.stats);
-      } catch (err) {
-        console.error('Failed to fetch daily calories', err);
-        setData([]);
-        setStats(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [UserID]);
+  const fetchData = async () => {
+    try {
+      const res: DailyCalorieResponse = await getDailyCalories(UserID);
+      setData(Array.isArray(res.data) ? res.data : []);
+      if (res.stats) setStats(res.stats);
+    } catch (err) {
+      console.error('Failed to fetch daily calories', err);
+      setData([]);
+      setStats(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, [UserID]);
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
-  if (data.length === 0) return <div>ไม่พบข้อมูลพลังงานที่ใช้ไปของวันนี้</div>;
+  if (!data || data.length === 0) {
+  return <div>ไม่พบข้อมูลพลังงานที่ใช้ไปของวันนี้</div>;
+}
+
 
   // คำนวณค่าต่างๆ
   const totalCalories = data.reduce((sum, item) => sum + item.calories, 0);

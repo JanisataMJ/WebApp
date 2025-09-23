@@ -11,7 +11,6 @@ type Article struct {
 	Information 	string
 	Reference		string
 	Image			string
-	Order			uint
 	PublishDate 	*time.Time
 	Published    	bool `gorm:"default:false"` // ยังไม่เผยแพร่
 	

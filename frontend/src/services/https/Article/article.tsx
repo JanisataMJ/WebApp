@@ -75,20 +75,15 @@ export const getAllArticles = async (): Promise<ArticleInterface[]> => {
       requestOptions
     );
 
-    // ตรวจสอบว่าบทความมี order หรือไม่ ถ้าไม่มีให้ 0
-    const dataWithOrder = response.data.map((art) => ({
-      ...art,
-      order: art.Order || 0,
-    }));
-
-    return dataWithOrder;
+    return response.data; // ใช้ข้อมูลตรง ๆ เลย
   } catch (error: any) {
     throw new Error("Error fetching articles: " + error.message);
   }
 };
 
+
 // PUT update order
-export const updateArticleOrder = async (
+/* export const updateArticleOrder = async (
   updatedArticles: ArticleInterface[]
 ): Promise<void> => {
   try {
@@ -97,7 +92,7 @@ export const updateArticleOrder = async (
   } catch (error: any) {
     throw new Error("Error updating article order: " + error.message);
   }
-};
+}; */
 
 
 // GET Article by ID

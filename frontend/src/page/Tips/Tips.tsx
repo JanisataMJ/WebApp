@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spin, Input, Select, message } from "antd";
 import { Link } from "react-router-dom";
+import { PictureOutlined } from "@ant-design/icons";
 import { ArticleInterface } from "../../interface/article_interface/article";
 import { getAllArticles } from "../../services/https/Article/article";
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import moment from "moment";
 import './Tips.css';
-import 'antd/dist/reset.css'; // สำหรับ v5
-
+import 'antd/dist/reset.css';
 
 const { Meta } = Card;
 const { Option } = Select;
@@ -152,8 +152,9 @@ const Tips = () => {
                           </div>
                         ) : (
                           <div className="no-image-placeholder-tips">
-                            <div className="no-image-icon-tips">📄</div>
-                            <span>ไม่มีรูปภาพ</span>
+                            <div className="no-image-icon-tips">
+                              <PictureOutlined style={{ fontSize: 40, color: "#bbb" }} />
+                            </div>
                           </div>
                         )
                       }

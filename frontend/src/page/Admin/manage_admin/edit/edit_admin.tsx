@@ -178,14 +178,11 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                     ) : (
                       <div className="edit-admin-upload-placeholder">
                         <UserOutlined className="edit-admin-upload-icon" />
-                        <span className="edit-admin-upload-text">เพิ่มรูปภาพ</span>
                       </div>
                     )}
                   </div>
                 </Upload>
-                <div className="edit-admin-upload-hint">
-                  คลิกเพื่อเปลี่ยนรูปโปรไฟล์
-                </div>
+                <div className="edit-admin-upload-hint">คลิกเพื่อเปลี่ยนรูปภาพ</div>
               </div>
             </div>
 
@@ -248,20 +245,11 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                     >
                       <Input className="edit-admin-form-input" placeholder="เบอร์โทรศัพท์" maxLength={10} />
                     </Form.Item>
-                    {/* <Form.Item
+                    
+                    <Form.Item
                       label="วันเกิด"
                       name="birthdate"
                       className="edit-admin-form-item"
-                      rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
-                    >
-                      <input
-                        type="date"
-                        className="form-input"
-                        max={new Date().toISOString().split("T")[0]} // ปิดวันที่อนาคต
-                      />
-                    </Form.Item> */}
-                    <Form.Item
-                      label="วันเกิด"
                       rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
                     >
                       <input
@@ -272,7 +260,6 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                         onChange={(e) => setBirthdate(e.target.value)}
                       />
                     </Form.Item>
-
                   </div>
 
                   <div className="edit-admin-form-row">

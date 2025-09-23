@@ -88,12 +88,12 @@ const Navbar: React.FC = () => {
         )}
         </div>
 
-        <Link
+        {/* <Link
           to="/calendar"
           className={`nav-link ${isActive('/calendar') ? 'active' : ''}`}
         >
           <span>อารมณ์/ความรู้สึก</span>
-        </Link>
+        </Link> */}
 
         <Link
           to="/overview"

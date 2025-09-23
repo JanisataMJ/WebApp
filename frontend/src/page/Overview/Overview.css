@@ -10,11 +10,11 @@
 /* Main Dashboard Container */
 .health-dashboard-overview {
   min-height: 100vh;
-  width: 90vw; /* ใช้ % เพื่อ responsive กับหน้าจอ */
+  width: 90vw; 
   max-width: 1000px;
   background: linear-gradient(135deg, #faf5ff, #eff6ff, #eef2ff);
   padding: 30px;
-  margin: 140px auto 20px auto; /* จัดกึ่งกลางแนวนอน */
+  margin: 140px auto 20px auto;
   border-radius: 20px;
   box-sizing: border-box;
 }
@@ -28,11 +28,11 @@
 /* Header */
 .dashboard-header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: space-between; 
+  align-items: center;  
   margin-bottom: 24px;
 }
+
 
 .header-content {
   display: flex;
@@ -40,16 +40,14 @@
   justify-content: start;
 }
 
-.header-content h1.dashboard-title {
+.dashboard-title-overview {
   font-size: 2rem;
   font-weight: bold;
-  color: #1f2937;
+  color: #934A5E;
   margin-bottom: 8px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
-.header-content p.dashboard-subtitle {
-  color: #6b7280;
-}
 
 
 /* Vital Signs Grid */
@@ -178,6 +176,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
+  margin-bottom: 15px;
 }
 
 .chart-icon {
@@ -431,7 +430,7 @@
   margin: 0 6px;                        /* ระยะห่างระหว่างปุ่ม */
   padding: 8px 20px;                    /* ขยายให้กดง่าย */
   background: #f3f4f6;                  /* เทาอ่อน */
-  color: #374151;                       /* ข้อความสีเทาเข้ม */
+  color: #513737;                       /* ข้อความสีเทาเข้ม */
   font-weight: 500;
   text-align: center;                   /* 🔥 ตัวหนังสืออยู่ตรงกลาง */
   transition: all 0.3s ease;
@@ -442,11 +441,111 @@
 
 .custom-radio-group-overview .ant-radio-button-wrapper:hover {
   background: #e0e7ff;                  /* hover เป็นฟ้าอ่อน */
-  color: #1e40af;          /* hover สีฟ้า */
+  color: #57648E;          /* hover สีฟ้า */
 }
 
 .custom-radio-group-overview .ant-radio-button-wrapper-checked {
-  background: #6366f1 !important;       /* primary color */
+  background: linear-gradient(135deg, #57648E, #934A5E) !important;       /* primary color */
   color: white !important;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
+
+
+.trend {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.trend.up {
+  color: green;
+}
+
+.trend.down {
+  color: red;
+}
+
+.trend.same {
+  color: gray;
+}
+
+.trend-change {
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+
+/* ตารางดูโปร ๆ */
+.ant-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.ant-table-thead > tr > th {
+  background: #f3f4f6;
+  font-weight: 600;
+  text-align: center;
+  font-size: 15px;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: center;
+  font-size: 14px;
+  padding: 12px 8px;
+}
+
+/* ให้ metric อยู่ด้านซ้ายสวย ๆ */
+.col-metric {
+  text-align: left !important;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* เน้นคอลัมน์ตาม mode */
+.highlight-col {
+  background-color: #e0f2fe !important;
+  font-weight: 600 !important;
+  color: #0ea5e9 !important;
+  border-left: 2px solid #38bdf8;
+  border-right: 2px solid #38bdf8;
+}
+
+.comparison-title {
+  font-size: 25px;       /* ขนาดใหญ่ */
+  font-weight: 700;      /* หนา */
+  color: #57648E;        /* เทาเข้ม */
+  text-align: center;    /* จัดกึ่งกลาง */
+  display: block;        /* ให้ span กินเต็มบรรทัด */
+  margin-top: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ปรับทุกหัวตาราง */
+.ant-table-thead > tr > th {
+  background: #f9fafb;      /* สีพื้นหลังอ่อน */
+  font-weight: 600;         /* ทำตัวหนา */
+  font-size: 16px;          /* ขยายตัวหนังสือ */
+  text-align: center;       /* จัดกึ่งกลาง */
+  color: #1f2937;           /* สีเทาเข้ม */
+}
+
+/* เฉพาะคอลัมน์แรก */
+.ant-table-thead .col-metric {
+  text-align: left !important;
+  color: #2563eb;           /* ฟ้า */
+}
+
+/* เฉพาะคอลัมน์ "thisWeek" */
+.ant-table-thead .col-thisweek {
+  text-align: center;
+  color: #16a34a;           /* เขียว */
+}
+
+/* เฉพาะคอลัมน์ "lastWeek" */
+.ant-table-thead .col-lastweek {
+  text-align: center;
+  color: #dc2626;           /* แดง */
+}
+

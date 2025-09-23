@@ -112,7 +112,7 @@ const Register: React.FC = () => {
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
-                    label="Gender"
+                    label="เพศ"
                     name="gender"
                     rules={[{ required: true, message: 'Please select your gender!' }]}
                   >
@@ -124,7 +124,7 @@ const Register: React.FC = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Birth Date"
+                    label="วันเกิด"
                     name="birth_date"
                     rules={[{ required: true, message: 'Please select your birth date!' }]}
                   >

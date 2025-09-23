@@ -17,7 +17,7 @@ import (
 )
 
 // sendEmail ส่งอีเมลแบบ production-ready
-func sendEmail(to string, subject string, body string, attachments ...string) error {
+func SendEmail(to string, subject string, body string, attachments ...string) error {
     from := os.Getenv("EMAIL_USER")
     pass := os.Getenv("EMAIL_PASS")
     smtpHost := os.Getenv("SMTP_HOST")
@@ -81,7 +81,7 @@ func SendImmediateAlert(c *gin.Context, db *gorm.DB, user entity.User, healthTyp
 		return
 	}
 
-	err := sendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
+	err := SendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
 	if err != nil {
 		log.Println("❌ ส่ง Email ไม่สำเร็จ:", err)
 	}
@@ -108,7 +108,7 @@ func SendImmediateAlertBackground(db *gorm.DB, user entity.User, healthTypeID ui
 		return
 	}
 
-	err := sendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
+	err := SendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
 	if err != nil {
 		log.Println("❌ ส่ง Email ไม่สำเร็จ:", err)
 	}
@@ -187,7 +187,7 @@ func SendWeeklySummary(db *gorm.DB, userID uint) {
         summary.AvgSpo2,
     )
 
-    if err := sendEmail(summary.User.Email, "Weekly Health Summary", summaryText); err != nil {
+    if err := SendEmail(summary.User.Email, "Weekly Health Summary", summaryText); err != nil {
         log.Printf("failed to send email: %v", err)
     }
 

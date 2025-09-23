@@ -114,16 +114,16 @@ func main() {
 		router.PUT("/article/:id/publishArticleNow", article.PublishArticleNow)
 		router.PUT("/article/:id/unpublishArticle", article.UnpublishArticle)
 
-		//healthSummary Route
+		// healthSummary Route
 		router.GET("/list-healthSummary", healthSummary.ListHealthSummary)
 		router.GET("/healthSummary/:id", healthSummary.GetHealthSummary)
 		router.GET("/healthSummary/weekly/:id", healthSummary.GetWeeklySummary)
 
-		//healthAnalysis Route
+		// healthAnalysis Route
 		router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
 		router.GET("/sleep-analysis/:id", healthAnalysis.GetSleepAnalysisByUser)
-		// ✅ Endpoint สำหรับเรียก Gemini on-demand
+		// Endpoint สำหรับเรียก Gemini on-demand
 		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
 
 		//HealthData Route
@@ -152,10 +152,10 @@ func main() {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
-	// ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
-	// ให้แน่ใจว่าได้เพิ่มบรรทัดนี้ลงไปแล้ว
-
-	go healthAnalysis.CheckForCriticalAlerts(context.Background())
+    // ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
+    go healthAnalysis.CheckForCriticalAlerts(context.Background())
+	 // ✅ เพิ่มบรรทัดนี้เพื่อรัน WeeklyAnalysisJob
+    go healthAnalysis.WeeklyAnalysisJob(context.Background())
 	// Run the server
 	r.Run("localhost:" + PORT)
 }

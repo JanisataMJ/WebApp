@@ -133,7 +133,7 @@
 /* Charts section */
 .charts-section-cal {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
   margin-bottom: 24px;
 }
@@ -370,4 +370,59 @@
   .charts-section-cal {
     break-inside: avoid;
   }
+}
+
+
+
+
+
+
+/* Styling for the new target input */
+.target-input-group {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.target-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    margin-top: -20px;
+    margin-left: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    height: 60px;
+}
+
+.target-input {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    width: 80px;
+    padding: 0;
+    outline: none;
+    color: #333;
+    -moz-appearance: textfield; /* สำหรับ Firefox */
+}
+
+/* ซ่อนปุ่มเพิ่ม/ลดในเบราว์เซอร์ */
+.target-input::-webkit-outer-spin-button,
+.target-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.unit-label {
+    font-size: 14px;
+    color: #999;
+    margin-left: 5px;
 }

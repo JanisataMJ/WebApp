@@ -153,9 +153,9 @@ func main() {
 	})
 
     // ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
-    // ให้แน่ใจว่าได้เพิ่มบรรทัดนี้ลงไปแล้ว
-
     go healthAnalysis.CheckForCriticalAlerts(context.Background())
+	 // ✅ เพิ่มบรรทัดนี้เพื่อรัน WeeklyAnalysisJob
+    go healthAnalysis.WeeklyAnalysisJob(context.Background())
 	// Run the server
 	r.Run("localhost:" + PORT)
 }

@@ -1,14 +1,18 @@
 package main
 
 import (
-	"net/http"
-	"strconv"
 	"context"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 
-	"github.com/gin-gonic/gin"
-
+	// Existing imports
 	"github.com/JanisataMJ/WebApp/config"
-
 	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
 	"github.com/JanisataMJ/WebApp/controller/admin_count"
 	"github.com/JanisataMJ/WebApp/controller/article"
@@ -19,17 +23,16 @@ import (
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
-
 	"github.com/JanisataMJ/WebApp/controller/user"
-
 	"github.com/JanisataMJ/WebApp/middlewares"
-
-	"log"
-	"os"
-
+	"github.com/JanisataMJ/WebApp/seed"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-
-	"github.com/JanisataMJ/WebApp/seed" //ข้อมูลตัวอย่าง
+	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/option"
+	"google.golang.org/api/sheets/v4"
 )
 
 const PORT = "8000"
@@ -41,34 +44,280 @@ func init() {
 	}
 }
 
+// ====================================================================
+// ✅ New functions for Google Sheets & SQLite
+// ====================================================================
+
+// getClient uses a Context and a Config to retrieve a Token then saves it.
+func getClient(config *oauth2.Config) *http.Client {
+	tokFile := "token.json"
+	tok, err := tokenFromFile(tokFile)
+	if err != nil {
+		tok = getTokenFromWeb(config)
+		saveToken(tokFile, tok)
+	}
+	return config.Client(context.Background(), tok)
+}
+
+// getTokenFromWeb retrieves a Token from a web user.
+func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	fmt.Printf("Go to the following link in your browser then type the " +
+		"authorization code: \n%v\n", authURL)
+
+	var authCode string
+	if _, err := fmt.Scan(&authCode); err != nil {
+		log.Fatalf("Unable to read authorization code: %v", err)
+	}
+
+	tok, err := config.Exchange(context.TODO(), authCode)
+	if err != nil {
+		log.Fatalf("Unable to retrieve token from web: %v", err)
+	}
+	return tok
+}
+
+// tokenFromFile retrieves a Token from a given file path.
+func tokenFromFile(file string) (*oauth2.Token, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	tok := &oauth2.Token{}
+	err = json.NewDecoder(f).Decode(tok)
+	return tok, err
+}
+
+// saveToken saves a Token to a file path.
+func saveToken(path string, token *oauth2.Token) {
+	fmt.Printf("Saving credential file to: %s\n", path)
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		log.Fatalf("Unable to cache oauth token: %v", err)
+	}
+	defer f.Close()
+	err = json.NewEncoder(f).Encode(token)
+	if err != nil {
+		log.Fatalf("Unable to save oauth token: %v", err)
+	}
+}
+
+// findColumnIndex searches for a column name in the header row and returns its index.
+func findColumnIndex(header []interface{}, name string) (int, error) {
+	for i, col := range header {
+		if col.(string) == name {
+			return i, nil
+		}
+	}
+	return -1, fmt.Errorf("column '%s' not found in header", name)
+}
+
+// ✅ New function to parse time with multiple layouts
+func parseTime(timeStr string) (time.Time, error) {
+    layouts := []string{
+        "2/1/2006, 15:04:05", // D/M/YYYY, H:M:S (e.g., 8/9/2025, 22:40:08)
+        "2/1/2006 15:04:05",  // D/M/YYYY H:M:S (e.g., 8/9/2025 22:40:08)
+    }
+
+    for _, layout := range layouts {
+        t, err := time.Parse(layout, timeStr)
+        if err == nil {
+            return t, nil
+        }
+    }
+    return time.Time{}, fmt.Errorf("failed to parse time string '%s' with any known layout", timeStr)
+}
+
+// importHealthData imports data from a Google Sheet into the database.
+func importHealthData(db *sql.DB, spreadsheetID, readRange string) {
+	// 1. Google Sheets API setup remains the same
+	b, err := os.ReadFile("credentials.json")
+	if err != nil {
+		log.Fatalf("Unable to read client secret file: %v", err)
+	}
+	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope)
+	if err != nil {
+		log.Fatalf("Unable to parse client secret file to config: %v", err)
+	}
+	client := getClient(config)
+	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
+	if err != nil {
+		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+	}
+
+	// ✅ อ่านช่วงข้อมูลทั้งหมดรวมทั้งแถว Header
+	resp, err := srv.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
+	if err != nil || resp.Values == nil {
+		log.Fatalf("Unable to retrieve data from sheet: %v", err)
+	}
+	fmt.Println("Data retrieved from Google Sheets. Now importing to SQLite...")
+
+	// 2. Database schema validation
+	sqlStmt := `
+	CREATE TABLE IF NOT EXISTS health_data (
+		user_id INTEGER,
+		timestamp DATETIME,
+		bpm INTEGER,
+		steps INTEGER,
+		spo2 INTEGER,
+		sleep_hours TEXT,
+		calories_burned INTEGER,
+		UNIQUE(user_id, timestamp)
+	);
+	`
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("Failed to create table: %v", err)
+		return
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+	stmt, err := tx.Prepare("INSERT OR IGNORE INTO health_data(user_id, timestamp, bpm, steps , spo2, sleep_hours, calories_burned) VALUES(?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	if len(resp.Values) < 2 {
+		log.Println("No data to import (header only or empty sheet)")
+		return
+	}
+
+	header := resp.Values[0]
+	dataRows := resp.Values[1:]
+
+	userIndex, err := findColumnIndex(header, "user_id")
+	if err != nil {
+		log.Fatal(err)
+	}
+	timeIndex, err := findColumnIndex(header, "Time")
+	if err != nil {
+		log.Fatal(err)
+	}
+	heartRateIndex, err := findColumnIndex(header, "HeartRate")
+	if err != nil {
+		log.Fatal(err)
+	}
+	stepsIndex, err := findColumnIndex(header, "Steps")
+	if err != nil {
+		log.Fatal(err)
+	}
+	spo2Index, err := findColumnIndex(header, "SpO2")
+	if err != nil {
+		log.Fatal(err)
+	}
+	sleepIndex, err := findColumnIndex(header, "Sleep")
+	if err != nil {
+		log.Fatal(err)
+	}
+	caloriesIndex, err := findColumnIndex(header, "Calories")
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	for _, row := range dataRows {
+		if len(row) > caloriesIndex { 
+			userID, err := strconv.Atoi(row[userIndex].(string))
+			if err != nil {
+				log.Printf("Failed to parse user_id '%s': %v", row[userIndex], err)
+				continue
+			}
+
+			timeStr := row[timeIndex].(string)
+			t, err := parseTime(timeStr)
+			if err != nil {
+				log.Printf("Failed to parse time string '%s': %v", timeStr, err)
+				continue
+			}
+			// ✅ จัดเก็บในรูปแบบที่ต้องการโดยไม่มีการระบุโซนเวลา เพื่อให้ SQLite จัดการเอง
+			formattedTime := t.Format("2006-01-02 15:04:05")
+
+			bpm, _ := strconv.Atoi(row[heartRateIndex].(string))
+			steps, _ := strconv.Atoi(row[stepsIndex].(string))
+			
+			var spo2 int
+			if row[spo2Index] != nil && row[spo2Index].(string) != "" {
+				spo2, _ = strconv.Atoi(row[spo2Index].(string))
+			}
+			
+			sleepHours := row[sleepIndex].(string)
+			
+			var caloriesBurned int
+			if row[caloriesIndex] != nil && row[caloriesIndex].(string) != "" {
+				caloriesBurned, _ = strconv.Atoi(row[caloriesIndex].(string))
+			}
+		
+			_, err = stmt.Exec(userID, formattedTime, bpm, steps, spo2, sleepHours, caloriesBurned)
+			if err != nil {
+				log.Printf("Failed to insert row for user %d at time %s: %v", userID, formattedTime, err)
+			}
+		} else {
+			log.Printf("Skipping row due to insufficient columns: %v", row)
+		}
+	}
+	tx.Commit()
+	fmt.Println("Data has been successfully imported to the database.")
+}
+
+// startDataImportJob is a Goroutine that periodically imports data.
+func startDataImportJob(sqlDB *sql.DB, spreadsheetID, readRange string) {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			log.Println("Running scheduled health data import...")
+			importHealthData(sqlDB, spreadsheetID, readRange)
+		}
+	}
+}
+
+// -------------------------------------------------------------------
+
+// The main function sets up the server and starts the import job.
 func main() {
+	// Environment variable setup
 	emailUser := os.Getenv("EMAIL_USER")
 	emailPass := os.Getenv("EMAIL_PASS")
 	smtpHost := os.Getenv("SMTP_HOST")
 	smtpPort := os.Getenv("SMTP_PORT")
 
 	log.Println("Email User:", emailUser)
-	log.Println("Email Pass:", emailPass) // แค่ทดสอบ (จริง ๆ ไม่ควร log password)
+	log.Println("Email Pass:", emailPass)
 	log.Println("SMTP Host:", smtpHost, "Port:", smtpPort)
 
-	// open connection database
+	// Open database connection
 	config.ConnectionDB()
-
-	// Generate databases
+	gormDB := config.DB()
 	config.SetupDatabase()
 
-	// Seed ข้อมูล HealthData //////////////////////////////////////
-	seed.SeedHealthData(config.DB())
-	seed.SeedHealthDataTwoWeeks(config.DB())
-	//////////////////////////////////////////////////////////////
+	// Seed data (if needed)
+	seed.SeedHealthData(gormDB)
+	seed.SeedHealthDataTwoWeeks(gormDB)
 
+	sqlDB, err := gormDB.DB()
+	if err != nil {
+		log.Fatalf("Failed to get *sql.DB from GORM: %v", err)
+	}
+
+	// ✅ Perform initial import on startup, reading from row 1 to get the header
+	importHealthData(sqlDB, "1sX8ZK_x9bYX14IrAUvPjw_tj8ASTbvB0z8BleX9gCuE", "Data!A1:G")
+
+	// ✅ Start a background job for periodic imports
+	// แก้ไข readRange เป็น "Data!A1:G" เพื่อให้ดึงข้อมูลพร้อม Header เสมอ
+	go startDataImportJob(sqlDB, "1sX8ZK_x9bYX14IrAUvPjw_tj8ASTbvB0z8BleX9gCuE", "Data!A1:G")
+
+	// Gin framework setup
 	r := gin.Default()
 	r.Use(CORSMiddleware())
-
-	// ✅ Middleware ใส่ DB ลง context
 	r.Use(middlewares.DBMiddleware(config.DB()))
 
-	// Auth Route
+	// Define routes...
 	r.POST("/signup", users.SignUp)
 	r.POST("/signin", users.SignIn)
 	r.POST("/create-admin", users.CreateAdmin)
@@ -76,94 +325,62 @@ func main() {
 	router := r.Group("/")
 	{
 		router.Use(middlewares.Authorizes())
-
-	
-	r.Static("/uploads", "./uploads")
-
-		// User Route
+		r.Static("/uploads", "./uploads")
 		router.PUT("/user/:id", users.Update)
 		router.GET("/users", users.GetAll)
 		router.GET("/user/:id", users.Get)
 		router.DELETE("/user/:id", users.Delete)
-
-		//Calendar Route
 		router.GET("/calendar", calendar.ListCalendar)
 		router.POST("/create-calendar", calendar.CreateCalendar)
 		router.DELETE("/delete-calendar/:id", calendar.DeleteCalendar)
-
-		//Notification Route
 		router.POST("/create-notification/:id", notification.CreateNotification)
 		router.GET("/notification/:id", notification.GetNotificationsByUserID)
 		router.PATCH("/notification/:id/status", notification.UpdateNotificationStatusByID)
-
-		// Email Route
 		router.GET("/send-weekly-summary/:userID", func(c *gin.Context) {
 			id, _ := strconv.Atoi(c.Param("userID"))
 			go gmail.SendWeeklySummary(config.DB(), uint(id))
 			c.JSON(200, gin.H{"message": "Weekly summary email process started", "userID": id})
 		})
 		router.POST("/check-realtime-alert", gmail.SendRealtimeAlert)
-
-		//Article Route
 		router.POST("/create-article/:id", article.CreateArticle)
 		router.GET("/list-article", article.ListArticles)
 		router.GET("/article/:id", article.GetArticleByID)
 		router.PUT("/update-article/:id", article.UpdateArticle)
 		router.DELETE("/delete-article/:id", article.DeleteArticle)
-
 		router.PUT("/order-articles", article.UpdateArticleOrder)
 		router.PUT("/article/:id/publishArticleNow", article.PublishArticleNow)
 		router.PUT("/article/:id/unpublishArticle", article.UnpublishArticle)
-
-		//healthSummary Route
 		router.GET("/list-healthSummary", healthSummary.ListHealthSummary)
 		router.GET("/healthSummary/:id", healthSummary.GetHealthSummary)
 		router.GET("/healthSummary/weekly/:id", healthSummary.GetWeeklySummary)
-
-		//healthAnalysis Route
 		router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
-// ✅ Endpoint สำหรับเรียก Gemini on-demand
 		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
-
-		//HealthData Route
 		router.GET("/list-healthData", healthData.ListHealthData)
 		router.GET("/healthData/:id", healthData.GetHealthDataByUserID)
 		router.GET("/healthData/weekly/:id", healthData.GetWeeklyHealthData)
-
-		// Daily APIs
 		router.GET("/daily-heart-rate", healthData.GetDailyHeartRate)
 		router.GET("/daily-steps", healthData.GetDailySteps)
 		router.GET("/daily-calories", healthData.GetDailyCalories)
 		router.GET("/daily-spo2", healthData.GetDailySpo2)
 		router.GET("/daily-sleep", healthData.GetDailySleep)
-
-		//SmartwatchDevice Route
 		router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
 		router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
-
-		//Count Route
 		router.GET("/admin-counts", count.GetAdminCounts)
 	}
 
 	r.GET("/genders", genders.GetAll)
-
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
-    // ✅ ส่วนนี้คือตำแหน่งที่ถูกต้องในการเริ่มต้น Goroutine
-    go healthAnalysis.CheckForCriticalAlerts(context.Background())
-	 // ✅ เพิ่มบรรทัดนี้เพื่อรัน WeeklyAnalysisJob
-    go healthAnalysis.WeeklyAnalysisJob(context.Background())
-	// Run the server
+	go healthAnalysis.CheckForCriticalAlerts(context.Background())
+	go healthAnalysis.WeeklyAnalysisJob(context.Background())
 	r.Run("localhost:" + PORT)
 }
 
 func CORSMiddleware() gin.HandlerFunc {
-
 	return func(c *gin.Context) {
-
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")

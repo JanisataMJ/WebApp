@@ -4,7 +4,6 @@ import Headers from '../../compronents/Pubblic_components/headerselect';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { GetUsersById } from '../../services/https/User/user';
-//import { UsersInterface } from '../../interface/profile_interface/IProfile';
 import { UsersInterface } from '../../interface/user_interface/IUser';
 import { message, Spin } from 'antd';
 import dayjs from 'dayjs';
@@ -55,7 +54,6 @@ const Profile: React.FC = () => {
             GenderID: userData.genderID || undefined
           });
 
-          // แปลง roleID เป็น number
           const numericRoleID = userData.RoleID ? Number(userData.RoleID) : null;
           setRoleID(numericRoleID);
 
@@ -86,6 +84,18 @@ const Profile: React.FC = () => {
     }
   };
 
+  // New function to handle back button click based on roleID
+  const handleGoBack = () => {
+    if (roleID === 1) {
+      navigate('/admin/home');
+    } else if (roleID === 2) {
+      navigate('/home');
+    } else {
+      // Fallback for unexpected roleID or if roleID is null
+      navigate(-1);
+    }
+  };
+
   return (
     <>
       {contextHolder}
@@ -94,7 +104,7 @@ const Profile: React.FC = () => {
         <div className="profile-title-section">
           <button
             className="profile-back-button"
-            onClick={() => navigate(-1)}
+            onClick={handleGoBack} // Call the new function here
             type="button"
             aria-label="Go Back"
           >
@@ -104,7 +114,6 @@ const Profile: React.FC = () => {
         </div>
 
         <div className='profile-container'>
-
           {loading ? (
             <Spin />
           ) : (
@@ -113,7 +122,6 @@ const Profile: React.FC = () => {
               <Link to="/editProfile" className="editProfile">
                 แก้ไข
               </Link>
-
               <div className="profile-header">
                 {users?.Profile ? (
                   <img
@@ -128,62 +136,50 @@ const Profile: React.FC = () => {
                   {users?.Username || 'Username not found'}
                 </h2>
               </div>
-
               <div className="profile-content">
                 <div className="item">
                   <span className="label">ชื่อ:</span>
                   <span className="value">{users ? `${users.FirstName} ${users.LastName}` : '-'}</span>
-
                   <span className="label">อีเมล:</span>
                   <span className="value">{users?.Email || '-'}</span>
                 </div>
-
                 <div className="item">
                   <span className="label">เพศ:</span>
                   <span className="value">{getGenderName(users?.GenderID)}</span>
-
                   <span className="label">วันเกิด:</span>
                   <span className="value">
                     {users?.BirthDay ? dayjs(users.BirthDay).format('DD/MM/YYYY') : '-'}
                   </span>
                 </div>
-
                 <div className="item">
                   <span className="label">เบอร์โทรศัพท์:</span>
                   <span className="value">{users?.Phonenumber || '-'}</span>
                 </div>
-
                 {roleID !== 1 && (
                   <>
                     <div className="item">
                       <span className="label">น้ำหนัก:</span>
                       <span className="value">{users?.Weight ? `${users.Weight} กก.` : 'ไม่ระบุ'}</span>
-
                       <span className="label">ส่วนสูง:</span>
                       <span className="value">{users?.Height ? `${users.Height} ซม.` : 'ไม่ระบุ'}</span>
                     </div>
-
                     <div className="item">
                       <span className="label">รอบอก:</span>
                       <span className="value">{users?.Bust ? `${users.Bust} ซม.` : 'ไม่ระบุ'}</span>
-
                       <span className="label">เอว:</span>
                       <span className="value">{users?.Waist ? `${users.Waist} ซม.` : 'ไม่ระบุ'}</span>
                     </div>
-
                     <div className="item">
                       <span className="label">สะโพก:</span>
                       <span className="value">{users?.Hip ? `${users.Hip} ซม.` : 'ไม่ระบุ'}</span>
                     </div>
                   </>
                 )}
-
               </div>
             </div>
           )}
         </div>
       </div>
-
     </>
   );
 };

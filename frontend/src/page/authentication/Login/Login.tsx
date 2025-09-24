@@ -68,7 +68,7 @@ const Login: React.FC = () => {
                 <div>
                     <img id="Logo" src={logo} alt="Logo" style={{ width: "120px", height: "120px" }} />
                 </div>
-                <h1 className="signin-title">Sign In</h1>
+                <h1 className="signin-title">Sign In User</h1>
 
                 <div className="signin-container">
                     <form onSubmit={onSubmit}>
@@ -88,7 +88,7 @@ const Login: React.FC = () => {
                         </div>
 
                         <div className="signin-button-group">
-                            <button type="button" className="signup-btn" onClick={Signup} >Sign Up</button>
+                           {/*  <button type="button" className="signup-btn" onClick={Signup} >Sign Up</button> */}
                             <button type="submit" className="login-btn" >Sign In</button>
                         </div>
                     </form>

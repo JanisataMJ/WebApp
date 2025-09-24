@@ -34,11 +34,11 @@ interface CustomTooltipProps {
 
 const STEP_LENGTH_M = 0.75; // ความยาวก้าวเฉลี่ย (เมตร)
 const USER_WEIGHT_KG = 60; // น้ำหนักผู้ใช้ (kg)
-const TARGET_STEPS = 10000;
 
 const DairySteps: React.FC = () => {
   const [data, setData] = useState<StepsData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [targetSteps, setTargetSteps] = useState(10000); // เปลี่ยนเป็น state
   const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
@@ -48,9 +48,7 @@ const DairySteps: React.FC = () => {
         const response = await getDailySteps(UserID);
         const rawSteps: Partial<StepsData>[] = Array.isArray(response) ? response : response.data || [];
 
-        // Map data และคำนวณ cumulative, distance, calories
         const stepsArray: StepsData[] = rawSteps.map((item: any, index: number) => {
-          const prevCumulative = index === 0 ? 0 : rawSteps[index - 1].cumulativeSteps || 0;
           const steps = index === 0
             ? item.steps || 0
             : (item.steps || 0) - (rawSteps[index - 1].steps || 0);
@@ -80,12 +78,11 @@ const DairySteps: React.FC = () => {
     };
 
     fetchStepsData();
-  }, []);
+  }, [UserID]);
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   if (!data || data.length === 0) return <div>ไม่พบข้อมูลการเดินของวันนี้</div>;
 
-  // สร้าง hourlyData
   const hourlyData = data.map(item => ({
     hour: item.time,
     steps: item.steps,
@@ -93,11 +90,10 @@ const DairySteps: React.FC = () => {
     intensity: item.intensity
   }));
 
-  // สรุปข้อมูลวัน
   const stepsSummary: StepsSummary = (() => {
     if (!data || data.length === 0) return {
       totalSteps: 0,
-      targetSteps: TARGET_STEPS,
+      targetSteps: targetSteps,
       completionPercentage: 0,
       totalDistance: 0,
       totalCalories: 0,
@@ -115,8 +111,8 @@ const DairySteps: React.FC = () => {
 
     return {
       totalSteps,
-      targetSteps: TARGET_STEPS,
-      completionPercentage: (totalSteps / TARGET_STEPS) * 100,
+      targetSteps: targetSteps,
+      completionPercentage: (totalSteps / targetSteps) * 100,
       totalDistance: Math.round(totalDistance * 100) / 100,
       totalCalories: Math.round(totalCalories),
       activeMinutes: activeHours * 60,
@@ -126,7 +122,6 @@ const DairySteps: React.FC = () => {
     };
   })();
 
-  // intensity distribution
   const intensityData = data.reduce((acc, item) => {
     acc[item.intensity] = (acc[item.intensity] || 0) + item.steps;
     return acc;
@@ -142,7 +137,6 @@ const DairySteps: React.FC = () => {
     percentage: (item.value / stepsSummary.totalSteps) * 100
   })).filter(item => item.value > 0);
 
-  // progress radial
   const progressData = [
     {
       name: 'Progress',
@@ -218,6 +212,21 @@ const DairySteps: React.FC = () => {
     <div className="steps-container">
       <div className="header-section-step">
         <h2 className="title-step">จำนวนก้าว</h2>
+        {/* เพิ่ม Input Field สำหรับตั้งค่าเป้าหมาย */}
+        <div className="target-input-group">
+          <label htmlFor="target-steps" className="target-label">ตั้งเป้าหมายก้าว</label>
+          <div className="input-with-unit">
+            <input
+              id="target-steps"
+              type="number"
+              value={targetSteps}
+              onChange={(e) => setTargetSteps(Number(e.target.value))}
+              className="target-input"
+              min="0"
+            />
+            <span className="unit-label">ก้าว</span>
+          </div>
+        </div>
 
         {/* สถิติสรุป */}
         <div className="steps-stats-grid">
@@ -285,8 +294,8 @@ const DairySteps: React.FC = () => {
                 {progress.emoji} {progress.text}
               </div>
               <div className="progress-details-step">
-                <p>🎯 เป้าหมาย: {formatNumber(TARGET_STEPS)} ก้าว</p>
-                <p>📈 เหลืออีก: {formatNumber(Math.max(0, TARGET_STEPS - stepsSummary.totalSteps))} ก้าว</p>
+                <p>🎯 เป้าหมาย: {formatNumber(targetSteps)} ก้าว</p>
+                <p>📈 เหลืออีก: {formatNumber(Math.max(0, targetSteps - stepsSummary.totalSteps))} ก้าว</p>
                 <p>⭐ ช่วงที่เดินมากที่สุด: {stepsSummary.peakHour} ({formatNumber(stepsSummary.peakSteps)} ก้าว)</p>
               </div>
             </div>

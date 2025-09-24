@@ -33,7 +33,7 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
         lastName: adminData.lastName,
         email: adminData.email,
         phonenumber: adminData.phonenumber,
-        gender: adminData.genderID,
+        gender: adminData.genderID === 1 ? "Male" : "Female",
         birthdate: adminData.birthdate ? moment(adminData.birthdate) : null,
       });
 
@@ -110,8 +110,8 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
       formData.append("lastName", values.lastName);
       formData.append("email", values.email);
       formData.append("phonenumber", values.phonenumber);
-      formData.append("genderID", values.gender.toString());
-      if (birthdate) formData.append("birthdate", birthdate); // <-- ใช้ state ตรงนี้
+      formData.append("genderID", values.gender === "Male" ? "1" : "2");
+      if (birthdate) formData.append("birthdate", birthdate);
 
       if (fileList[0]?.originFileObj) {
         formData.append("profile", fileList[0].originFileObj);
@@ -245,7 +245,7 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                     >
                       <Input className="edit-admin-form-input" placeholder="เบอร์โทรศัพท์" maxLength={10} />
                     </Form.Item>
-                    
+
                     <Form.Item
                       label="วันเกิด"
                       name="birthdate"
@@ -268,12 +268,15 @@ const EditAdmin: React.FC<EditAdminModalProps> = ({ open, onCancel, onSuccess, a
                       name="gender"
                       className="edit-admin-form-item"
                       rules={[{ required: true, message: 'กรุณาเลือกเพศ' }]}
+                      valuePropName="value"
+                      getValueFromEvent={(e) => e.target.value} // ดึงค่าจาก select
                     >
                       <select className="form-input">
                         <option value="Male">ผู้ชาย</option>
                         <option value="Female">ผู้หญิง</option>
                       </select>
                     </Form.Item>
+
                   </div>
                 </div>
               </Form>

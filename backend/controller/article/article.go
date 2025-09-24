@@ -258,20 +258,6 @@ type OrderUpdate struct {
 	Order int  `json:"order"`
 }
 
-/* func UpdateArticleOrder(c *gin.Context) {
-	var updates []OrderUpdate
-	if err := c.ShouldBindJSON(&updates); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	db := config.DB()
-	for _, u := range updates {
-		db.Model(&entity.Article{}).Where("id = ?", u.ID).Update("order", u.Order)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Order updated"})
-} */
 
 // DELETE /articles/:id
 func DeleteArticle(c *gin.Context) {

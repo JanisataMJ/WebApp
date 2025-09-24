@@ -29,7 +29,7 @@ type HealthSummaryResponse struct {
 // แปลง "7 h. 30 m." เป็น 7.5
 func ParseSleepHours(s string) float64 {
 	var hours, minutes float64
-	_, err := fmt.Sscanf(s, "%f h. %f m.", &hours, &minutes)
+	_, err := fmt.Sscanf(s, "%f h %f m", &hours, &minutes)
 	if err != nil {
 		return 0
 	}

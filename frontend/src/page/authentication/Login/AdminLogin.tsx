@@ -62,7 +62,7 @@ const AdminLogin: React.FC = () => {
                 <div>
                     <img id="Logo" src={logo} alt="Logo" style={{ width: "120px", height: "120px" }} />
                 </div>
-                <h1 className="signin-title">Admin</h1>
+                <h1 className="signin-title">Sign In Admin</h1>
 
                 <div className="signin-container">
                     <form onSubmit={onSubmit}>

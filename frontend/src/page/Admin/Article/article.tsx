@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Spin, Button, Popconfirm, message, Tag } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { PictureOutlined } from "@ant-design/icons";
 import Headers from '../../../compronents/Pubblic_components/headerselect';
 import AddArticle from './create_article/create_article';
 import EditArticle from './edit_article/edit_article';
@@ -8,7 +9,6 @@ import { ArticleInterface } from '../../../interface/article_interface/article';
 import {
   getAllArticles,
   deleteArticle,
-  updateArticleOrder,
   publishArticleNow,
   unpublishArticle
 } from '../../../services/https/Article/article';
@@ -28,7 +28,9 @@ const ArticlePage: React.FC = () => {
     setLoading(true);
     try {
       const data = await getAllArticles();
-      setArticles(data.sort((a, b) => (a.Order || 0) - (b.Order || 0)));
+      setArticles(data.sort((a, b) =>
+        new Date(b.PublishDate || "").getTime() - new Date(a.PublishDate || "").getTime()
+      ));
     } catch (err: any) {
       message.error("Failed to fetch articles: " + err.message);
     } finally {
@@ -72,25 +74,6 @@ const ArticlePage: React.FC = () => {
     }
   };
 
-  // Drag and drop
-  const handleDragEnd = async (result: any) => {
-    if (!result.destination) return;
-
-    const newArticles = Array.from(articles);
-    const [moved] = newArticles.splice(result.source.index, 1);
-    newArticles.splice(result.destination.index, 0, moved);
-
-    const updated = newArticles.map((art, index) => ({ ...art, Order: index + 1 }));
-    setArticles(updated);
-
-    try {
-      await updateArticleOrder(updated);
-      message.success("Article order updated!");
-    } catch (err: any) {
-      message.error("Failed to update order: " + err.message);
-    }
-  };
-
   if (loading) {
     return (
       <div>
@@ -117,121 +100,103 @@ const ArticlePage: React.FC = () => {
           />
         </div>
 
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="articles">
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="articles-grid-article"
+        <div className="articles-grid-article">
+          {articles.map((article) => (
+            <div
+              key={article.ID}
+              className="article-card-wrapper-article"
+            >
+              <Card
+                hoverable
+                className={`article-card-article ${article.Published
+                  ? "published-card-article"
+                  : "unpublished-card-article"
+                  }`}
+                cover={
+                  article.Image ? (
+                    <div className="card-image-container-article">
+                      <img
+                        alt={article.Title}
+                        src={article.Image.startsWith("http")
+                          ? article.Image
+                          : `http://localhost:8000/${article.Image}`}
+                        className="card-image-article"
+                      />
+                    </div>
+                  ) : (
+                    <div className="no-image-placeholder-article">
+                      <PictureOutlined style={{ fontSize: 40, color: "#bbb" }} />
+                    </div>
+
+                  )
+                }
               >
-                {articles.map((article, index) => (
-                  <Draggable key={article.ID} draggableId={article.ID.toString()} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="article-card-wrapper-article"
-                      >
-                        <Card
-                          key={article.ID}
-                          hoverable
-                          className={`article-card-article ${article.Published
-                              ? "published-card-article"
-                              : "unpublished-card-article"
-                            }`}
-                          cover={
-                            article.Image ? (
-                              <div className="card-image-container-article">
-                                <img
-                                  alt={article.Title}
-                                  src={article.Image.startsWith("http")
-                                    ? article.Image
-                                    : `http://localhost:8000/${article.Image}`}
-                                  className="card-image-article"
-                                />
-                              </div>
-                            ) : (
-                              <div className="no-image-placeholder-article">
-                                <span>📷 No Image</span>
-                              </div>
-                            )
-                          }
-                        >
-                          {/* ปุ่มเผยแพร่เป็นวงกลม มุมบนขวา */}
-                          <Button
-                            shape="circle"
-                            size="small"
-                            className={`publish-button-article ${article.Published
-                                ? "published-button-article"
-                                : "unpublished-button-article"
-                              }`}
-                            onClick={() =>
-                              article.Published
-                                ? handleUnpublish(article.ID)
-                                : handlePublish(article.ID)
-                            }
-                          />
+                {/* ปุ่มเผยแพร่เป็นวงกลม มุมบนขวา */}
+                <Button
+                  shape="circle"
+                  size="small"
+                  className={`publish-button-article ${article.Published
+                    ? "published-button-article"
+                    : "unpublished-button-article"
+                    }`}
+                  onClick={() =>
+                    article.Published
+                      ? handleUnpublish(article.ID)
+                      : handlePublish(article.ID)
+                  }
+                />
 
-                          <Meta
-                            title={<span className="card-title-article">{article.Title}</span>}
-                            description={
-                              <div className="card-description-article">
-                                <p className="card-info-article">{article.Information}</p>
-                                <div className="card-reference-article">
-                                  <small>แหล่งอ้างอิง: {article.Reference}</small>
-                                </div>
-                                {article.PublishDate && (
-                                  <div className={`publish-date-article ${article.Published ? "published-date-article" : "unpublished-date-article"
-                                    }`}>
-                                    <small>
-                                      วันที่เผยแพร่ล่าสุด: {moment(article.PublishDate).format("DD/MM/YYYY HH:mm")}
-                                    </small>
-                                  </div>
-                                )}
-                              </div>
-                            }
-                          />
-
-                          {/* ปุ่มแก้ไขและลบ */}
-                          <div className="card-actions-article">
-                            <Button
-                              type="link"
-                              className="edit-button-article"
-                              onClick={() => setEditing(article)}
-                            >
-                              ✏️ แก้ไข
-                            </Button>
-
-                            <Popconfirm
-                              title="ยืนยันการลบบทความ?"
-                              onConfirm={() => handleDelete(article.ID)}
-                              okText="ใช่"
-                              cancelText="ยกเลิก"
-                              placement="topRight"
-                            >
-                              {/* เปลี่ยน type เป็น "default" หรือ "text" แทน "link" */}
-                              <Button
-                                type="text"
-                                danger
-                                className="delete-button-article"
-                              >
-                                🗑️ ลบ
-                              </Button>
-                            </Popconfirm>
-                          </div>
-
-                        </Card>
+                <Meta
+                  title={<span className="card-title-article">{article.Title}</span>}
+                  description={
+                    <div className="card-description-article">
+                      <p className="card-info-article">{article.Information}</p>
+                      <div className="card-reference-article">
+                        <small>แหล่งอ้างอิง: {article.Reference}</small>
                       </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+                      {article.PublishDate && (
+                        <div className={`publish-date-article ${article.Published ? "published-date-article" : "unpublished-date-article"
+                          }`}>
+                          <small>
+                            วันที่เผยแพร่ล่าสุด: {moment(article.PublishDate).format("DD/MM/YYYY HH:mm")}
+                          </small>
+                        </div>
+                      )}
+                    </div>
+                  }
+                />
+
+                {/* ปุ่มแก้ไขและลบ */}
+                <div className="card-actions-article">
+                  <Button
+                    type="link"
+                    className="edit-button-article"
+                    onClick={() => setEditing(article)}
+                  >
+                    ✏️ แก้ไข
+                  </Button>
+
+                  <Popconfirm
+                    title="ยืนยันการลบบทความ?"
+                    onConfirm={() => handleDelete(article.ID)}
+                    okText="ใช่"
+                    cancelText="ยกเลิก"
+                    placement="topRight"
+                  >
+                    <Button
+                      type="text"
+                      danger
+                      className="delete-button-article"
+                    >
+                      🗑️ ลบ
+                    </Button>
+                  </Popconfirm>
+                </div>
+
+              </Card>
+            </div>
+          ))}
+        </div>
 
         {/* Modal แก้ไข */}
         {editing && (

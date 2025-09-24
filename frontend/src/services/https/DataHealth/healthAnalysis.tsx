@@ -43,3 +43,15 @@ export const getHealthAnalysisByUserID = async (
     throw new Error("Error fetching health analysis: " + (error as Error).message);
   }
 };
+
+export const GetSleepAnalysisByUser = async (userId: number) => {
+  try {
+    const requestOptions = getRequestOptions();
+    const res = await axios.get(`${apiUrl}/sleep-analysis/${userId}`, 
+      requestOptions
+    );
+    return res.data;
+  } catch (err: any) {
+    throw new Error("Error fetching sleep analysis: " + err.message);
+  }
+};

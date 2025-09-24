@@ -126,8 +126,8 @@
 .no-image-placeholder-article {
   height: 200px;
   display: flex;
-  items-center: center;
-  justify-content: center;
+  align-items: center;     /* <<< ตรงนี้แก้จาก items-center */
+  justify-content: center; /* จัดตรงกลางแนวนอน */
   background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
   color: #9ca3af;
   font-size: 1.1rem;

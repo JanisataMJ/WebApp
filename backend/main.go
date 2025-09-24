@@ -11,9 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	// Existing imports
 	"github.com/JanisataMJ/WebApp/config"
-	calendar "github.com/JanisataMJ/WebApp/controller/Calendar"
 	"github.com/JanisataMJ/WebApp/controller/admin_count"
 	"github.com/JanisataMJ/WebApp/controller/article"
 	"github.com/JanisataMJ/WebApp/controller/gender"
@@ -44,11 +42,6 @@ func init() {
 	}
 }
 
-// ====================================================================
-// ✅ New functions for Google Sheets & SQLite
-// ====================================================================
-
-// getClient uses a Context and a Config to retrieve a Token then saves it.
 func getClient(config *oauth2.Config) *http.Client {
 	tokFile := "token.json"
 	tok, err := tokenFromFile(tokFile)
@@ -59,7 +52,6 @@ func getClient(config *oauth2.Config) *http.Client {
 	return config.Client(context.Background(), tok)
 }
 
-// getTokenFromWeb retrieves a Token from a web user.
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the " +
@@ -77,7 +69,6 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	return tok
 }
 
-// tokenFromFile retrieves a Token from a given file path.
 func tokenFromFile(file string) (*oauth2.Token, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -89,7 +80,6 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 	return tok, err
 }
 
-// saveToken saves a Token to a file path.
 func saveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", path)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
@@ -103,7 +93,6 @@ func saveToken(path string, token *oauth2.Token) {
 	}
 }
 
-// findColumnIndex searches for a column name in the header row and returns its index.
 func findColumnIndex(header []interface{}, name string) (int, error) {
 	for i, col := range header {
 		if col.(string) == name {
@@ -113,11 +102,10 @@ func findColumnIndex(header []interface{}, name string) (int, error) {
 	return -1, fmt.Errorf("column '%s' not found in header", name)
 }
 
-// ✅ New function to parse time with multiple layouts
 func parseTime(timeStr string) (time.Time, error) {
     layouts := []string{
-        "2/1/2006, 15:04:05", // D/M/YYYY, H:M:S (e.g., 8/9/2025, 22:40:08)
-        "2/1/2006 15:04:05",  // D/M/YYYY H:M:S (e.g., 8/9/2025 22:40:08)
+        "2/1/2006, 15:04:05", 
+        "2/1/2006 15:04:05",  
     }
 
     for _, layout := range layouts {
@@ -129,9 +117,7 @@ func parseTime(timeStr string) (time.Time, error) {
     return time.Time{}, fmt.Errorf("failed to parse time string '%s' with any known layout", timeStr)
 }
 
-// importHealthData imports data from a Google Sheet into the database.
 func importHealthData(db *sql.DB, spreadsheetID, readRange string) {
-	// 1. Google Sheets API setup remains the same
 	b, err := os.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -146,14 +132,12 @@ func importHealthData(db *sql.DB, spreadsheetID, readRange string) {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	// ✅ อ่านช่วงข้อมูลทั้งหมดรวมทั้งแถว Header
 	resp, err := srv.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
 	if err != nil || resp.Values == nil {
 		log.Fatalf("Unable to retrieve data from sheet: %v", err)
 	}
 	fmt.Println("Data retrieved from Google Sheets. Now importing to SQLite...")
 
-	// 2. Database schema validation
 	sqlStmt := `
 	CREATE TABLE IF NOT EXISTS health_data (
 		user_id INTEGER,
@@ -233,7 +217,7 @@ func importHealthData(db *sql.DB, spreadsheetID, readRange string) {
 				log.Printf("Failed to parse time string '%s': %v", timeStr, err)
 				continue
 			}
-			// ✅ จัดเก็บในรูปแบบที่ต้องการโดยไม่มีการระบุโซนเวลา เพื่อให้ SQLite จัดการเอง
+
 			formattedTime := t.Format("2006-01-02 15:04:05")
 
 			bpm, _ := strconv.Atoi(row[heartRateIndex].(string))
@@ -263,7 +247,6 @@ func importHealthData(db *sql.DB, spreadsheetID, readRange string) {
 	fmt.Println("Data has been successfully imported to the database.")
 }
 
-// startDataImportJob is a Goroutine that periodically imports data.
 func startDataImportJob(sqlDB *sql.DB, spreadsheetID, readRange string) {
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
@@ -277,11 +260,8 @@ func startDataImportJob(sqlDB *sql.DB, spreadsheetID, readRange string) {
 	}
 }
 
-// -------------------------------------------------------------------
 
-// The main function sets up the server and starts the import job.
 func main() {
-	// Environment variable setup
 	emailUser := os.Getenv("EMAIL_USER")
 	emailPass := os.Getenv("EMAIL_PASS")
 	smtpHost := os.Getenv("SMTP_HOST")
@@ -291,12 +271,10 @@ func main() {
 	log.Println("Email Pass:", emailPass)
 	log.Println("SMTP Host:", smtpHost, "Port:", smtpPort)
 
-	// Open database connection
 	config.ConnectionDB()
 	gormDB := config.DB()
 	config.SetupDatabase()
 
-	// Seed data (if needed)
 	seed.SeedHealthData(gormDB)
 	seed.SeedHealthDataTwoWeeks(gormDB)
 
@@ -305,11 +283,8 @@ func main() {
 		log.Fatalf("Failed to get *sql.DB from GORM: %v", err)
 	}
 
-	// ✅ Perform initial import on startup, reading from row 1 to get the header
 	importHealthData(sqlDB, "1sX8ZK_x9bYX14IrAUvPjw_tj8ASTbvB0z8BleX9gCuE", "Data!A1:G")
 
-	// ✅ Start a background job for periodic imports
-	// แก้ไข readRange เป็น "Data!A1:G" เพื่อให้ดึงข้อมูลพร้อม Header เสมอ
 	go startDataImportJob(sqlDB, "1sX8ZK_x9bYX14IrAUvPjw_tj8ASTbvB0z8BleX9gCuE", "Data!A1:G")
 
 	// Gin framework setup
@@ -330,9 +305,6 @@ func main() {
 		router.GET("/users", users.GetAll)
 		router.GET("/user/:id", users.Get)
 		router.DELETE("/user/:id", users.Delete)
-		router.GET("/calendar", calendar.ListCalendar)
-		router.POST("/create-calendar", calendar.CreateCalendar)
-		router.DELETE("/delete-calendar/:id", calendar.DeleteCalendar)
 		router.POST("/create-notification/:id", notification.CreateNotification)
 		router.GET("/notification/:id", notification.GetNotificationsByUserID)
 		router.PATCH("/notification/:id/status", notification.UpdateNotificationStatusByID)
@@ -347,7 +319,6 @@ func main() {
 		router.GET("/article/:id", article.GetArticleByID)
 		router.PUT("/update-article/:id", article.UpdateArticle)
 		router.DELETE("/delete-article/:id", article.DeleteArticle)
-		router.PUT("/order-articles", article.UpdateArticleOrder)
 		router.PUT("/article/:id/publishArticleNow", article.PublishArticleNow)
 		router.PUT("/article/:id/unpublishArticle", article.UnpublishArticle)
 		router.GET("/list-healthSummary", healthSummary.ListHealthSummary)
@@ -355,6 +326,7 @@ func main() {
 		router.GET("/healthSummary/weekly/:id", healthSummary.GetWeeklySummary)
 		router.GET("/list-healthAnalysis", healthAnalysis.ListHealthAnalysis)
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
+		router.GET("/sleep-analysis/:id", healthAnalysis.GetSleepAnalysisByUser)
 		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
 		router.GET("/list-healthData", healthData.ListHealthData)
 		router.GET("/healthData/:id", healthData.GetHealthDataByUserID)

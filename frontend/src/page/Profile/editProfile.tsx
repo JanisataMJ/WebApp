@@ -314,7 +314,8 @@ const EditProfile: React.FC = () => {
                                         <div className="form-group">
                                             <label>วันเกิด</label>
                                             <Form.Item
-                                                label="วันเกิด"
+                                                name="gender"
+                                                className="form-item"
                                                 rules={[{ required: true, message: 'กรุณาเลือกวันเกิด' }]}
                                             >
                                                 <input

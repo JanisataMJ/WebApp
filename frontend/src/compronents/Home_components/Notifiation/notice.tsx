@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './Notice.css';
-import { Mail, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell , X, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   getNotificationByUserID,
   sendWeeklySummary,
   updateNotificationStatusByID,
 } from '../../../services/https/Notification/notification';
 import { NotificationInterface } from '../../../interface/notification_interface/notification';
-//import TestSummaryButton from './testSumButton';
 
 const Notice: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,6 +16,11 @@ const Notice: React.FC = () => {
 
   const showModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);  
+
+  // นับจำนวนแจ้งเตือนที่ยังไม่อ่าน
+  const unreadCount = notifications.filter(
+    (n) => n.NotificationStatus?.Status === 'ยังไม่อ่าน'
+  ).length;
 
   // โหลดข้อมูลแจ้งเตือน
   useEffect(() => {
@@ -106,7 +110,10 @@ const Notice: React.FC = () => {
     <>
       {/* Floating Button */}
       <button className="floating-button" onClick={showModal}>
-        <Mail className="icon-noti" />
+        <Bell  className="icon-noti" />
+        {unreadCount > 0 && (
+          <span className="badge-noti">{unreadCount}</span>
+        )}
       </button>
 
       {/* Modal */}
@@ -115,31 +122,6 @@ const Notice: React.FC = () => {
           <div className="modal-noti">
             <h2 className="modal-title">แจ้งเตือนสุขภาพ</h2>
             <p className="modal-subtitle">สุขภาพของคุณสำคัญที่สุด</p>
-
-            {/*
-            <div className="test-button">
-              <TestSummaryButton
-                onSent={async () => {
-                  const res = await getNotificationByUserID(UserID);
-                  const safeNotifications = res
-                    .filter((n): n is NotificationInterface => !!n && !!n.Timestamp)
-                    .map((n) => ({
-                      ID: n.ID,
-                      Timestamp: n.Timestamp || new Date().toISOString(),
-                      Title: n.Title || '',
-                      Message: n.Message || '',
-                      UserID: n.UserID,
-                      HealthTypeID: n.HealthTypeID,
-                      NotificationStatusID: n.NotificationStatusID,
-                      HealthType: n.HealthType || { ID: 0, Type: 'ไม่ระบุ' },
-                      NotificationStatus: n.NotificationStatus || { ID: n.NotificationStatusID, Status: 'ไม่ทราบสถานะ' },
-                    }))
-                    .sort((a, b) => new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime());
-
-                  setNotifications(safeNotifications);
-                }}
-              />
-            </div> */}
 
             {/* เนื้อหาที่ scroll ได้ */}
             <div className="modal-body-noti">

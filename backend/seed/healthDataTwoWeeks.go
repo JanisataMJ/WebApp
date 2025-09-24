@@ -55,6 +55,10 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	// ---------------------------
 	for daysAgo := 13; daysAgo >= 0; daysAgo-- { // 14 วัน
 		day := now.AddDate(0, 0, -daysAgo)
+
+		sleepStart := 20 // เริ่มนอน 20.00
+		sleepEnd := 5    // ตื่น 05.00
+
 		for hour := 0; hour < 24; hour++ {
 			hd := entity.HealthData{
 				Timestamp:      day.Add(time.Duration(hour) * time.Hour),
@@ -65,12 +69,15 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 				SleepHours:     "0",
 				UserID:         user.ID,
 			}
-			if hour >= 0 && hour < 6 {
+
+			// ✅ ถ้าอยู่ในช่วงนอน
+			if (hour >= sleepStart && hour <= 23) || (hour >= 0 && hour < sleepEnd) {
 				hd.Bpm = uint(50 + rand.Intn(10))
 				hd.Steps = 0
 				hd.Spo2 = 96
-				hd.SleepHours = fmt.Sprintf("%d h.", hour+1)
+				hd.SleepHours = "1" // หนึ่งชั่วโมงต่อ record
 			}
+
 			db.Create(&hd)
 
 			analyses := []entity.HealthAnalysis{

@@ -45,11 +45,12 @@ export const getHealthSummaryByUserID = async (
 };
 
 export const GetWeeklySummary = async (
-  userId: number
-): Promise<HealthSummaryInterface> => {   // 👈 ไม่ต้องเป็น array
+  userId: number,
+  mode: "weekly" | "last7days" | "lastweek" | "last2weeks" = "weekly"
+): Promise<HealthSummaryInterface> => {
   const requestOptions = getRequestOptions();
   const response = await axios.get<HealthSummaryInterface>(
-    `${apiUrl}/healthSummary/weekly/${userId}`,
+    `${apiUrl}/healthSummary/weekly/${userId}?mode=${mode}`, 
     requestOptions
   );
   return response.data;

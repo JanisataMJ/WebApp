@@ -74,9 +74,9 @@ const Profile: React.FC = () => {
   const getGenderName = (genderID?: number) => {
     switch (genderID) {
       case 1:
-        return 'Male';
+        return 'ผู้ชาย';
       case 2:
-        return 'Female';
+        return 'ผู้หญิง';
       case 3:
         return 'Other';
       default:

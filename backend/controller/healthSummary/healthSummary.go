@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"log"
 
 	"github.com/JanisataMJ/WebApp/config"
 	"github.com/JanisataMJ/WebApp/entity"
@@ -77,58 +76,41 @@ func GetHealthSummary(c *gin.Context) {
 	c.JSON(http.StatusOK, summary)
 }
 
-// GET /health/summary/7days/:userID
-/* func Get7DaysSummary(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	userID := c.Param("userID")
-
-	var summary entity.HealthSummary
-
-	// หา Summary ล่าสุด 7 วัน
-	err := db.Where("user_id = ?", userID).
-		Order("created_at desc").
-		First(&summary).Error
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "summary not found"})
-		return
-	}
-
-	resp := HealthSummaryResponse{
-		PeriodStart: summary.PeriodStart.Format("2006-01-02"),
-		PeriodEnd:   summary.PeriodEnd.Format("2006-01-02"),
-		AvgBpm:      summary.AvgBpm,
-		MinBpm:      summary.MinBpm,
-		MaxBpm:      summary.MaxBpm,
-		AvgSteps:    summary.AvgSteps,
-		TotalSteps:  summary.TotalSteps,
-		AvgSleep:    summary.AvgSleep,
-		AvgCalories: summary.AvgCalories,
-		AvgSpo2:     summary.AvgSpo2,
-		AvgBodyTemp: summary.AvgBodyTemp,
-		MinBodyTemp: summary.MinBodyTemp,
-		MaxBodyTemp: summary.MaxBodyTemp,
-		WeekNumber:  summary.WeekNumber,
-	}
-
-	c.JSON(http.StatusOK, resp)
-} */
 
 func GetWeeklySummary(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	userID := c.Param("id")
+	mode := c.DefaultQuery("mode", "weekly") // 👈 เพิ่ม mode
 
-	// หาวันจันทร์ล่าสุด
 	today := time.Now()
-	weekday := int(today.Weekday())
-	if weekday == 0 {
-		weekday = 7 // Sunday = 7
-	}
-	startOfWeek := today.AddDate(0, 0, -(weekday - 1)) // จันทร์
-	endOfWeek := startOfWeek.AddDate(0, 0, 6)          // อาทิตย์
+	var startDate, endDate time.Time
 
-	// ดึงข้อมูล HealthData ของผู้ใช้ในสัปดาห์
+	// เลือกช่วงเวลาตาม mode
+	switch mode {
+	case "last7days":
+		startDate = today.AddDate(0, 0, -6)
+		endDate = today
+	case "lastweek":
+		weekday := int(today.Weekday())
+		if weekday == 0 {
+			weekday = 7 // Sunday = 7
+		}
+		startOfThisWeek := today.AddDate(0, 0, -(weekday - 1))
+		endOfLastWeek := startOfThisWeek.AddDate(0, 0, -1)
+		startDate = endOfLastWeek.AddDate(0, 0, -6)
+		endDate = endOfLastWeek
+	default: // weekly (สัปดาห์นี้)
+		weekday := int(today.Weekday())
+		if weekday == 0 {
+			weekday = 7
+		}
+		startDate = today.AddDate(0, 0, -(weekday - 1)) // จันทร์
+		endDate = startDate.AddDate(0, 0, 6)            // อาทิตย์
+	}
+
+	// ดึงข้อมูล HealthData ของผู้ใช้ในช่วงเวลานี้
 	var healthDatas []entity.HealthData
-	if err := db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", userID, startOfWeek, endOfWeek).
+	if err := db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", userID, startDate, endDate).
 		Find(&healthDatas).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch health data"})
 		return
@@ -163,51 +145,41 @@ func GetWeeklySummary(c *gin.Context) {
 		avgSpo2 = totalSpo2 / count
 	}
 
+	// ดึง RiskLevel ล่าสุด (อาจจะอยากเลือกเฉพาะช่วงเดียวกันด้วย)
 	var healthSummary entity.HealthSummary
+	if err := db.Preload("RiskLevel").
+		Where("user_id = ?", userID).
+		Order("period_start DESC").
+		First(&healthSummary).Error; err != nil {
+		// ไม่เจอ risk level ก็ไม่ต้อง error ให้ return summary ไปเลย
+		healthSummary.RiskLevel.Rlevel = "ไม่ระบุ"
+	}
 
-if err := db.Preload("RiskLevel").
-    Where("user_id = ?", userID).
-    Order("period_start DESC").
-    First(&healthSummary).Error; err != nil {
-    c.JSON(http.StatusNotFound, gin.H{"error": "HealthSummary not found 2"})
-    return
-}
-
-
-result := struct {
-    PeriodStart time.Time `json:"period_start"`
-    PeriodEnd   time.Time `json:"period_end"`
-    AvgBpm      float64   `json:"avg_bpm"`
-    MinBpm      uint      `json:"min_bpm"`
-    MaxBpm      uint      `json:"max_bpm"`
-    TotalSteps  int64     `json:"total_steps"`
-    AvgSleep    float64   `json:"avg_sleep"`
-    AvgCalories float64   `json:"avg_calories"`
-    AvgSpo2     float64   `json:"avg_spo2"`
-    AvgSteps    float64   `json:"avg_steps"`
-    RiskLevel   string    `json:"risk_level"`
-}{
-    PeriodStart: startOfWeek,
-    PeriodEnd:   endOfWeek,
-    AvgBpm:      avgBpm,
-    MinBpm:      minBpm,
-    MaxBpm:      maxBpm,
-    TotalSteps:  totalSteps,
-    AvgSleep:    avgSleep,
-    AvgCalories: avgCalories,
-    AvgSpo2:     avgSpo2,
-    AvgSteps:    avgSteps,
-    RiskLevel:   healthSummary.RiskLevel.Rlevel, // 👈 ใช้จาก preload
-}
-
+	result := struct {
+		PeriodStart time.Time `json:"period_start"`
+		PeriodEnd   time.Time `json:"period_end"`
+		AvgBpm      float64   `json:"avg_bpm"`
+		MinBpm      uint      `json:"min_bpm"`
+		MaxBpm      uint      `json:"max_bpm"`
+		TotalSteps  int64     `json:"total_steps"`
+		AvgSleep    float64   `json:"avg_sleep"`
+		AvgCalories float64   `json:"avg_calories"`
+		AvgSpo2     float64   `json:"avg_spo2"`
+		AvgSteps    float64   `json:"avg_steps"`
+		RiskLevel   string    `json:"risk_level"`
+	}{
+		PeriodStart: startDate,
+		PeriodEnd:   endDate,
+		AvgBpm:      avgBpm,
+		MinBpm:      minBpm,
+		MaxBpm:      maxBpm,
+		TotalSteps:  totalSteps,
+		AvgSleep:    avgSleep,
+		AvgCalories: avgCalories,
+		AvgSpo2:     avgSpo2,
+		AvgSteps:    avgSteps,
+		RiskLevel:   healthSummary.RiskLevel.Rlevel,
+	}
 
 	c.JSON(http.StatusOK, result)
-	
-
-
-	log.Println("userID =", userID)
-log.Println("startOfWeek =", startOfWeek)
-log.Println("endOfWeek =", endOfWeek)
-
-
 }

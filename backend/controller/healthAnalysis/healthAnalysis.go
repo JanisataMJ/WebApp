@@ -64,8 +64,8 @@ func GetSleepAnalysisByUser(c *gin.Context) {
     var analyses []entity.HealthAnalysis
     if err := config.DB().
     Model(&entity.HealthAnalysis{}).
-    Joins("JOIN health_data ON health_data.id = health_analysis.health_data_id").
-    Where("health_analysis.category = ? AND health_data.user_id = ?", "การนอนหลับ", userId).
+    Joins("JOIN health_data ON health_data.id = health_analyses.health_data_id").
+    Where("health_analyses.category = ? AND health_data.user_id = ?", "การนอนหลับ", userId).
     Preload("HealthData").
     Preload("RiskLevel").
     Find(&analyses).Error; err != nil {

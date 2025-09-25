@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-//import './Navbar.css';
 import '../Pubblic_components/header.css'
 
 const Navbar: React.FC = () => {
@@ -71,7 +70,7 @@ const Navbar: React.FC = () => {
           <div className="sub-nav">
             {[
               { id: 'chart1', label: 'อัตราการเต้นหัวใจ' }, 
-              { id: 'chart2', label: 'พลังงานที่ใช้ไป' },
+              { id: 'chart2', label: 'พลังงานที่เผาผลาญ' },
               { id: 'chart3', label: 'จำนวนก้าว' },
               { id: 'chart4', label: 'ออกซิเจนในเลือด' },
               { id: 'chart5', label: 'การนอนหลับ' },
@@ -87,13 +86,6 @@ const Navbar: React.FC = () => {
           </div>
         )}
         </div>
-
-        {/* <Link
-          to="/calendar"
-          className={`nav-link ${isActive('/calendar') ? 'active' : ''}`}
-        >
-          <span>อารมณ์/ความรู้สึก</span>
-        </Link> */}
 
         <Link
           to="/overview"

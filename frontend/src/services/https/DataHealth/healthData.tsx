@@ -1,28 +1,18 @@
 import axios from "axios";
 import { HealthDataInterface } from "../../../interface/health_data_interface/health_data";
+import { RealTimeInterface } from "../../../interface/health_data_interface/realtime";
 
 const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
 
-/*= () => {
-  const Authorization = localStorage.getItem("token");
-  const Bearer = localStorage.getItem("token_type");
-  return {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `${Bearer} ${Authorization}`,
-    },
-  };
-};*/
 const getRequestOptions = () => {
-  const token = localStorage.getItem("token"); // token จริง
+  const token = localStorage.getItem("token");
   return {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // ใช้ Bearer ตรง ๆ
+      Authorization: `Bearer ${token}`,
     },
   };
 };
-
 
 
 export const getHealthData = async (): Promise<HealthDataInterface[]> => {
@@ -39,13 +29,12 @@ export const getHealthData = async (): Promise<HealthDataInterface[]> => {
 };
 
 
-// GET HealthData by userID
 export const getHealthDataByUserID = async (
   userId: number
-): Promise<HealthDataInterface[]> => {
+): Promise<RealTimeInterface[]> => {
   try {
     const requestOptions = getRequestOptions();
-    const response = await axios.get<HealthDataInterface[]>(
+    const response = await axios.get<RealTimeInterface[]>(
       `${apiUrl}/healthData/${userId}`, // backend ต้องรองรับ route นี้
       requestOptions
     );
@@ -58,7 +47,6 @@ export const getHealthDataByUserID = async (
 };
 
 
-// ดึงข้อมูล Daily Heart Rate
 export const getDailyHeartRate = async (
   userId: number,
   withStats = false
@@ -76,7 +64,6 @@ export const getDailyHeartRate = async (
 };
 
 
-// ดึงข้อมูล Daily Steps
 export const getDailySteps = async (
   userId: number,
   withStats = false
@@ -94,7 +81,6 @@ export const getDailySteps = async (
 };
 
 
-// ดึงข้อมูล Daily Calories
 export const getDailyCalories = async (
   userId: number,
   withStats = false
@@ -112,7 +98,6 @@ export const getDailyCalories = async (
 };
 
 
-// ดึงข้อมูล Daily Spo2
 export const getDailySpo2 = async (
   userId: number,
   withStats = false
@@ -130,7 +115,6 @@ export const getDailySpo2 = async (
 };
 
 
-// ดึงข้อมูล Daily Sleep
 export const getDailySleep = async (
   userId: number,
   withStats = false

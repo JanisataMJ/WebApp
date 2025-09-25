@@ -73,7 +73,7 @@ const Overview = () => {
               : undefined,
           },
           {
-            label: "พลังงานที่ใช้ไป",
+            label: "พลังงานที่เผาผลาญ",
             value: latestWeek.avg_calories?.toFixed(0) || 0,
             unit: "kcal",
             status: latestWeek.risk_level || "ไม่ระบุ",
@@ -199,7 +199,7 @@ const Overview = () => {
 
   const chartConfig = [
     { key: "avg_bpm", label: "ค่าเฉลี่ยอัตราการเต้นหัวใจ", color: "#ef4444", fill: "#fee2e2", icon: <Heart className="chart-icon heart-rate" /> },
-    { key: "calories", label: "ค่าเฉลี่ยพลังงานที่ใช้ไป", color: "#f97316", fill: "#ffedd5", icon: <Flame className="chart-icon calories" /> },
+    { key: "calories", label: "ค่าเฉลี่ยพลังงานที่เผาผลาญ", color: "#f97316", fill: "#ffedd5", icon: <Flame className="chart-icon calories" /> },
     { key: "avgSteps", label: "จำนวนก้าวเดินทั้งหมด", color: "#3b82f6", fill: "#dbeafe", icon: <Footprints className="chart-icon steps" /> },
     { key: "avg_spo2", label: "ค่าเฉลี่ยออกซิเจนในเลือด", color: "#10b981", fill: "#d1fae5", icon: <Activity className="chart-icon spo2" /> },
     { key: "sleep_hours", label: "ค่าเฉลี่ยจำนวนการนอน", color: "#8b5cf6", fill: "#ede9fe", icon: <Bed className="chart-icon sleep" /> },
@@ -222,7 +222,7 @@ const Overview = () => {
       lastWeek: prevSummary?.avg_bpm?.toFixed(0),
     },
     {
-      metric: "ค่าเฉลี่ยพลังงานที่ใช้ไป",
+      metric: "ค่าเฉลี่ยพลังงานที่เผาผลาญ",
       thisWeek: summary?.avg_calories?.toFixed(0),
       lastWeek: prevSummary?.avg_calories?.toFixed(0),
     },

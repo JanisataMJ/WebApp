@@ -118,7 +118,7 @@
     display: flex;
     flex-direction: column;
     margin-top: 4px;
-    min-width: 180px;
+    min-width: 200px;
 }
 .nav-sub-link, .topbar .nav-sub-link {
     display: block;

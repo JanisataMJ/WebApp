@@ -4,8 +4,8 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import './slideshow.css';
 import { Activity, Heart, Droplets, Thermometer, Moon, TrendingUp } from 'lucide-react';
 
-import { HealthDataInterface } from '../../interface/health_data_interface/health_data';
 import { getHealthDataByUserID } from '../../services/https/DataHealth/healthData';
+import { RealTimeInterface } from '../../interface/health_data_interface/realtime';
 
 type HealthItem = {
   icon: React.ComponentType<any>;
@@ -21,18 +21,16 @@ const Slider: React.FC = () => {
   const [healthItems, setHealthItems] = useState<HealthItem[]>([]);
   const UserID = Number(localStorage.getItem("id"));
 
-  // ฟังก์ชันหาค่า Interpretation / Suggestion จาก HealthAnalysis
-  const findAnalysis = (data: HealthDataInterface, category: string) => {
+  const findAnalysis = (data: RealTimeInterface, category: string) => {
     return data.HealthAnalysis?.find(a => a.Category === category);
   };
 
 
-  // ฟังก์ชัน map ข้อมูลจาก API → UI
-  const mapHealthData = (data: HealthDataInterface): HealthItem[] => [
+  const mapHealthData = (data: RealTimeInterface): HealthItem[] => [
     {
       icon: Heart,
       label: "อัตราการเต้นหัวใจ",
-      value: String(data.Bpm),  // <-- ✅
+      value: String(data.Bpm),
       sub: findAnalysis(data, "อัตราการเต้นหัวใจ")?.Interpretation || "ไม่มีข้อมูล",
       color: "#ef4444",
       bgGradient: "linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)"
@@ -40,7 +38,7 @@ const Slider: React.FC = () => {
     {
       icon: Activity,
       label: "พลังงานที่ใช้ไป",
-      value: String(data.CaloriesBurned.toFixed(0)), // <-- ✅
+      value: String(data.CaloriesBurned.toFixed(0)),
       sub: findAnalysis(data, "พลังงานที่ใช้ไป")?.Interpretation || "ไม่มีข้อมูล",
       color: "#f59e0b",
       bgGradient: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)"
@@ -48,7 +46,7 @@ const Slider: React.FC = () => {
     {
       icon: Droplets,
       label: "ออกซิเจนในเลือด",
-      value: `${data.Spo2}%` as string, // <-- ✅
+      value: `${data.Spo2}%` as string,
       sub: findAnalysis(data, "ออกซิเจนในเลือด")?.Interpretation || "ไม่มีข้อมูล",
       color: "#3b82f6",
       bgGradient: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)"
@@ -56,7 +54,7 @@ const Slider: React.FC = () => {
     {
       icon: Moon,
       label: "การนอนหลับ",
-      value: (data.SleepHours || "ไม่มีข้อมูล") as string, // <-- ✅ DB เก็บ string
+      value: (data.SleepHours || "ไม่มีข้อมูล") as string,
       sub: findAnalysis(data, "การนอนหลับ")?.Interpretation || "ไม่มีข้อมูล",
       color: "#6366f1",
       bgGradient: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)"
@@ -64,7 +62,7 @@ const Slider: React.FC = () => {
     {
       icon: TrendingUp,
       label: "จำนวนก้าว",
-      value: String(data.Steps), // <-- ✅
+      value: String(data.Steps),
       sub: findAnalysis(data, "จำนวนก้าว")?.Interpretation || "ไม่มีข้อมูล",
       color: "#10b981",
       bgGradient: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)"
@@ -78,14 +76,12 @@ const Slider: React.FC = () => {
       try {
         const res = await getHealthDataByUserID(UserID);
 
-        // เรียงข้อมูลตาม Timestamp
         const sorted = res.sort(
-          (a: HealthDataInterface, b: HealthDataInterface) =>
+          (a: RealTimeInterface, b: RealTimeInterface) =>
             new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
         );
 
         if (sorted.length > 0) {
-          // ใช้ record ล่าสุดมา map → healthItems
           setHealthItems(mapHealthData(sorted[0]));
         }
       } catch (error) {
@@ -96,7 +92,6 @@ const Slider: React.FC = () => {
     fetchHealthdatas();
   }, [UserID]);
 
-  // Auto slide
   useEffect(() => {
     if (healthItems.length === 0) return;
     const interval = setInterval(() => {
@@ -142,7 +137,6 @@ const Slider: React.FC = () => {
   return (
     <div className="slider-container">
       <div className="slider-wrapper">
-        {/* Header Section */}
         <div className="slider-header">
           <h2 className="slider-title">ดัชนีสุขภาพ</h2>
           <div className="date-container">
@@ -151,7 +145,6 @@ const Slider: React.FC = () => {
           </div>
         </div>
 
-        {/* Cards */}
         <div className="cards-container">
           <Button className="nav-arrow nav-arrow-left" onClick={handlePrevious} icon={<LeftOutlined />} />
 
@@ -209,7 +202,6 @@ const Slider: React.FC = () => {
           <Button className="nav-arrow nav-arrow-right" onClick={handleNext} icon={<RightOutlined />} />
         </div>
 
-        {/* Dots */}
         <div className="dots-container">
           {healthItems.map((item, index) => (
             <Button
@@ -225,7 +217,6 @@ const Slider: React.FC = () => {
           ))}
         </div>
 
-       {/* Progress Bar */}
         <div className="progress-bar-container">
           <div
             className="progress-bar"
@@ -235,7 +226,6 @@ const Slider: React.FC = () => {
           />
         </div> 
 
-        {/* Quick Stats */}
         <div className="quick-stats">
           <div className="stat-item">
             <span className="stat-label">สิ่งที่ควรโฟกัสวันนี้</span>

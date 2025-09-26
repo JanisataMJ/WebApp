@@ -15,6 +15,9 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
+	
+	appConfig "github.com/JanisataMJ/WebApp/config" 
+	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 )
 
 // Constants
@@ -147,11 +150,13 @@ func ImportHealthData(db *sql.DB) {
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
-	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope)
+    // 💡 เปลี่ยนชื่อตัวแปร 'config' เป็น 'oauthConfig'
+	oauthConfig, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope) 
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-	client := getClient(config)
+    // 💡 ใช้ชื่อใหม่ในการเรียก getClient
+	client := getClient(oauthConfig) 
 	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
@@ -254,6 +259,10 @@ func ImportHealthData(db *sql.DB) {
 			log.Fatalf("Failed to update last_imported_row in config: %v", err)
 		}
 		fmt.Printf("Data import finished. Successfully processed %d new rows. Next read will start at row %d.\n", rowsProcessed, newLastRow)
+		fmt.Println("Starting HealthAnalysis...")
+        // 💡 เรียกใช้ฟังก์ชันวิเคราะห์ โดยดึง *gorm.DB จาก config.DB()
+        healthAnalysis.AnalyzeHealthData(appConfig.DB()) 
+        fmt.Println("HealthAnalysis completed.")
 	} else {
 		fmt.Println("Data import finished. No new rows were processed.")
 	}

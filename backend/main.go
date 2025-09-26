@@ -19,7 +19,7 @@ import (
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
 	"github.com/JanisataMJ/WebApp/controller/user"
 	"github.com/JanisataMJ/WebApp/middlewares"
-	"github.com/JanisataMJ/WebApp/seed"
+	/* "github.com/JanisataMJ/WebApp/seed" */
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -50,8 +50,11 @@ func main() {
 	gormDB := config.DB()
 	config.SetupDatabase()
 
-	seed.SeedHealthData(gormDB)
-	seed.SeedHealthDataTwoWeeks(gormDB)
+	//seed.SeedHealthData(gormDB)
+	//seed.SeedHealthDataTwoWeeks(gormDB)
+
+	//*** เรียกใช้ Backfill Health Analysis ที่นี่ ***
+    //healthAnalysis.BackfillHealthAnalysis(gormDB)
 
 	sqlDB, err := gormDB.DB()
 	if err != nil {
@@ -65,6 +68,13 @@ func main() {
 
 	// Initial import
 	healthData.ImportHealthData(sqlDB)
+	 // ----------------------------------------------------
+    // ✅ ตำแหน่งที่ควรเรียกใช้ AnalyzeHealthData
+    // ----------------------------------------------------
+    log.Println("▶️ Starting initial Health Analysis...")
+    healthAnalysis.AnalyzeHealthData(gormDB) // 💡 ต้องเรียกใช้ตรงนี้!
+    log.Println("✅ Initial Health Analysis completed.")
+    // ----------------------------------------------------
 
 	// Start data import job
 	go healthData.StartDataImportJob(sqlDB) 

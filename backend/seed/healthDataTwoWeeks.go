@@ -53,29 +53,41 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	// ---------------------------
 	// 3️⃣ สร้าง HealthData + HealthAnalysis ย้อนหลัง 2 สัปดาห์
 	// ---------------------------
-	for daysAgo := 13; daysAgo >= 0; daysAgo-- { // 14 วัน
-		day := now.AddDate(0, 0, -daysAgo)
+	today := time.Now() // เก็บวันที่และเวลาปัจจุบัน
+	startOfDay := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, today.Location())
 
-		sleepStart := 20 // เริ่มนอน 20.00
-		sleepEnd := 5    // ตื่น 05.00
+	for daysAgo := 13; daysAgo >= 0; daysAgo-- {
+		day := startOfDay.AddDate(0, 0, -daysAgo)
 
-		for hour := 0; hour < 24; hour++ {
+		// ✅ สุ่มชั่วโมงการนอนของวันนั้น (6.0 - 9.0 ชั่วโมง)
+		sleepDuration := 6 + rand.Float64()*3 // 6-9 ชม.
+		hours := int(sleepDuration)
+		minutes := int((sleepDuration - float64(hours)) * 60)
+
+		sleepString := fmt.Sprintf("%dh %dm", hours, minutes)
+
+		maxHour := 23
+		if day.Year() == today.Year() && day.YearDay() == today.YearDay() {
+			maxHour = today.Hour() - 1
+			if maxHour < 0 {
+				maxHour = 0
+			}
+		}
+
+		for hour := 0; hour <= maxHour; hour++ {
 			hd := entity.HealthData{
 				Timestamp:      day.Add(time.Duration(hour) * time.Hour),
 				Bpm:            uint(60 + rand.Intn(40)),
 				Steps:          int64(500 + rand.Intn(2000)),
 				CaloriesBurned: 100 + rand.Float64()*50,
 				Spo2:           95 + float64(rand.Intn(4)),
-				SleepHours:     "0",
+				SleepHours:     "", // ส่วนใหญ่เป็นค่าว่าง
 				UserID:         user.ID,
 			}
 
-			// ✅ ถ้าอยู่ในช่วงนอน
-			if (hour >= sleepStart && hour <= 23) || (hour >= 0 && hour < sleepEnd) {
-				hd.Bpm = uint(50 + rand.Intn(10))
-				hd.Steps = 0
-				hd.Spo2 = 96
-				hd.SleepHours = "1" // หนึ่งชั่วโมงต่อ record
+			// ✅ ใส่ SleepHours แค่ record แรกของวัน (เช่น 00:00)
+			if hour == 0 {
+				hd.SleepHours = sleepString
 			}
 
 			db.Create(&hd)

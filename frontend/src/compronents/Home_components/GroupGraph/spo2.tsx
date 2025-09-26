@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, RadialBarChart, RadialBar, PieChart, Pie, Cell } from 'recharts';
 import './spo2.css';
 import { getDailySpo2 } from '../../../services/https/DataHealth/healthData'; // ตัวอย่าง service function
+import { Customized } from "recharts";
 
 interface SpO2Data {
   time: string;
   spo2: number;
   hour: number;
   status: 'normal' | 'low' | 'critical' | 'severe';
-  activity: string;
 }
 
 interface StatusDistribution {
@@ -20,7 +20,7 @@ interface StatusDistribution {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{ value: number; payload?: SpO2Data; [key: string]: any }>;
+  payload?: Array<{ value: number; payload?: SpO2Data;[key: string]: any }>;
   label?: string;
 }
 
@@ -33,24 +33,47 @@ const DairySpo2: React.FC = () => {
     const fetchData = async () => {
       try {
         const res = await getDailySpo2(UserID);
-        const mappedData: SpO2Data[] = res.data.map((d: any) => {
+
+        // ถ้า res.data ไม่มีค่า → ให้ fallback เป็น array ว่าง
+        const rawData = res?.data ?? [];
+
+        const mappedData: SpO2Data[] = rawData.map((d: any) => {
           let status: 'normal' | 'low' | 'critical' | 'severe';
-          const spo2 = Number(d.spo2.toFixed(2));
+          const spo2 = Number(d.spo2?.toFixed(2) ?? 0);
           if (spo2 >= 96) status = 'normal';
           else if (spo2 >= 90) status = 'low';
           else if (spo2 >= 85) status = 'critical';
           else status = 'severe';
 
-          const [hour, minute] = d.time.split(':').map(Number);
+          const [hour, minute] = (d.time || "00:00").split(":").map(Number);
           return {
-            time: d.time,
+            time: `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`,
             spo2,
             hour,
             status,
-            activity: d.activity || 'ไม่ระบุ'
           };
         });
-        setData(mappedData);
+
+        // ✅ สร้างช่วงเวลา 0:00 → เวลาปัจจุบัน
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        const fullDay: SpO2Data[] = [];
+        for (let h = 0; h <= currentHour; h++) {
+          const timeLabel = `${h.toString().padStart(2, "0")}:00`;
+          const found = mappedData.find(d => d.time.startsWith(`${h.toString().padStart(2, "0")}:`));
+          fullDay.push(
+            found || {
+              time: timeLabel,
+              spo2: null as any, // ไม่มีค่า → ให้เป็น null
+              hour: h,
+              status: "normal",
+            }
+          );
+        }
+
+        setData(fullDay);
       } catch (err) {
         console.error(err);
         setData([]);
@@ -60,6 +83,7 @@ const DairySpo2: React.FC = () => {
     };
     fetchData();
   }, []);
+
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   if (data.length === 0) return <div>ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>;
@@ -106,7 +130,6 @@ const DairySpo2: React.FC = () => {
       const data = payload[0].payload;
       return (
         <div className="custom-tooltip-spo2">
-          <p className="tooltip-time-spo2">{`${label} - ${data.activity}`}</p>
           <p className="tooltip-spo2">{`SpO2: ${payload[0].value.toFixed(2)}%`}</p>
           <p className={`tooltip-status-spo2 ${data.status}`}>{getStatusText(data.status)}</p>
         </div>
@@ -135,7 +158,7 @@ const DairySpo2: React.FC = () => {
     <div className="spo2-container">
       <div className="header-section-spo2">
         <h2 className="title-spo2">ออกซิเจนในเลือด</h2>
-        
+
         {/* สถิติสรุป */}
         <div className="stats-grid-spo2">
           <div className="stat-card-spo2">
@@ -161,11 +184,11 @@ const DairySpo2: React.FC = () => {
           <h3 className="status-title-spo2">📊 สถานะปัจจุบัน</h3>
           <div className="radial-container-spo2">
             <ResponsiveContainer width="100%" height={200}>
-              <RadialBarChart 
-                cx="50%" 
-                cy="50%" 
-                innerRadius="60%" 
-                outerRadius="90%" 
+              <RadialBarChart
+                cx="50%"
+                cy="50%"
+                innerRadius="60%"
+                outerRadius="90%"
                 data={radialData}
                 startAngle={90}
                 endAngle={-270}
@@ -175,11 +198,11 @@ const DairySpo2: React.FC = () => {
                   cornerRadius={10}
                   fill={getStatusColor(currentSpO2)}
                 />
-                <text 
-                  x="50%" 
-                  y="50%" 
-                  textAnchor="middle" 
-                  dominantBaseline="middle" 
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
                   className="radial-text-spo2"
                 >
                   <tspan x="50%" dy="-10" fontSize="32" fontWeight="bold" fill={getStatusColor(currentSpO2)}>
@@ -206,45 +229,52 @@ const DairySpo2: React.FC = () => {
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              
+
               {/* เส้นอ้างอิง */}
               <ReferenceLine y={96} stroke="#10b981" strokeDasharray="5 5" label="ปกติ (≥96%)" />
               <ReferenceLine y={90} stroke="#f59e0b" strokeDasharray="5 5" label="ต่ำ (90-95%)" />
               <ReferenceLine y={85} stroke="#ef4444" strokeDasharray="5 5" label="วิกฤต (<90%)" />
-              
-              <XAxis 
-                dataKey="time" 
+
+              <XAxis
+                dataKey="time"
                 stroke="#666"
                 tick={{ fontSize: 12 }}
               />
-              <YAxis 
+              <YAxis
                 stroke="#666"
                 tick={{ fontSize: 12 }}
                 domain={[80, 100]}
                 label={{ value: 'SpO2 (%)', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip content={<CustomTooltip />} />
-              
-              <Line 
-                type="monotone" 
-                dataKey="spo2" 
-                stroke="#3b82f6" 
+
+              <Line
+                type="monotone"
+                dataKey="spo2"
+                stroke="#3b82f6"
                 strokeWidth={3}
-                dot={(props: any) => {
-                  const { cx, cy, payload } = props;
-                  return (
-                    <circle 
-                      cx={cx} 
-                      cy={cy} 
-                      r={5} 
-                      fill={getStatusColor(payload.spo2)}
-                      stroke="white"
-                      strokeWidth={2}
-                    />
-                  );
-                }}
+                connectNulls={false}
+                dot={false} // ปิด dot default
                 activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
               />
+              <Customized
+                component={({ points }: any) =>
+                  points?.map((point: any, index: number) =>
+                    point?.value ? (
+                      <circle
+                        key={index}
+                        cx={point.x}
+                        cy={point.y}
+                        r={5}
+                        fill={getStatusColor(point.value)}
+                        stroke="white"
+                        strokeWidth={2}
+                      />
+                    ) : null
+                  )
+                }
+              />
+
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -268,21 +298,21 @@ const DairySpo2: React.FC = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip 
+              <Tooltip
                 formatter={(value: number, name: string, props: any) => [
-                  `${value.toFixed(1)}% (${props.payload.count} ครั้ง)`, 
+                  `${value.toFixed(1)}% (${props.payload.count} ครั้ง)`,
                   name
                 ]}
               />
             </PieChart>
           </ResponsiveContainer>
-          
+
           {/* Legend */}
           <div className="pie-legend-spo2">
             {statusDistribution.map((item, index) => (
               <div key={index} className="legend-item-spo2">
-                <div 
-                  className="legend-color-spo2" 
+                <div
+                  className="legend-color-spo2"
                   style={{ backgroundColor: item.color }}
                 ></div>
                 <span className="legend-text-spo2">

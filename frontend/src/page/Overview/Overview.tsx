@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import { GetWeeklySummary } from "../../services/https/DataHealth/healthSummary";
 import { GetWeeklyHealthData } from "../../services/https/DataHealth/healthData";
 import { HealthSummaryInterface } from "../../interface/health_summary_interface/health_summary";
-import { HealthDataInterface } from "../../interface/health_data_interface/health_data";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Activity, Heart, Droplets, Thermometer, Moon, TrendingUp, TrendingDown, ArrowRightLeft, Footprints, Bed, Flame } from 'lucide-react';
 import { Radio, Table, Card } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
 import "./Overview.css";
-import { Form, Input, Modal, message } from "antd";
 import Headers from '../../compronents/Pubblic_components/headerselect';
 import Notification from '../../compronents/Home_components/Notifiation/notice';
 
@@ -156,44 +154,54 @@ const Overview = () => {
   }, [UserID, mode]);
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await GetWeeklyHealthData(UserID, mode);
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const data = await GetWeeklyHealthData(UserID, mode);
 
-        // จัดกลุ่มตามวัน
-        const grouped: Record<string, { steps: number; bpm: number; sleep: number; calories: number; spo2: number; count: number }> = {};
+      const dayNames = ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."];
 
-        data.forEach((d: any) => {
-          const day = new Date(d.date).toLocaleDateString("th-TH", { weekday: "short" });
-          if (!grouped[day]) {
-            grouped[day] = { steps: 0, bpm: 0, sleep: 0, calories: 0, spo2: 0, count: 0 };
-          }
-          grouped[day].steps += d.steps;
-          grouped[day].bpm += d.avg_bpm || 0;
-          grouped[day].sleep += d.sleep_hours || 0;
-          grouped[day].calories += d.calories || 0;
-          grouped[day].spo2 += d.avg_spo2 || 0;
-          grouped[day].count += 1;
-        });
+      const grouped: Record<string, { steps: number; bpm: number; sleep: number; calories: number; spo2: number; count: number }> = {};
+      dayNames.forEach((d) => {
+        grouped[d] = { steps: 0, bpm: 0, sleep: 0, calories: 0, spo2: 0, count: 0 };
+      });
 
-        // ทำค่าเฉลี่ยรายวัน
-        const mapped = Object.entries(grouped).map(([day, v]) => ({
-          date: day,
-          avgSteps: Math.round(v.steps / v.count),   // ✅ เฉลี่ย steps
-          avg_bpm: Math.round(v.bpm / v.count),
-          sleep_hours: (v.sleep / v.count).toFixed(1),
-          calories: Math.round(v.calories / v.count),
-          avg_spo2: Math.round(v.spo2 / v.count),
-        }));
+      data.forEach((d: any) => {
+        const jsDate = new Date(d.date);
+        let dayIndex = jsDate.getDay(); 
+        dayIndex = (dayIndex + 6) % 7;
 
-        setWeeklyData(mapped);
-      } catch (error) {
-        console.error("Error fetching weekly data:", error);
-      }
-    };
-    fetchData();
-  }, [UserID, mode]);
+        const day = dayNames[dayIndex];
+        grouped[day].steps += d.steps;
+        grouped[day].bpm += d.avg_bpm || 0;
+        grouped[day].sleep += d.sleep_hours || 0;
+        grouped[day].calories += d.calories || 0;
+        grouped[day].spo2 += d.avg_spo2 || 0;
+        grouped[day].count += 1;
+      });
+
+      // ✅ ทำ mapped ตามลำดับ dayNames
+      const mapped = dayNames.map((day) => {
+        const v = grouped[day];
+        return {
+          day,
+          avgSteps: v.count ? Math.round(v.steps / v.count) : 0,
+          avg_bpm: v.count ? Math.round(v.bpm / v.count) : 0,
+          sleep_hours: v.count ? Number((v.sleep / v.count).toFixed(1)) : 0,
+          calories: v.count ? Math.round(v.calories / v.count) : 0,
+          avg_spo2: v.count ? Math.round(v.spo2 / v.count) : 0,
+        };
+      });
+
+      setWeeklyData(mapped);
+    } catch (error) {
+      console.error("Error fetching weekly data:", error);
+    }
+  };
+  fetchData();
+}, [UserID, mode]);
+
+
 
 
 
@@ -366,7 +374,7 @@ const Overview = () => {
             {chartConfig.map(({ key, label, color, fill, icon }) => (
               <div className="chart-card" key={key}>
                 <h2 className="chart-title">{icon} {label}</h2>
-                <ResponsiveContainer width="100%" height={250}>
+                {/* <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={weeklyData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
@@ -374,7 +382,27 @@ const Overview = () => {
                     <Tooltip />
                     <Area type="monotone" dataKey={key} stroke={color} fill={fill} strokeWidth={3} />
                   </AreaChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer> */}
+                <ResponsiveContainer width="100%" height={250}>
+  <AreaChart data={weeklyData}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="day" />
+    {key === "sleep_hours" ? (
+      <YAxis domain={[0, 12]} tickFormatter={(val) => `${val}h`} />
+    ) : (
+      <YAxis />
+    )}
+    <Tooltip />
+    <Area
+      type="monotone"
+      dataKey={key}
+      stroke={color}
+      fill={fill}
+      strokeWidth={3}
+    />
+  </AreaChart>
+</ResponsiveContainer>
+
               </div>
             ))}
           </div>

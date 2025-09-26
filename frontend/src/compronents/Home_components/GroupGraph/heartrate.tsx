@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart, Line, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 import "./heartrate.css";
 import { getDailyHeartRate } from "../../../services/https/DataHealth/healthData";
 
 interface HeartRatePoint {
-  time: string;
-  heartRate: number;
+  time: string;      // format เช่น "14:30"
+  heartRate: number | null;
 }
 
 interface DailyHeartRateResponse {
   date: string;
-  data: HeartRatePoint[];
+  data: { time: string; heartRate: number }[];
   stats?: { avg: number; min: number; max: number };
 }
-
 
 const DairyHeartRate: React.FC = () => {
   const [data, setData] = useState<HeartRatePoint[]>([]);
@@ -21,32 +23,40 @@ const DairyHeartRate: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const UserID = Number(localStorage.getItem("id"));
 
+  // เตรียม array ของชั่วโมง 0-23
+  const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, "0")}:00`);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getDailyHeartRate(UserID);
+        const res: DailyHeartRateResponse = await getDailyHeartRate(UserID);
 
-        // map data ให้ตรงกับ interface
-        const heartData: HeartRatePoint[] = res.data.map((d: any) => ({
-          time: d.time,
-          heartRate: d.heartRate,
+        // map API data => { "HH:00": heartRate }
+        const heartDataMap: Record<string, number> = {};
+        res.data.forEach((d) => {
+          const hour = d.time.slice(0, 2) + ":00"; // ตัดแค่ชั่วโมง
+          heartDataMap[hour] = d.heartRate;
+        });
+
+        // รวมกับทุกชั่วโมง 0-23
+        const fullDayData: HeartRatePoint[] = hours.map((h) => ({
+          time: h,
+          heartRate: heartDataMap[h] ?? null,
         }));
-        setData(heartData);
 
+        setData(fullDayData);
         if (res.stats) setStats(res.stats);
         else setStats(null);
-
       } catch (err) {
         console.error(err);
         setData([]);
         setStats(null);
       } finally {
-        setLoading(false); // สำคัญ ไม่งั้นจะค้างที่ Loading...
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
-
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   if (data.length === 0) return <div>ไม่พบข้อมูลอัตราการเต้นหัวใจของวันนี้</div>;
@@ -56,7 +66,7 @@ const DairyHeartRate: React.FC = () => {
       return (
         <div className="custom-tooltip-hr">
           <p>{`เวลา: ${label}`}</p>
-          <p>{`Heart Rate: ${payload[0].value} bpm`}</p>
+          <p>{`Heart Rate: ${payload[0].value ?? "ไม่มีข้อมูล"} bpm`}</p>
         </div>
       );
     }
@@ -67,7 +77,6 @@ const DairyHeartRate: React.FC = () => {
     <div className="heartrate-container">
       <h2 className="text-header-hr">อัตราการเต้นหัวใจ</h2>
 
-      {/* Stats */}
       {stats && (
         <div className="stats-grid-hr">
           <div className="stat-card-hr">
@@ -85,11 +94,15 @@ const DairyHeartRate: React.FC = () => {
         </div>
       )}
 
-      {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="time" stroke="#666" tick={{ fontSize: 12 }} />
+          <XAxis
+            dataKey="time"
+            stroke="#666"
+            tick={{ fontSize: 12 }}
+            ticks={hours} // บังคับให้แสดงทุกชั่วโมง
+          />
           <YAxis
             stroke="#666"
             tick={{ fontSize: 12 }}
@@ -104,6 +117,7 @@ const DairyHeartRate: React.FC = () => {
             strokeWidth={2}
             dot={{ fill: "#ef4444", r: 3 }}
             activeDot={{ r: 6, stroke: "#ef4444", strokeWidth: 2 }}
+            connectNulls={false} // จะเว้นช่วงที่ไม่มีข้อมูล
           />
         </LineChart>
       </ResponsiveContainer>

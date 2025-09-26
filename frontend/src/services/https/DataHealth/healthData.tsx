@@ -115,7 +115,7 @@ export const getDailySpo2 = async (
 };
 
 
-export const getDailySleep = async (
+export const getDailySleep = async ( 
   userId: number,
   withStats = false
 ): Promise<any> => {

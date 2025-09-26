@@ -153,6 +153,26 @@ func SetupDatabase() {
    db.FirstOrCreate(Admin2, &entity.User{Email: "admin2@gmail.com",})
 
 
+   OppoUser := &entity.User{
+        Username:       "OppoUser",
+        Password:       hashedPassword,
+        Email:          "user10@gmail.com",
+        FirstName:      "User10",
+        LastName:       "Oppo",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0861234567",
+        Profile:        "uploads/Profiles/profile10.jpeg",
+        Height:         166,
+        Weight:         55,
+        Bust:           33,
+        Waist:          25,
+        Hip:            37,
+        RoleID:         2,
+        GenderID:       2,
+   }
+   db.FirstOrCreate(OppoUser, &entity.User{Email: "user10@gmail.com",})
+
+
    
    initialCalendars := []entity.MoodData{
 		{
@@ -220,19 +240,27 @@ func SetupDatabase() {
     db.Create(&healthData2)
 
 
-    // RiskLevel
-    var lGood, lNormal, lBad entity.RiskLevel
-    Rlevels := []entity.RiskLevel{
-        {Rlevel: "ดี"},
-        {Rlevel: "ปกติ"},
-        {Rlevel: "เสี่ยง"},
-    }
-    for i, level := range Rlevels {
-        db.FirstOrCreate(&Rlevels[i], entity.RiskLevel{Rlevel: level.Rlevel})
-    }
-    lGood = Rlevels[0]
-    lNormal = Rlevels[1]
-    lBad = Rlevels[2]
+
+    lGood := entity.RiskLevel{
+		Rlevel: "ดี",
+	}
+
+    lNormal := entity.RiskLevel{
+		Rlevel: "ปกติ",
+	}
+
+    lBad := entity.RiskLevel{
+		Rlevel: "เสี่ยง",
+	}
+
+    llow := entity.RiskLevel{
+		Rlevel: "ต่ำ",
+	}
+
+	db.Create(&lGood)
+	db.Create(&lNormal)
+	db.Create(&lBad)
+    db.Create(&llow)
 
 
 

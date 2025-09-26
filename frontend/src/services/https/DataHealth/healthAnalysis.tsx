@@ -45,7 +45,7 @@ export const getHealthAnalysisByUserID = async (
 };
 
 export const GetSleepAnalysisByUser = async (userId: number) => {
-  try {
+  try { 
     const requestOptions = getRequestOptions();
     const res = await axios.get(`${apiUrl}/sleep-analysis/${userId}`, 
       requestOptions

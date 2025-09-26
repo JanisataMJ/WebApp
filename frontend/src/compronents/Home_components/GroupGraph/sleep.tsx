@@ -1,128 +1,137 @@
-import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, RadialBarChart, RadialBar } from 'recharts';
-import './sleep.css';
-import { getDailySleep } from '../../../services/https/DataHealth/healthData'; 
-import { GetSleepAnalysisByUser } from '../../../services/https/DataHealth/healthAnalysis';
+import React, { useEffect, useState } from "react";
+import {
+  AreaChart, Area, XAxis, YAxis,
+  ResponsiveContainer, Tooltip, CartesianGrid
+} from "recharts";
+import "./sleep.css";
+import { getDailySleep } from "../../../services/https/DataHealth/healthData";
 
- interface SleepData {
-  time: string;
-  sleepStage: 'awake' | 'light' | 'deep' | 'rem';
-  stageValue: number;
-  hour: number;
-  heartRate?: number;
-  movement?: number;
+interface SleepData {
+  sleepHours: string; // เช่น "8h 30m"
 }
 
-interface SleepSummary {
-  totalSleep: number;
-  deepSleep: number;
-  lightSleep: number;
-  remSleep: number;
-  awakeTime: number;
-  sleepEfficiency: number;
-  fallAsleepTime: number;
-}
-
-interface SleepStageDistribution {
-  name: string;
-  value: number;
-  duration: number;
-  color: string;
-  percentage: number;
-}
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    value: number;
-    payload?: SleepData;
-    [key: string]: any;
-  }>;
-  label?: string;
-}
-
-  interface SleepAnalysis {
-  riskId: number;
-  note?: string;
+interface ChartData {
+  minute: number;  // หน่วยนาที ใช้ทำแกน X
+  value: number;   // 1 = กำลังนอน
 }
 
 const DairySleep: React.FC = () => {
-  const [data, setData] = useState<SleepData[]>([]);
-  const [sleepAnalysis, setSleepAnalysis] = useState<SleepAnalysis | null>(null);
+  const [sleepRecord, setSleepRecord] = useState<SleepData | null>(null);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [maxMinutes, setMaxMinutes] = useState(480); // default 8 ชม. = 480 นาที
   const [loading, setLoading] = useState(true);
   const UserID = Number(localStorage.getItem("id"));
+
+  // helper แปลง "8h 30m" → นาทีทั้งหมด
+  const parseSleepMinutes = (text: string): number => {
+    const hMatch = text.match(/(\d+)h/);
+    const mMatch = text.match(/(\d+)m/);
+    const hours = hMatch ? parseInt(hMatch[1], 10) : 0;
+    const minutes = mMatch ? parseInt(mMatch[1], 10) : 0;
+    return hours * 60 + minutes;
+  };
+
+  // helper แปลง นาที → HH:mm
+  const formatMinutes = (mins: number): string => {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m === 0 ? `${h}:00` : `${h}:${m.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resSleep, resAnalysis] = await Promise.all([
-          getDailySleep(UserID),
-          GetSleepAnalysisByUser(UserID)
-        ]);
+        const res = await getDailySleep(UserID);
+        if (!res.data || res.data.length === 0) {
+          setSleepRecord(null);
+          return;
+        }
 
-        const mappedData: SleepData[] = resSleep.data.map((d: any) => {
-          const [hourStr, minStr] = d.time.split(':').map(Number);
-          const hour = hourStr + minStr / 60;
-          return { ...d, hour };
-        });
+        const record: SleepData = res.data[0];
+        setSleepRecord(record);
 
-        setData(mappedData);
-        setSleepAnalysis(resAnalysis.data);
+        // คำนวณเป็นนาที
+        const totalMinutes = parseSleepMinutes(record.sleepHours);
+        setMaxMinutes(totalMinutes);
 
+        // สร้าง dataset: ทีละ 30 นาที
+        const generated: ChartData[] = [];
+        for (let i = 0; i <= totalMinutes; i += 30) {
+          generated.push({ minute: i, value: 1 });
+        }
+        if (totalMinutes % 30 !== 0) {
+          generated.push({ minute: totalMinutes, value: 1 });
+        }
+
+        setChartData(generated);
       } catch (err) {
-        console.error('Error fetching sleep data/analysis:', err);
-        setData([]);
+        console.error("Error fetching sleep data:", err);
+        setSleepRecord(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
+  // ticks ทุกครึ่งชม.
+  const ticks: number[] = [];
+  for (let i = 0; i <= Math.max(480, maxMinutes); i += 30) {
+    ticks.push(i);
+  }
+
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
-  if (data.length === 0) return <div>ยังไม่มีข้อมูลการนอนของวันนี้</div>;
-
-  // ✅ หาเวลานอนเริ่มต้น-สิ้นสุด
-  const sleepStart = data[0]?.time;
-  const sleepEnd = data[data.length - 1]?.time;
-
-  // ✅ นับจำนวนการนอนวันนี้ (session)
-  const sessionCount = 1; // ถ้าอยากละเอียด ให้ detect gap > 30 นาที = session ใหม่
-
-  // ✅ ใช้ riskId จาก HealthAnalysis
-  const getSleepQualityFromRisk = (riskId: number) => {
-    switch (riskId) {
-      case 1: return { text: 'ดีเยี่ยม', emoji: '🌟', color: '#10b981' };
-      case 2: return { text: 'พอใช้', emoji: '😐', color: '#f59e0b' };
-      case 3: return { text: 'เสี่ยง', emoji: '⚠️', color: '#ef4444' };
-      default: return { text: 'ไม่ทราบ', emoji: '❓', color: '#6b7280' };
-    }
-  };
-
-  const quality = sleepAnalysis ? getSleepQualityFromRisk(sleepAnalysis.riskId) : null;
+  if (!sleepRecord) return <div>ยังไม่มีข้อมูลการนอนของเมื่อคืน</div>;
 
   return (
     <div className="sleep-container">
-      <h2 className="title-sleep">การนอนหลับวันนี้</h2>
+      <h2 className="title-sleep">การนอนเมื่อคืน</h2>
 
       <div className="summary-section">
-        <p>🛏️ ช่วงเวลานอน: {sleepStart} - {sleepEnd}</p>
-        <p>🔁 จำนวนครั้งการนอน: {sessionCount} ครั้ง</p>
-        {quality && (
-          <p style={{ color: quality.color }}>
-            {quality.emoji} คุณภาพการนอน: {quality.text}
-          </p>
-        )}
+        <p>😴 รวมเวลานอน: {sleepRecord.sleepHours}</p>
       </div>
 
-      {/* กราฟช่วงเวลาการนอน */}
       <div className="chart-container-sleep">
-        <h3>📈 ระยะการนอนตลอดคืน</h3>
-        <ResponsiveContainer width="100%" height={350}>
-          <AreaChart data={data}>
-            <XAxis dataKey="time" />
-            <YAxis domain={[0.5, 4.5]} />
-            <Area type="stepAfter" dataKey="stageValue" stroke="#3b82f6" />
+        <h3>📊 กราฟชั่วโมงการนอน</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="minute"
+              type="number"
+              domain={[0, Math.max(480, maxMinutes)]} // ขั้นต่ำ 8 ชม.
+              ticks={ticks}
+              tickFormatter={formatMinutes} // ✅ นาที → เวลา
+              tick={{ fontSize: 12, fill: "#ffffff", fontWeight: "bold" }}
+              label={{ value: "เวลา (ชม.:นาที)", position: "insideBottom", offset: -5 }}
+            />
+            <YAxis hide />
+            <Tooltip
+              formatter={() => ["นอน"]}
+              labelFormatter={(value) => `ชั่วโมงที่: ${formatMinutes(value as number)}`}
+              contentStyle={{
+                backgroundColor: "#1f2937", // สีพื้นหลัง (เทาเข้ม)
+                border: "1px solid #60a5fa",
+                borderRadius: "8px"
+              }}
+              itemStyle={{
+                color: "#facc15", // สีตัวหนังสือ (เหลือง)
+                fontWeight: "bold"
+              }}
+              labelStyle={{
+                color: "#93c5fd", // สี label (ฟ้าอ่อน)
+                fontWeight: "bold"
+              }}
+            />
+            <Area
+              type="stepAfter"
+              dataKey="value"
+              stroke="#2563eb"
+              strokeWidth={3}
+              fill="#60a5fa"
+              isAnimationActive={false}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

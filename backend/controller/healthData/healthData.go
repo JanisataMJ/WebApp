@@ -55,7 +55,6 @@ func GetHealthDataByUserID(c *gin.Context) {
 
 
 // GET 	/healthData/weekly/6?mode=last7days
-// 		/healthData/weekly/6?mode=weekly
 func GetWeeklyHealthData(c *gin.Context) {
     db := c.MustGet("db").(*gorm.DB)
     userID := c.Param("id")
@@ -129,7 +128,7 @@ func GetWeeklyHealthData(c *gin.Context) {
             Date:       date, // 👉 ได้วันที่จริง YYYY-MM-DD
             AvgBpm:     totalBpm / count,
             Steps:      totalSteps,
-            SleepHours: totalSleep / count,
+            SleepHours: totalSleep,
             Calories:   totalCalories / count,
             AvgSpo2:    totalSpo2 / count,
         })

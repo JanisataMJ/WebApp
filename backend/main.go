@@ -129,7 +129,6 @@ func main() {
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
 		router.GET("/sleep-analysis/:id", healthAnalysis.GetSleepAnalysisByUser)
 		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
-		router.POST("/create-healthAnalysis/:id", healthAnalysis.CreateHealthAnalysis)
 		router.GET("/list-healthData", healthData.ListHealthData)
 		router.GET("/healthData/:id", healthData.GetHealthDataByUserID)
 		router.GET("/healthData/weekly/:id", healthData.GetWeeklyHealthData)

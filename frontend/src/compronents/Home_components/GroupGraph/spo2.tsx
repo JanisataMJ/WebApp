@@ -6,9 +6,9 @@ import { Customized } from "recharts";
 
 interface SpO2Data {
   time: string;
-  spo2: number | null; // เปลี่ยนเป็น number | null เพื่อความชัดเจน
+  spo2: number | null;
   hour: number;
-  status: 'normal' | 'low' | 'critical' | 'severe' | 'none'; // เพิ่ม 'none' สำหรับข้อมูลที่เป็น null
+  status: 'normal' | 'low' | 'critical' | 'severe' | 'none';
 }
 
 interface StatusDistribution {
@@ -86,19 +86,22 @@ const DairySpo2: React.FC = () => {
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   const validSpo2Data = data.filter(d => d.spo2 !== null) as { time: string; spo2: number; hour: number; status: SpO2Data['status'] }[];
-  if (validSpo2Data.length === 0) return <div>ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>;
+  //if (validSpo2Data.length === 0) return <div>ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>;
 
   // คำนวณ stats จากข้อมูลที่ 'มีค่า' เท่านั้น
   const spo2Values = validSpo2Data.map(d => d.spo2);
 
-  // ป้องกันการหารด้วยศูนย์หากมีค่าเป็น 0 ทั้งหมด (แต่กรณีนี้ถูกกรองด้วย validSpo2Data.length === 0 ไปแล้ว)
   const avgSpO2 = spo2Values.length > 0
-    ? Number((spo2Values.reduce((a, b) => (a as number) + (b as number), 0) / spo2Values.length).toFixed(2))
+    ? Number((spo2Values.reduce((a, b) => a + b, 0) / spo2Values.length).toFixed(2))
     : 0;
 
-  // Math.max/min ใช้กับ array ว่างไม่ได้ ดังนั้นใช้เงื่อนไขจาก validSpo2Data.length
-  const maxSpO2 = Math.max(...spo2Values);
-  const minSpO2 = Math.min(...spo2Values); // ✅ minSpO2 จะมาจากค่า SpO2 ที่เป็นตัวเลขเท่านั้น
+  const maxSpO2 = spo2Values.length > 0 ? Math.max(...spo2Values) : 0;
+  const minSpO2 = spo2Values.length > 0 ? Math.min(...spo2Values) : 0;
+
+  const currentSpO2 = spo2Values.length > 0
+    ? validSpo2Data[validSpo2Data.length - 1].spo2
+    : 0;
+
 
   const statusCounts = validSpo2Data.reduce((acc, item) => { // ใช้ validSpo2Data เพื่อคำนวณ distribution
     acc[item.status] = (acc[item.status] || 0) + 1;
@@ -114,7 +117,7 @@ const DairySpo2: React.FC = () => {
     { name: 'อันตราย', value: ((statusCounts.severe || 0) / totalValidCount) * 100, count: statusCounts.severe || 0, color: '#991b1b' }
   ].filter(item => item.count > 0);
 
-  const currentSpO2 = validSpo2Data[validSpo2Data.length - 1]?.spo2 || 98; // Fallback เป็น 98 ถ้าไม่มีข้อมูลที่มีค่าเลย
+  //const currentSpO2 = validSpo2Data[validSpo2Data.length - 1]?.spo2 || 98; // Fallback เป็น 98 ถ้าไม่มีข้อมูลที่มีค่าเลย
 
   function getStatusColor(spo2: number): string {
     if (spo2 >= 96) return '#10b981';
@@ -176,6 +179,10 @@ const DairySpo2: React.FC = () => {
     <div className="spo2-container">
       <div className="header-section-spo2">
         <h2 className="title-spo2">ออกซิเจนในเลือด</h2>
+
+        {validSpo2Data.length === 0 && (
+          <div className="no-data-message"  style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>
+        )}
 
         {/* สถิติสรุป */}
         <div className="stats-grid-spo2">

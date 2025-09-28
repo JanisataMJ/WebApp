@@ -22,7 +22,7 @@ import (
 	// 💡 แก้ไข Alias: users เป็น user
 	user "github.com/JanisataMJ/WebApp/controller/user" 
 	"github.com/JanisataMJ/WebApp/middlewares"
-	/* "github.com/JanisataMJ/WebApp/seed" */
+	"github.com/JanisataMJ/WebApp/seed"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -52,7 +52,7 @@ func main() {
 	config.SetupDatabase()
 
 	//seed.SeedHealthData(gormDB)
-	//seed.SeedHealthDataTwoWeeks(gormDB)
+	seed.SeedHealthDataTwoWeeks(gormDB)
 
 	//*** เรียกใช้ Backfill Health Analysis ที่นี่ ***
 	//healthAnalysis.BackfillHealthAnalysis(gormDB)

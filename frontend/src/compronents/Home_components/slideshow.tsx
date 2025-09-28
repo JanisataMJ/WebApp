@@ -69,8 +69,37 @@ const Slider: React.FC = () => {
     },
   ];
 
+  /* useEffect(() => {
+    const fetchHealthdatas = async () => {
+      try {
+        const res = await getHealthDataByUserID(UserID);
 
-  // โหลดข้อมูล health data
+        const sorted = res.sort(
+          (a: RealTimeInterface, b: RealTimeInterface) =>
+            new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
+        );
+
+        if (sorted.length > 0) {
+          const latest = sorted[0];
+
+          // ✅ วันที่ปัจจุบัน (Asia/Bangkok)
+          const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+          const latestDate = new Date(latest.Timestamp).toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+
+          if (latestDate === today) {
+            setHealthItems(mapHealthData(latest));
+          } else {
+            console.warn("ข้อมูลล่าสุดไม่ใช่ของวันนี้:", latestDate);
+            setHealthItems([]); // ❌ ไม่ต้องแสดงค่า
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch health data:", error);
+      }
+    };
+
+    fetchHealthdatas();
+  }, [UserID]); */
   useEffect(() => {
     const fetchHealthdatas = async () => {
       try {
@@ -82,15 +111,44 @@ const Slider: React.FC = () => {
         );
 
         if (sorted.length > 0) {
-          setHealthItems(mapHealthData(sorted[0]));
+          const latest = sorted[0];
+
+          // ✅ วันที่ปัจจุบัน (Asia/Bangkok)
+          const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+          const latestDate = new Date(latest.Timestamp).toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+
+          if (latestDate === today) {
+            // ข้อมูลวันนี้ → ใช้จริง
+            setHealthItems(mapHealthData(latest));
+          } else {
+            // ❌ ไม่ใช่วันนี้ → สร้าง dummy ค่า 0
+            const emptyData: RealTimeInterface = {
+              ...latest,
+              Bpm: 0,
+              CaloriesBurned: 0,
+              Spo2: 0,
+              SleepHours: 0,
+              Steps: 0,
+              HealthAnalysis: [] // ล้าง interpret
+            };
+
+            // แปลงแล้วใส่ข้อความว่าไม่มีข้อมูล
+            const items = mapHealthData(emptyData).map(item => ({
+              ...item,
+              sub: "ไม่พบข้อมูลสุขภาพตอนนี้"
+            }));
+
+            setHealthItems(items);
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch health data:', error);
+        console.error("Failed to fetch health data:", error);
       }
     };
 
     fetchHealthdatas();
   }, [UserID]);
+
 
   useEffect(() => {
     if (healthItems.length === 0) return;
@@ -224,7 +282,7 @@ const Slider: React.FC = () => {
               background: `linear-gradient(90deg, ${healthItems[currentIndex].color} 0%, ${healthItems[currentIndex].color}80 100%)`
             }}
           />
-        </div> 
+        </div>
 
         <div className="quick-stats">
           <div className="stat-item">

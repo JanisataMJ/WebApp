@@ -60,25 +60,24 @@ func SetupDatabase() {
 
 	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 
-	// User 1
 	User1 := &entity.User{
-		Username:    "James",
-		Password:    hashedPassword,
-		Email:       "user1@gmail.com",
-		FirstName:   "James",
-		LastName:    "Smith",
-		Birthdate:   BirthDay,
-		Phonenumber: "0866666666",
-		Profile:     "uploads/Profiles/profile1.jpeg",
-		Height:      186,
-		Weight:      75,
-		Bust:        42,
-		Waist:       35,
-		Hip:         37,
-		RoleID:      2,
-		GenderID:    1,
-	}
-	db.FirstOrCreate(User1, &entity.User{Email: "user1@gmail.com"})
+        Username:       "James",
+        Password:       hashedPassword,
+        Email:          "user1@gmail.com",
+        FirstName:      "James",
+        LastName:       "Smith",
+        Birthdate:      BirthDay,
+        Phonenumber:    "0866666666",
+        Profile:        "uploads/Profiles/profile1.jpeg",
+        Height:         186,
+        Weight:         75,
+        Bust:           42,
+        Waist:          35,
+        Hip:            37,
+        RoleID:         2,
+        GenderID:       1,
+   }
+   db.FirstOrCreate(User1, &entity.User{Email: "user1@gmail.com"})
 
 	// User 2 (ID=2)
 	User2 := &entity.User{

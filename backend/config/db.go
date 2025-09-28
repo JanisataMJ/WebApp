@@ -33,7 +33,6 @@ func SetupDatabase() {
        &entity.User{},
        &entity.Role{},
        &entity.Gender{},
-       &entity.MoodData{},
        &entity.Notification{},
        &entity.Trends{},
        &entity.HealthType{},
@@ -171,27 +170,6 @@ func SetupDatabase() {
         GenderID:       2,
    }
    db.FirstOrCreate(OppoUser, &entity.User{Email: "user10@gmail.com",})
-
-
-   
-   initialCalendars := []entity.MoodData{
-		{
-            UserID:     1,
-			Title:      "Animal Feeding",
-			CalendarDate:  time.Date(2024, 12, 20, 8, 0, 0, 0, time.UTC),
-			AllDay:     true,
-		},
-		{
-            UserID:     1,
-			Title:      "Health Checkup",
-			CalendarDate:  time.Date(2024, 12, 22, 10, 0, 0, 0, time.UTC),
-			AllDay:     true,
-		},
-	}
-
-	for _, calendar := range initialCalendars {
-		db.FirstOrCreate(&calendar, entity.MoodData{Title: calendar.Title, CalendarDate: calendar.CalendarDate})
-	}
 
 
     //SmartwatchDevice

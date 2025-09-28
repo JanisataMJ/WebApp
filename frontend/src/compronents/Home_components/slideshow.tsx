@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import './slideshow.css';
-import { Activity, Heart, Droplets, Thermometer, Moon, TrendingUp } from 'lucide-react';
+import { Activity, Heart, Droplets, Moon, TrendingUp } from 'lucide-react';
 
 import { getHealthDataByUserID } from '../../services/https/DataHealth/healthData';
 import { RealTimeInterface } from '../../interface/health_data_interface/realtime';

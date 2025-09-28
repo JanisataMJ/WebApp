@@ -6,9 +6,9 @@ import { Customized } from "recharts";
 
 interface SpO2Data {
   time: string;
-  spo2: number;
+  spo2: number | null; // เปลี่ยนเป็น number | null เพื่อความชัดเจน
   hour: number;
-  status: 'normal' | 'low' | 'critical' | 'severe';
+  status: 'normal' | 'low' | 'critical' | 'severe' | 'none'; // เพิ่ม 'none' สำหรับข้อมูลที่เป็น null
 }
 
 interface StatusDistribution {
@@ -38,7 +38,7 @@ const DairySpo2: React.FC = () => {
         const rawData = res?.data ?? [];
 
         const mappedData: SpO2Data[] = rawData.map((d: any) => {
-          let status: 'normal' | 'low' | 'critical' | 'severe';
+          let status: 'normal' | 'low' | 'critical' | 'severe' | 'none';
           const spo2 = Number(d.spo2?.toFixed(2) ?? 0);
           if (spo2 >= 96) status = 'normal';
           else if (spo2 >= 90) status = 'low';
@@ -57,7 +57,7 @@ const DairySpo2: React.FC = () => {
         // ✅ สร้างช่วงเวลา 0:00 → เวลาปัจจุบัน
         const now = new Date();
         const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
+        // const currentMinute = now.getMinutes(); // ไม่ได้ใช้
 
         const fullDay: SpO2Data[] = [];
         for (let h = 0; h <= currentHour; h++) {
@@ -66,9 +66,9 @@ const DairySpo2: React.FC = () => {
           fullDay.push(
             found || {
               time: timeLabel,
-              spo2: null as any, // ไม่มีค่า → ให้เป็น null
+              spo2: null, // ไม่มีค่า → ให้เป็น null
               hour: h,
-              status: "normal",
+              status: "none", // สถานะ 'none' สำหรับข้อมูลที่ไม่มี
             }
           );
         }
@@ -84,29 +84,37 @@ const DairySpo2: React.FC = () => {
     fetchData();
   }, []);
 
-
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
-  if (data.length === 0) return <div>ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>;
+  const validSpo2Data = data.filter(d => d.spo2 !== null) as { time: string; spo2: number; hour: number; status: SpO2Data['status'] }[];
+  if (validSpo2Data.length === 0) return <div>ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>;
 
-  // คำนวณ stats
-  const spo2Values = data.map(d => d.spo2);
-  const avgSpO2 = Number((spo2Values.reduce((a, b) => a + b, 0) / spo2Values.length).toFixed(2));
+  // คำนวณ stats จากข้อมูลที่ 'มีค่า' เท่านั้น
+  const spo2Values = validSpo2Data.map(d => d.spo2);
+
+  // ป้องกันการหารด้วยศูนย์หากมีค่าเป็น 0 ทั้งหมด (แต่กรณีนี้ถูกกรองด้วย validSpo2Data.length === 0 ไปแล้ว)
+  const avgSpO2 = spo2Values.length > 0
+    ? Number((spo2Values.reduce((a, b) => (a as number) + (b as number), 0) / spo2Values.length).toFixed(2))
+    : 0;
+
+  // Math.max/min ใช้กับ array ว่างไม่ได้ ดังนั้นใช้เงื่อนไขจาก validSpo2Data.length
   const maxSpO2 = Math.max(...spo2Values);
-  const minSpO2 = Math.min(...spo2Values);
+  const minSpO2 = Math.min(...spo2Values); // ✅ minSpO2 จะมาจากค่า SpO2 ที่เป็นตัวเลขเท่านั้น
 
-  const statusCounts = data.reduce((acc, item) => {
+  const statusCounts = validSpo2Data.reduce((acc, item) => { // ใช้ validSpo2Data เพื่อคำนวณ distribution
     acc[item.status] = (acc[item.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
+  const totalValidCount = validSpo2Data.length;
+
   const statusDistribution: StatusDistribution[] = [
-    { name: 'ปกติ', value: ((statusCounts.normal || 0) / data.length) * 100, count: statusCounts.normal || 0, color: '#10b981' },
-    { name: 'ต่ำ', value: ((statusCounts.low || 0) / data.length) * 100, count: statusCounts.low || 0, color: '#f59e0b' },
-    { name: 'วิกฤต', value: ((statusCounts.critical || 0) / data.length) * 100, count: statusCounts.critical || 0, color: '#ef4444' },
-    { name: 'อันตราย', value: ((statusCounts.severe || 0) / data.length) * 100, count: statusCounts.severe || 0, color: '#991b1b' }
+    { name: 'ปกติ', value: ((statusCounts.normal || 0) / totalValidCount) * 100, count: statusCounts.normal || 0, color: '#10b981' },
+    { name: 'ต่ำ', value: ((statusCounts.low || 0) / totalValidCount) * 100, count: statusCounts.low || 0, color: '#f59e0b' },
+    { name: 'วิกฤต', value: ((statusCounts.critical || 0) / totalValidCount) * 100, count: statusCounts.critical || 0, color: '#ef4444' },
+    { name: 'อันตราย', value: ((statusCounts.severe || 0) / totalValidCount) * 100, count: statusCounts.severe || 0, color: '#991b1b' }
   ].filter(item => item.count > 0);
 
-  const currentSpO2 = data[data.length - 1]?.spo2 || 98;
+  const currentSpO2 = validSpo2Data[validSpo2Data.length - 1]?.spo2 || 98; // Fallback เป็น 98 ถ้าไม่มีข้อมูลที่มีค่าเลย
 
   function getStatusColor(spo2: number): string {
     if (spo2 >= 96) return '#10b981';
@@ -121,8 +129,16 @@ const DairySpo2: React.FC = () => {
       case 'low': return '🟡 ต่ำ';
       case 'critical': return '🔴 วิกฤต';
       case 'severe': return '🆘 อันตราย';
-      default: return 'ไม่ทราบ';
+      // ลบ case 'none' ออกจากที่นี่ เพราะไม่ควรส่งค่า 'none' มาตรงๆ
+      default: return 'ไม่ทราบ'; // หรืออาจเปลี่ยนเป็น 'ไม่มีข้อมูลล่าสุด' ถ้า status เป็น 'none'
     }
+  };
+
+  const getSpO2Status = (spo2: number): 'normal' | 'low' | 'critical' | 'severe' => {
+    if (spo2 >= 96) return 'normal';
+    if (spo2 >= 90) return 'low';
+    if (spo2 >= 85) return 'critical';
+    return 'severe';
   };
 
   const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
@@ -130,6 +146,7 @@ const DairySpo2: React.FC = () => {
       const data = payload[0].payload;
       return (
         <div className="custom-tooltip-spo2">
+          <p className="tooltip-time-spo2">{`เวลา: ${label}`}</p>
           <p className="tooltip-spo2">{`SpO2: ${payload[0].value.toFixed(2)}%`}</p>
           <p className={`tooltip-status-spo2 ${data.status}`}>{getStatusText(data.status)}</p>
         </div>
@@ -152,6 +169,7 @@ const DairySpo2: React.FC = () => {
   };
 
   const radialData = [{ name: 'SpO2', value: currentSpO2, fill: getStatusColor(currentSpO2) }];
+  const currentSpO2Status = getSpO2Status(currentSpO2); // 👈 **ใช้ค่านี้**
 
 
   return (
@@ -215,7 +233,7 @@ const DairySpo2: React.FC = () => {
               </RadialBarChart>
             </ResponsiveContainer>
             <div className={`status-indicator-spo2 ${data[data.length - 1]?.status}`}>
-              {getStatusText(data[data.length - 1]?.status)}
+              {getStatusText(currentSpO2Status)}
             </div>
           </div>
         </div>
@@ -239,6 +257,8 @@ const DairySpo2: React.FC = () => {
                 dataKey="time"
                 stroke="#666"
                 tick={{ fontSize: 12 }}
+                type="category"   // ใช้ category ตามข้อมูลจริง
+                allowDuplicatedCategory={false}
               />
               <YAxis
                 stroke="#666"

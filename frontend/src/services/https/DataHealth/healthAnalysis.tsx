@@ -1,7 +1,7 @@
 import axios from "axios";
 import { HealthAnalysisInterface } from "../../../interface/health_analysis_interface/health_analysis";
 
-const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
+const apiUrl = "http://localhost:8000"; 
 const getRequestOptions = () => {
   const Authorization = localStorage.getItem("token");
   const Bearer = localStorage.getItem("token_type");

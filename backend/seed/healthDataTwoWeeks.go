@@ -74,18 +74,28 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 			}
 		}
 
+		cumulativeSteps := int64(0)
+		cumulativeCalories := 0.0
+
 		for hour := 0; hour <= maxHour; hour++ {
+			// สุ่มก้าวเดินของชั่วโมงนี้
+			stepsThisHour := int64(rand.Intn(200) + 50) // เช่น 50-250 ก้าว/ชม.
+			cumulativeSteps += stepsThisHour
+
+			// สุ่มแคลอรี่ที่เผาผลาญของชั่วโมงนี้
+			caloriesThisHour := 50 + rand.Float64()*30 // เช่น 50-80 kcal/ชม.
+			cumulativeCalories += caloriesThisHour
+
 			hd := entity.HealthData{
 				Timestamp:      day.Add(time.Duration(hour) * time.Hour),
 				Bpm:            uint(60 + rand.Intn(40)),
-				Steps:          int64(500 + rand.Intn(2000)),
-				CaloriesBurned: 100 + rand.Float64()*50,
+				Steps:          cumulativeSteps,
+				CaloriesBurned: cumulativeCalories, // 👈 ใช้ cumulative
 				Spo2:           95 + float64(rand.Intn(4)),
-				SleepHours:     "", // ส่วนใหญ่เป็นค่าว่าง
+				SleepHours:     "",
 				UserID:         user.ID,
 			}
 
-			// ✅ ใส่ SleepHours แค่ record แรกของวัน (เช่น 00:00)
 			if hour == 0 {
 				hd.SleepHours = sleepString
 			}

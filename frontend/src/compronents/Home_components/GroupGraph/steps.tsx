@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar } from 'recharts';
 import './steps.css';
 import { getDailySteps } from '../../../services/https/DataHealth/healthData';
+import { GetUsersById } from '../../../services/https/User/user';
+import { UsersInterface } from '../../../interface/profile_interface/IProfile';
 
 interface StepsData {
   time: string;
@@ -32,29 +34,69 @@ interface CustomTooltipProps {
   label?: string;
 }
 
-const STEP_LENGTH_M = 0.75; // ความยาวก้าวเฉลี่ย (เมตร)
-const USER_WEIGHT_KG = 60; // น้ำหนักผู้ใช้ (kg)
-
 const DairySteps: React.FC = () => {
   const [data, setData] = useState<StepsData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [targetSteps, setTargetSteps] = useState(10000); // เปลี่ยนเป็น state
-  const UserID = Number(localStorage.getItem("id"));
+  const [targetSteps, setTargetSteps] = useState(10000);
+  const [userWeightKg, setUserWeightKg] = useState(60);
+  const [userHeightCm, setUserHeightCm] = useState(170);
+
+  // ✅ 1. แก้ไข: แยก UserID เป็น string และ number
+  const UserIDString = localStorage.getItem("id") || "";
+  const UserIDNumber = Number(UserIDString);
+
+
+  // 🎯 ฟังก์ชันคำนวณความยาวก้าว (เมตร) จากส่วนสูง (ซม.)
+  const calculateStrideLength = (heightCm: number): number => {
+    if (heightCm <= 0) return 0.75;
+    return (heightCm * 0.414) / 100;
+  };
 
   useEffect(() => {
-    const fetchStepsData = async () => {
+    const fetchAllData = async () => {
       setLoading(true);
+
+      let actualWeight = 60;
+      let actualHeight = 160;
+
       try {
-        const response = await getDailySteps(UserID);
+        // 1. ดึงข้อมูล User (ส่วนสูง/น้ำหนัก)
+        if (UserIDString) {
+          // ✅ แก้ไข: ใช้ UserIDString (string)
+          const userRes = await GetUsersById(UserIDString);
+          const userData = userRes?.data as UsersInterface;
+
+          if (userData) {
+            // ✅ แก้ไข: ใช้ Optional Chaining และ Nullish Coalescing เพื่อเลี่ยง undefined
+            actualWeight = (userData.weight ?? 0) > 0 ? userData.weight! : 60;
+            actualHeight = (userData.height ?? 0) > 0 ? userData.height! : 160;
+
+            setUserWeightKg(actualWeight);
+            setUserHeightCm(actualHeight);
+            console.log('actualWeight:', actualWeight);
+            console.log('actualHeight:', actualHeight);
+          }
+        }
+
+        // 2. คำนวณความยาวก้าวจริงจากส่วนสูง
+        const actualStepLengthM = calculateStrideLength(actualHeight);
+
+        // 3. ดึงข้อมูล Steps
+        // ✅ แก้ไข: ใช้ UserIDNumber (number)
+        const response = await getDailySteps(UserIDNumber);
         const rawSteps: Partial<StepsData>[] = Array.isArray(response) ? response : response.data || [];
 
+        // 4. Map Data โดยใช้ Weight และ Stride Length จริง
         const stepsArray: StepsData[] = rawSteps.map((item: any, index: number) => {
+          // ... (ส่วนคำนวณ Steps/CumulativeSteps เดิม)
           const steps = index === 0
             ? item.steps || 0
             : (item.steps || 0) - (rawSteps[index - 1].steps || 0);
           const cumulativeSteps = item.steps || 0;
-          const distance = steps * STEP_LENGTH_M / 1000;
-          const calories = distance * USER_WEIGHT_KG * 0.5;
+
+          // คำนวณ Distance & Calories ที่ใช้ actualWeight/actualStepLengthM
+          const distance = steps * actualStepLengthM / 1000;
+          const calories = (distance * actualWeight * 0.5) || 0;
 
           return {
             time: item.time || '',
@@ -70,15 +112,15 @@ const DairySteps: React.FC = () => {
 
         setData(stepsArray);
       } catch (error) {
-        console.error('Error fetching steps:', error);
+        console.error('Error fetching data:', error);
         setData([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStepsData();
-  }, [UserID]);
+    fetchAllData();
+  }, [UserIDString]); 
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   if (!data || data.length === 0) return <div>ไม่พบข้อมูลการเดินของวันนี้</div>;

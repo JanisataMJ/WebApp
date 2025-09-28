@@ -16,7 +16,7 @@ import (
 )
 
 // parseSleepHours แปลงค่า SleepHours (เช่น "10 h. 30 m.") เป็นชั่วโมงทศนิยม
-func parseSleepHours(sleepStr string, userID uint) float64 {
+func ParseSleepHours(sleepStr string, userID uint) float64 {
 	// ใช้ Regular Expression เพื่อค้นหาตัวเลขทั้งหมด
 	re := regexp.MustCompile(`\d+(\.\d+)?`)
 	matches := re.FindAllString(sleepStr, -1)
@@ -53,7 +53,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 	dataString.WriteString("Timestamp,Heart Rate,Steps,Blood Oxygen,Sleep (Hours),Calories\n") // ลบ Body Temperature ออกถ้าไม่มีข้อมูล
 
 	for _, item := range healthData {
-		sleepValue := parseSleepHours(item.SleepHours, userID)
+		sleepValue := ParseSleepHours(item.SleepHours, userID)
 		
 		dataString.WriteString(fmt.Sprintf("%s,%d,%d,%.2f,%.2f,%f\n",
 			item.CreatedAt.Format("2006-01-02"),

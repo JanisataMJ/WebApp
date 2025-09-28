@@ -41,24 +41,33 @@ const DairyCalorie: React.FC = () => {
           const minTime = Math.min(...times.map(t => parseInt(t.split(":")[0])));
           const maxTime = Math.max(...times.map(t => parseInt(t.split(":")[0])));
 
-          // 🔄 เติมทุกชั่วโมงในช่วง min → max
-          const hourlyData: CalorieData[] = [];
-          for (let h = minTime; h <= maxTime + 1; h++) {
-            const hourLabel = `${String(h).padStart(2, "0")}:00`;
+          // 1) Group by hour → เลือกค่า max ของแต่ละชั่วโมง
+          const grouped: { [hour: string]: CalorieData } = {};
+          rawData.forEach(d => {
+            const hour = d.time.split(":")[0]; // เอาเฉพาะชั่วโมง
+            if (!grouped[hour] || d.calories > grouped[hour].calories) {
+              grouped[hour] = d;
+            }
+          });
 
-            // หา record ที่เวลาจริงอยู่ในชั่วโมงนี้
-            const record = rawData.find(r => parseInt(r.time.split(":")[0]) === h);
+          // 2) เรียงตามเวลา
+          const sorted = Object.values(grouped).sort((a, b) =>
+            a.time.localeCompare(b.time)
+          );
 
-            hourlyData.push({
-              time: hourLabel, // เอาไว้โชว์ใน X axis
-              calories: record ? record.calories : 0, // ต่อชั่วโมง
-              activity: record ? record.activity : "ไม่มีข้อมูล",
-              originalTime: record ? record.time : "" // 👉 เก็บเวลาจริงไว้
-            } as any);
-          }
+          // 3) คำนวณ diff (ปัจจุบัน - ก่อนหน้า)
+          const diffData: CalorieData[] = sorted.map((d, i) => {
+            if (i === 0) return { ...d }; // ค่าแรกใช้ตามจริง
+            const prev = sorted[i - 1];
+            return {
+              ...d,
+              calories: d.calories - prev.calories
+            };
+          });
 
-          setData(hourlyData);
-          setTotalBurnedCalories(rawData[rawData.length - 1].calories);
+          setData(diffData);
+          setTotalBurnedCalories(sorted[sorted.length - 1].calories);
+
         }
       } catch (err) {
         console.error("Failed to fetch daily burned calories", err);

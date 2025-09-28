@@ -16,26 +16,12 @@ type HealthItem = {
   bgGradient: string;
 };
 
-// 👇 helper: แปลง "8h 30m" → 8.5
-/* const parseSleepToHours = (val: string | number | null | undefined): number => {
-  if (!val) return 0;
-  if (typeof val === "number") return val;
 
-  const match = val.match(/(\d+)h\s*(\d+)?m?/);
-  if (!match) return 0;
-
-  const hours = parseInt(match[1], 10);
-  const minutes = match[2] ? parseInt(match[2], 10) : 0;
-
-  return hours + minutes / 60;
-}; */
-
-// 👉 helper function แปลง string/number → "7.10 ชม."
 const formatSleepHours = (val: string | number | null | undefined): string => {
   if (!val) return "ไม่มีข้อมูล";
 
   if (typeof val === "number") {
-    return `${val.toFixed(2)} ชม.`; // กรณี backend ส่งตัวเลขทศนิยม
+    return `${val.toFixed(2)} ชม.`;
   }
 
   const match = val.match(/(\d+)h\s*(\d+)?m?/);

@@ -9,10 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	// ลบ "regexp" ออกเพราะถูกย้ายไปที่ geminiAnalysis.go
-	// ลบ "github.com/google/generative-ai-go/genai" ออก
-	// ลบ "google.golang.org/api/option" ออก
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/JanisataMJ/WebApp/config"
@@ -142,7 +138,7 @@ func CheckForCriticalAlerts(ctx context.Context) {
 			if latestHealthData.Bpm >= uint(criticalHeartRateHigh) {
 				alerts += fmt.Sprintf("- อัตราการเต้นของหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
 			}
-			if latestHealthData.Bpm >= uint(criticalHeartRateLow) {
+			if latestHealthData.Bpm <= uint(criticalHeartRateLow) {
 				alerts += fmt.Sprintf("- อัตราการเต้นของหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
 			}
 			if latestHealthData.Spo2 <= criticalSpo2 {
@@ -162,29 +158,9 @@ func CheckForCriticalAlerts(ctx context.Context) {
 
 // WeeklyAnalysisJob ทำงานเป็น Goroutine สำหรับการวิเคราะห์รายสัปดาห์
 func WeeklyAnalysisJob(ctx context.Context) {
-	// Schedule to run every Sunday at a specific time (or immediately for demo)
-	// For actual weekly job scheduling, you'd use a library like `go-co` or check the day of the week.
-	// For now, we keep the simple loop structure but rename it for clarity.
-	
-	// NOTE: โค้ดนี้จะทำงานวนลูปทุกนาที ซึ่งไม่ใช่ "Weekly" ที่ถูกต้อง แต่ผมจะรักษารูปแบบเดิมไว้
-	// หากต้องการให้เป็น Weekly จริงๆ ควรเพิ่ม:
-	/*
-	for {
-		now := time.Now()
-		if now.Weekday() == time.Sunday && now.Hour() == 2 { // run Sunday at 2 AM
-			runWeeklyAnalysis(ctx)
-		}
-		time.Sleep(1 * time.Hour)
-	}
-	*/
-
 	// *** เดิม: วนลูปทันที ***
 	runWeeklyAnalysis(ctx) // รันครั้งแรกทันที
 	
-	// วนลูปเพื่อรันซ้ำตามที่ต้องการ (เช่น ทุกวันอาทิตย์)
-	// เนื่องจากไม่มีตัวจับเวลาแบบ Weekly ในโค้ดเดิม, ผมจะรันเพียงครั้งเดียวเพื่อให้ Log ไม่เยอะเกินไป
-	// ในการใช้งานจริง: ควรเปลี่ยนเป็นตัวจับเวลาที่เหมาะสม
-
 	select {
 	case <-ctx.Done():
 		log.Println("Weekly analysis job stopped.")

@@ -34,15 +34,14 @@ const Overview = () => {
   useEffect(() => {
     const fetchVitals = async () => {
       try {
-        const latestWeek: HealthSummaryInterface = await GetWeeklySummary(UserID, mode);
+        const modeBackend = mode === "weekly" ? "weekly" : "lastweek";
+        const latestWeek = await GetWeeklySummary(UserID, modeBackend);
 
         let previousWeek: HealthSummaryInterface | null = null;
         if (mode === "weekly") {
-          console.log("Fetching comparison: lastweek"); // DEBUG
           previousWeek = await GetWeeklySummary(UserID, "lastweek");
         } else if (mode === "lastweek") {
-          console.log("Fetching comparison: last2weeks"); // DEBUG
-          previousWeek = await GetWeeklySummary(UserID, "last2weeks");
+          previousWeek = await GetWeeklySummary(UserID, "weekly"); // หรือสัปดาห์ก่อนของ lastweek
         }
 
         setSummary(latestWeek);
@@ -156,55 +155,64 @@ const Overview = () => {
   }, [UserID, mode]);
 
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const data = await GetWeeklyHealthData(UserID, mode);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await GetWeeklyHealthData(UserID, mode);
 
-      const dayNames = ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."];
+        const dayNames = ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."];
 
-      const grouped: Record<string, { steps: number; bpm: number; sleep: number; calories: number; spo2: number; count: number }> = {};
-      dayNames.forEach((d) => {
-        grouped[d] = { steps: 0, bpm: 0, sleep: 0, calories: 0, spo2: 0, count: 0 };
-      });
+        const grouped: Record<string, { steps: number; bpm: number; sleep: number; calories: number; spo2: number; count: number }> = {};
+        dayNames.forEach((d) => {
+          grouped[d] = { steps: 0, bpm: 0, sleep: 0, calories: 0, spo2: 0, count: 0 };
+        });
 
-      data.forEach((d: any) => {
-        const jsDate = new Date(d.date);
-        let dayIndex = jsDate.getDay(); 
-        dayIndex = (dayIndex + 6) % 7;
-
-        const day = dayNames[dayIndex];
-        grouped[day].steps += d.steps;
-        grouped[day].bpm += d.avg_bpm || 0;
-        grouped[day].sleep += d.sleep_hours || 0;
-        grouped[day].calories += d.calories || 0;
-        grouped[day].spo2 += d.avg_spo2 || 0;
-        grouped[day].count += 1;
-      });
-
-      // ✅ ทำ mapped ตามลำดับ dayNames
-      const mapped = dayNames.map((day) => {
-        const v = grouped[day];
-        return {
-          day,
-          avgSteps: v.count ? Math.round(v.steps / v.count) : 0,
-          avg_bpm: v.count ? Math.round(v.bpm / v.count) : 0,
-          sleep_hours: v.count ? Number((v.sleep / v.count).toFixed(1)) : 0,
-          calories: v.count ? Math.round(v.calories / v.count) : 0,
-          avg_spo2: v.count ? Math.round(v.spo2 / v.count) : 0,
+        // แปลง SleepHours string เป็น float
+        const parseSleep = (s: string) => {
+          if (!s) return 0;
+          const re = /(\d+)\s*h(?:our)?\.?\s*(\d+)?\s*m?\.?/i;
+          const match = s.match(re);
+          if (match) {
+            const hours = parseFloat(match[1]);
+            const minutes = match[2] ? parseFloat(match[2]) : 0;
+            return hours + minutes / 60;
+          }
+          return parseFloat(s) || 0;
         };
-      });
 
-      setWeeklyData(mapped);
-    } catch (error) {
-      console.error("Error fetching weekly data:", error);
-    }
-  };
-  fetchData();
-}, [UserID, mode]);
+        data.forEach((d: any) => {
+          const jsDate = new Date(d.date);
+          let dayIndex = jsDate.getDay();
+          dayIndex = (dayIndex + 6) % 7; // ปรับให้เริ่มจันทร์ = 0
 
+          const day = dayNames[dayIndex];
+          grouped[day].steps += d.steps;
+          grouped[day].bpm += d.avg_bpm || 0;
+          grouped[day].sleep += parseSleep(d.sleep_hours); // ✅ แปลงเป็น float
+          grouped[day].calories += d.calories || 0;
+          grouped[day].spo2 += d.avg_spo2 || 0;
+          grouped[day].count += 1;
+        });
 
+        const mapped = dayNames.map((day) => {
+          const v = grouped[day];
+          return {
+            day,
+            avgSteps: v.count ? Math.round(v.steps / v.count) : 0,
+            avg_bpm: v.count ? Math.round(v.bpm / v.count) : 0,
+            sleep_hours: v.count ? parseFloat((v.sleep / v.count).toFixed(1)) : 0, // ✅ float
+            calories: v.count ? Math.round(v.calories / v.count) : 0,
+            avg_spo2: v.count ? Math.round(v.spo2 / v.count) : 0,
+          };
+        });
 
+        setWeeklyData(mapped);
+      } catch (error) {
+        console.error("Error fetching weekly data:", error);
+      }
+    };
+    fetchData();
+  }, [UserID, mode]);
 
 
   const chartConfig = [
@@ -288,7 +296,7 @@ const Overview = () => {
       align: "center",
       className:
         "col-thisweek " +
-        (["weekly","lastweek"].includes(mode)
+        (["weekly", "lastweek"].includes(mode)
           ? "highlight-col"
           : ""),
       render: (value: any, record: any) => {
@@ -382,24 +390,24 @@ const Overview = () => {
                   </AreaChart>
                 </ResponsiveContainer> */}
                 <ResponsiveContainer width="100%" height={250}>
-  <AreaChart data={weeklyData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="day" />
-    {key === "sleep_hours" ? (
-      <YAxis domain={[0, 12]} tickFormatter={(val) => `${val}h`} />
-    ) : (
-      <YAxis />
-    )}
-    <Tooltip />
-    <Area
-      type="monotone"
-      dataKey={key}
-      stroke={color}
-      fill={fill}
-      strokeWidth={3}
-    />
-  </AreaChart>
-</ResponsiveContainer>
+                  <AreaChart data={weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    {key === "sleep_hours" ? (
+                      <YAxis domain={[0, 12]} tickFormatter={(val) => `${val}h`} />
+                    ) : (
+                      <YAxis />
+                    )}
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey={key}
+                      stroke={color}
+                      fill={fill}
+                      strokeWidth={3}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
 
               </div>
             ))}

@@ -61,16 +61,17 @@ const DairySpo2: React.FC = () => {
 
         const fullDay: SpO2Data[] = [];
         for (let h = 0; h <= currentHour; h++) {
-          const timeLabel = `${h.toString().padStart(2, "0")}:00`;
-          const found = mappedData.find(d => d.time.startsWith(`${h.toString().padStart(2, "0")}:`));
-          fullDay.push(
-            found || {
-              time: timeLabel,
-              spo2: null, // ไม่มีค่า → ให้เป็น null
+          const hourData = mappedData.filter(d => d.hour === h);
+          if (hourData.length > 0) {
+            fullDay.push(...hourData); // เอาทุกจุดของชั่วโมงนั้น
+          } else {
+            fullDay.push({
+              time: `${h.toString().padStart(2, "0")}:00`,
+              spo2: null,
               hour: h,
-              status: "none", // สถานะ 'none' สำหรับข้อมูลที่ไม่มี
-            }
-          );
+              status: "none",
+            });
+          }
         }
 
         setData(fullDay);
@@ -83,6 +84,15 @@ const DairySpo2: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const chartData = [...data]
+    .map(d => ({ ...d, spo2: d.spo2 !== null ? d.spo2 : undefined }))
+    .sort((a, b) => {
+      const [ah, am] = a.time.split(':').map(Number);
+      const [bh, bm] = b.time.split(':').map(Number);
+      return ah * 60 + am - (bh * 60 + bm);
+    });
+
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   const validSpo2Data = data.filter(d => d.spo2 !== null) as { time: string; spo2: number; hour: number; status: SpO2Data['status'] }[];
@@ -181,7 +191,7 @@ const DairySpo2: React.FC = () => {
         <h2 className="title-spo2">ออกซิเจนในเลือด</h2>
 
         {validSpo2Data.length === 0 && (
-          <div className="no-data-message"  style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>
+          <div className="no-data-message" style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>
         )}
 
         {/* สถิติสรุป */}
@@ -252,7 +262,7 @@ const DairySpo2: React.FC = () => {
         <div className="chart-container-spo2 line-chart-spo2">
           <h3 className="chart-title-spo2">📈 แนวโน้ม SpO2 ตลอดวัน</h3>
           <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
               {/* เส้นอ้างอิง */}
@@ -280,14 +290,15 @@ const DairySpo2: React.FC = () => {
                 dataKey="spo2"
                 stroke="#3b82f6"
                 strokeWidth={3}
-                connectNulls={false}
-                dot={false} // ปิด dot default
+                dot={true} // ✅ เปิด dot ทุกค่า
+                connectNulls={true}
                 activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
               />
+
               <Customized
                 component={({ points }: any) =>
                   points?.map((point: any, index: number) =>
-                    point?.value ? (
+                    point?.value !== undefined ? (
                       <circle
                         key={index}
                         cx={point.x}
@@ -301,7 +312,6 @@ const DairySpo2: React.FC = () => {
                   )
                 }
               />
-
             </LineChart>
           </ResponsiveContainer>
         </div>

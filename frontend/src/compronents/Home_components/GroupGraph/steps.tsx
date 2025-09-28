@@ -120,10 +120,10 @@ const DairySteps: React.FC = () => {
     };
 
     fetchAllData();
-  }, [UserIDString]); 
+  }, [UserIDString]);
 
-  if (loading) return <div>กำลังโหลดข้อมูล...</div>;
-  if (!data || data.length === 0) return <div>ไม่พบข้อมูลการเดินของวันนี้</div>;
+  /* if (loading) return <div>กำลังโหลดข้อมูล...</div>;
+  if (!data || data.length === 0) return <div>ไม่พบข้อมูลการเดินของวันนี้</div>; */
 
   const hourlyData = data.map(item => ({
     hour: item.time,
@@ -269,6 +269,10 @@ const DairySteps: React.FC = () => {
             <span className="unit-label">ก้าว</span>
           </div>
         </div>
+
+        {data.length === 0 && (
+          <div className="no-data-message"  style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลการเดินของวันนี้</div>
+        )}
 
         {/* สถิติสรุป */}
         <div className="steps-stats-grid">

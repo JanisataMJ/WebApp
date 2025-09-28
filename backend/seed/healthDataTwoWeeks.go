@@ -92,7 +92,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 				Steps:          cumulativeSteps,
 				CaloriesBurned: cumulativeCalories, // 👈 ใช้ cumulative
 				Spo2:           95 + float64(rand.Intn(4)),
-				SleepHours:     "",
+				SleepHours:     sleepString,
 				UserID:         user.ID,
 			}
 

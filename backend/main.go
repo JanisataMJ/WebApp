@@ -2,35 +2,30 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/JanisataMJ/WebApp/config"
-	"github.com/JanisataMJ/WebApp/controller/admin_count"
+	// 💡 แก้ไข Alias: count เป็น admin_count
+	adminCount "github.com/JanisataMJ/WebApp/controller/admin_count" 
 	"github.com/JanisataMJ/WebApp/controller/article"
-	"github.com/JanisataMJ/WebApp/controller/gender"
+	// 💡 แก้ไข Alias: genders เป็น gender
+	"github.com/JanisataMJ/WebApp/controller/gender" 
 	"github.com/JanisataMJ/WebApp/controller/gmail"
 	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
-	"github.com/JanisataMJ/WebApp/controller/user"
+	// 💡 แก้ไข Alias: users เป็น user
+	user "github.com/JanisataMJ/WebApp/controller/user" 
 	"github.com/JanisataMJ/WebApp/middlewares"
-	"github.com/JanisataMJ/WebApp/seed"
+	/* "github.com/JanisataMJ/WebApp/seed" */
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/option"
-	"google.golang.org/api/sheets/v4"
 )
 
 const PORT = "8000"
@@ -41,225 +36,6 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 }
-
-func getClient(config *oauth2.Config) *http.Client {
-	tokFile := "token.json"
-	tok, err := tokenFromFile(tokFile)
-	if err != nil {
-		tok = getTokenFromWeb(config)
-		saveToken(tokFile, tok)
-	}
-	return config.Client(context.Background(), tok)
-}
-
-func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	fmt.Printf("Go to the following link in your browser then type the " +
-		"authorization code: \n%v\n", authURL)
-
-	var authCode string
-	if _, err := fmt.Scan(&authCode); err != nil {
-		log.Fatalf("Unable to read authorization code: %v", err)
-	}
-
-	tok, err := config.Exchange(context.TODO(), authCode)
-	if err != nil {
-		log.Fatalf("Unable to retrieve token from web: %v", err)
-	}
-	return tok
-}
-
-func tokenFromFile(file string) (*oauth2.Token, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	tok := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(tok)
-	return tok, err
-}
-
-func saveToken(path string, token *oauth2.Token) {
-	fmt.Printf("Saving credential file to: %s\n", path)
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		log.Fatalf("Unable to cache oauth token: %v", err)
-	}
-	defer f.Close()
-	err = json.NewEncoder(f).Encode(token)
-	if err != nil {
-		log.Fatalf("Unable to save oauth token: %v", err)
-	}
-}
-
-func findColumnIndex(header []interface{}, name string) (int, error) {
-	for i, col := range header {
-		if col.(string) == name {
-			return i, nil
-		}
-	}
-	return -1, fmt.Errorf("column '%s' not found in header", name)
-}
-
-func parseTime(timeStr string) (time.Time, error) {
-    layouts := []string{
-        "2/1/2006, 15:04:05", 
-        "2/1/2006 15:04:05",  
-    }
-
-    for _, layout := range layouts {
-        t, err := time.Parse(layout, timeStr)
-        if err == nil {
-            return t, nil
-        }
-    }
-    return time.Time{}, fmt.Errorf("failed to parse time string '%s' with any known layout", timeStr)
-}
-
-func importHealthData(db *sql.DB, spreadsheetID, readRange string) {
-	b, err := os.ReadFile("credentials.json")
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
-	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope)
-	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
-	}
-	client := getClient(config)
-	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
-	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets client: %v", err)
-	}
-
-	resp, err := srv.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
-	if err != nil || resp.Values == nil {
-		log.Fatalf("Unable to retrieve data from sheet: %v", err)
-	}
-	fmt.Println("Data retrieved from Google Sheets. Now importing to SQLite...")
-
-	sqlStmt := `
-	CREATE TABLE IF NOT EXISTS health_data (
-		user_id INTEGER,
-		timestamp DATETIME,
-		bpm INTEGER,
-		steps INTEGER,
-		spo2 INTEGER,
-		sleep_hours TEXT,
-		calories_burned INTEGER,
-		UNIQUE(user_id, timestamp)
-	);
-	`
-	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("Failed to create table: %v", err)
-		return
-	}
-
-	tx, err := db.Begin()
-	if err != nil {
-		log.Fatal(err)
-	}
-	stmt, err := tx.Prepare("INSERT OR IGNORE INTO health_data(user_id, timestamp, bpm, steps , spo2, sleep_hours, calories_burned) VALUES(?, ?, ?, ?, ?, ?, ?)")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-
-	if len(resp.Values) < 2 {
-		log.Println("No data to import (header only or empty sheet)")
-		return
-	}
-
-	header := resp.Values[0]
-	dataRows := resp.Values[1:]
-
-	userIndex, err := findColumnIndex(header, "user_id")
-	if err != nil {
-		log.Fatal(err)
-	}
-	timeIndex, err := findColumnIndex(header, "Time")
-	if err != nil {
-		log.Fatal(err)
-	}
-	heartRateIndex, err := findColumnIndex(header, "HeartRate")
-	if err != nil {
-		log.Fatal(err)
-	}
-	stepsIndex, err := findColumnIndex(header, "Steps")
-	if err != nil {
-		log.Fatal(err)
-	}
-	spo2Index, err := findColumnIndex(header, "SpO2")
-	if err != nil {
-		log.Fatal(err)
-	}
-	sleepIndex, err := findColumnIndex(header, "Sleep")
-	if err != nil {
-		log.Fatal(err)
-	}
-	caloriesIndex, err := findColumnIndex(header, "Calories")
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	for _, row := range dataRows {
-		if len(row) > caloriesIndex { 
-			userID, err := strconv.Atoi(row[userIndex].(string))
-			if err != nil {
-				log.Printf("Failed to parse user_id '%s': %v", row[userIndex], err)
-				continue
-			}
-
-			timeStr := row[timeIndex].(string)
-			t, err := parseTime(timeStr)
-			if err != nil {
-				log.Printf("Failed to parse time string '%s': %v", timeStr, err)
-				continue
-			}
-
-			formattedTime := t.Format("2006-01-02 15:04:05")
-
-			bpm, _ := strconv.Atoi(row[heartRateIndex].(string))
-			steps, _ := strconv.Atoi(row[stepsIndex].(string))
-			
-			var spo2 int
-			if row[spo2Index] != nil && row[spo2Index].(string) != "" {
-				spo2, _ = strconv.Atoi(row[spo2Index].(string))
-			}
-			
-			sleepHours := row[sleepIndex].(string)
-			
-			var caloriesBurned int
-			if row[caloriesIndex] != nil && row[caloriesIndex].(string) != "" {
-				caloriesBurned, _ = strconv.Atoi(row[caloriesIndex].(string))
-			}
-		
-			_, err = stmt.Exec(userID, formattedTime, bpm, steps, spo2, sleepHours, caloriesBurned)
-			if err != nil {
-				log.Printf("Failed to insert row for user %d at time %s: %v", userID, formattedTime, err)
-			}
-		} else {
-			log.Printf("Skipping row due to insufficient columns: %v", row)
-		}
-	}
-	tx.Commit()
-	fmt.Println("Data has been successfully imported to the database.")
-}
-
-func startDataImportJob(sqlDB *sql.DB, spreadsheetID, readRange string) {
-	ticker := time.NewTicker(1 * time.Minute)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			log.Println("Running scheduled health data import...")
-			importHealthData(sqlDB, spreadsheetID, readRange)
-		}
-	}
-}
-
 
 func main() {
 	emailUser := os.Getenv("EMAIL_USER")
@@ -275,17 +51,42 @@ func main() {
 	gormDB := config.DB()
 	config.SetupDatabase()
 
-	seed.SeedHealthData(gormDB)
-	seed.SeedHealthDataTwoWeeks(gormDB)
+	//seed.SeedHealthData(gormDB)
+	//seed.SeedHealthDataTwoWeeks(gormDB)
+
+	//*** เรียกใช้ Backfill Health Analysis ที่นี่ ***
+	//healthAnalysis.BackfillHealthAnalysis(gormDB)
 
 	sqlDB, err := gormDB.DB()
 	if err != nil {
 		log.Fatalf("Failed to get *sql.DB from GORM: %v", err)
 	}
 
-	importHealthData(sqlDB, "1sX8ZK_x9bYX14IrAUvPjw_tj8ASTbvB0z8BleX9gCuE", "Data!A1:G")
+	// *** เรียกใช้ Setup และ Import จาก Controller ใหม่ ***
+	if err := healthData.SetupConfigTable(sqlDB); err != nil {
+		log.Fatalf("Failed to setup config table: %v", err)
+	}
 
-	go startDataImportJob(sqlDB, "1sX8ZK_x9bYX14IrAUvPjw_tj8ASTbvB0z8BleX9gCuE", "Data!A1:G")
+	// Initial import
+	healthData.ImportHealthData(sqlDB)
+	// ----------------------------------------------------
+	// ✅ ตำแหน่งที่ควรเรียกใช้ AnalyzeHealthData
+	// ----------------------------------------------------
+	log.Println("▶️ Starting initial Health Analysis...")
+	healthAnalysis.AnalyzeHealthData(gormDB) // 💡 ต้องเรียกใช้ตรงนี้!
+	log.Println("✅ Initial Health Analysis completed.")
+    
+    // ----------------------------------------------------
+    // 🚩 การเรียกใช้ Backfill Summary (รันเพียงครั้งเดียวเมื่อต้องการสร้างย้อนหลัง)
+    // ----------------------------------------------------
+    log.Println("▶️ Starting FULL BACKFILL Summary Job...")
+    // ตั้งค่า isBackfill เป็น true เพื่อให้สร้าง Summary ย้อนหลังทุกสัปดาห์
+    healthSummary.RunSummaryJob(gormDB, true) 
+    log.Println("✅ FULL BACKFILL Summary Job completed.")
+    // ----------------------------------------------------
+
+	// Start data import job
+	go healthData.StartDataImportJob(sqlDB)
 
 	// Gin framework setup
 	r := gin.Default()
@@ -293,18 +94,18 @@ func main() {
 	r.Use(middlewares.DBMiddleware(config.DB()))
 
 	// Define routes...
-	r.POST("/signup", users.SignUp)
-	r.POST("/signin", users.SignIn)
-	r.POST("/create-admin", users.CreateAdmin)
+	r.POST("/signup", user.SignUp) // ใช้ Alias 'user'
+	r.POST("/signin", user.SignIn) // ใช้ Alias 'user'
+	r.POST("/create-admin", user.CreateAdmin) // ใช้ Alias 'user'
 
 	router := r.Group("/")
 	{
 		router.Use(middlewares.Authorizes())
 		r.Static("/uploads", "./uploads")
-		router.PUT("/user/:id", users.Update)
-		router.GET("/users", users.GetAll)
-		router.GET("/user/:id", users.Get)
-		router.DELETE("/user/:id", users.Delete)
+		router.PUT("/user/:id", user.Update) // ใช้ Alias 'user'
+		router.GET("/users", user.GetAll)    // ใช้ Alias 'user'
+		router.GET("/user/:id", user.Get)    // ใช้ Alias 'user'
+		router.DELETE("/user/:id", user.Delete) // ใช้ Alias 'user'
 		router.POST("/create-notification/:id", notification.CreateNotification)
 		router.GET("/notification/:id", notification.GetNotificationsByUserID)
 		router.PATCH("/notification/:id/status", notification.UpdateNotificationStatusByID)
@@ -339,10 +140,10 @@ func main() {
 		router.GET("/daily-sleep", healthData.GetDailySleep)
 		router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
 		router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
-		router.GET("/admin-counts", count.GetAdminCounts)
+		router.GET("/admin-counts", adminCount.GetAdminCounts) // ใช้ Alias 'adminCount'
 	}
 
-	r.GET("/genders", genders.GetAll)
+	r.GET("/genders", genders.GetAll) // ใช้ Alias 'gender'
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})

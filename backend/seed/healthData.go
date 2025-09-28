@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/entity"
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ func SeedHealthData(db *gorm.DB) {
 	// ---------------------------
 	// Risk Levels
 	// ---------------------------
-	var lGood, lNormal, lBad entity.RiskLevel
+	var lGood entity.RiskLevel // เหลือแค่ lGood ที่จำเป็นต้องใช้ใน HealthSummary
 	Rlevels := []entity.RiskLevel{
 		{Rlevel: "ดี"},
 		{Rlevel: "ปกติ"},
@@ -24,9 +25,9 @@ func SeedHealthData(db *gorm.DB) {
 	for i, level := range Rlevels {
 		db.FirstOrCreate(&Rlevels[i], entity.RiskLevel{Rlevel: level.Rlevel})
 	}
-	lGood = Rlevels[0]
-	lNormal = Rlevels[1]
-	lBad = Rlevels[2]
+	// ดึงค่า RiskLevel 'ดี' มาใช้สำหรับ HealthSummary
+	// (Rlevels[0] คือ 'ดี')
+	lGood = Rlevels[0] 
 
 	// ---------------------------
 	// HealthData + HealthAnalysis
@@ -55,50 +56,9 @@ func SeedHealthData(db *gorm.DB) {
 
 		db.Create(&hd)
 
-		analyses := []entity.HealthAnalysis{
-			{
-				Category:       "อัตราการเต้นหัวใจ",
-				Value:          fmt.Sprintf("%d bpm", hd.Bpm),
-				Interpretation: interpretHeartRate(hd.Bpm),
-				Suggestion:     suggestHeartRate(hd.Bpm),
-				RiskLevelID:    mapRiskLevelHeartRate(hd.Bpm, lGood, lNormal, lBad),
-				HealthDataID:   hd.ID,
-			},
-			{
-				Category:       "จำนวนก้าว",
-				Value:          fmt.Sprintf("%d ก้าว", hd.Steps),
-				Interpretation: interpretSteps(hd.Steps),
-				Suggestion:     suggestSteps(hd.Steps),
-				RiskLevelID:    mapRiskLevelSteps(hd.Steps, lGood, lNormal, lBad),
-				HealthDataID:   hd.ID,
-			},
-			{
-				Category:       "การนอนหลับ",
-				Value:          hd.SleepHours,
-				Interpretation: interpretSleep(hd.SleepHours),
-				Suggestion:     suggestSleep(hd.SleepHours),
-				RiskLevelID:    lNormal.ID,
-				HealthDataID:   hd.ID,
-			},
-			{
-				Category:       "พลังงานที่ใช้ไป",
-				Value:          fmt.Sprintf("%.2f kcal", hd.CaloriesBurned),
-				Interpretation: interpretCalories(hd.CaloriesBurned),
-				Suggestion:     suggestCalories(hd.CaloriesBurned),
-				RiskLevelID:    mapRiskLevelCalories(hd.CaloriesBurned, lGood, lNormal, lBad),
-				HealthDataID:   hd.ID,
-			},
-			{
-				Category:       "ออกซิเจนในเลือด",
-				Value:          fmt.Sprintf("%.0f %%", hd.Spo2),
-				Interpretation: interpretSpo2(hd.Spo2),
-				Suggestion:     suggestSpo2(hd.Spo2),
-				RiskLevelID:    mapRiskLevelSpo2(hd.Spo2, lGood, lNormal, lBad),
-				HealthDataID:   hd.ID,
-			},
-		}
-
-		db.Create(&analyses)
+		// *** เรียกใช้ฟังก์ชันใหม่เพื่อสร้าง HealthAnalysis ***
+		// ฟังก์ชันนี้จะดึง RiskLevel จาก DB ภายในตัวมันเอง
+		healthAnalysis.ProcessNewHealthData(db, &hd) 
 	}
 
 	// ---------------------------
@@ -110,8 +70,8 @@ func SeedHealthData(db *gorm.DB) {
 		return
 	}
 
-	start := now.Truncate(24 * time.Hour)               // เริ่มต้นวันนี้
-	end := start.AddDate(0, 0, 1).Add(-time.Nanosecond) // สิ้นสุดวันนี้
+	start := now.Truncate(24 * time.Hour)
+	end := start.AddDate(0, 0, 1).Add(-time.Nanosecond)
 
 	var healthDatas []entity.HealthData
 	db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", user.ID, start, end).Find(&healthDatas)
@@ -137,168 +97,22 @@ func SeedHealthData(db *gorm.DB) {
 		AvgCalories: 2500,
 		AvgSpo2:     97,
 		WeekNumber:  35,
-		UserID:      user.ID, // fix id=1
+		UserID:      user.ID,
 		TrendsID:    1,
-		RiskLevelID: lGood.ID,
+		RiskLevelID: lGood.ID, // <--- ใช้ lGood ที่ยังจำเป็นอยู่
 	}
 	db.Create(&summary)
 
-	// ถ้าต้องการ Seed Notification
 	notif := entity.Notification{
 		Timestamp:            time.Now(),
 		Title:                "Weekly Health Summary",
 		Message:              "ตัวอย่างข้อความสรุปสุขภาพ",
 		UserID:               user.ID,
 		HealthSummaryID:      &summary.ID,
-		HealthTypeID:         1, // ✅ กำหนดประเภท เช่น 1 = Weekly Summary
-		//TrendsID:             2,
+		HealthTypeID:         1, 
 		NotificationStatusID: 2,
 	}
 	db.Create(&notif)
 
 }
-
-// ---------------------------
-// RiskLevel Mapping Functions
-// ---------------------------
-func mapRiskLevelHeartRate(bpm uint, lGood, lNormal, lBad entity.RiskLevel) uint {
-	if bpm < 60 {
-		return lBad.ID
-	} else if bpm <= 100 {
-		return lNormal.ID
-	}
-	return lBad.ID
-}
-
-func mapRiskLevelSteps(steps int64, lGood, lNormal, lBad entity.RiskLevel) uint {
-	if steps < 5000 {
-		return lBad.ID
-	} else if steps < 10000 {
-		return lNormal.ID
-	}
-	return lGood.ID
-}
-
-func mapRiskLevelCalories(calories float64, lGood, lNormal, lBad entity.RiskLevel) uint {
-	if calories < 200 {
-		return lBad.ID
-	} else if calories < 400 {
-		return lNormal.ID
-	}
-	return lGood.ID
-}
-
-func mapRiskLevelSpo2(spo2 float64, lGood, lNormal, lBad entity.RiskLevel) uint {
-	if spo2 < 95 {
-		return lBad.ID
-	} else if spo2 <= 98 {
-		return lNormal.ID
-	}
-	return lGood.ID
-}
-
-func mapRiskLevelBodyTemp(temp float64, lGood, lNormal, lBad entity.RiskLevel) uint {
-	if temp < 36.0 || temp > 37.5 {
-		return lBad.ID
-	}
-	return lNormal.ID
-}
-
-// ---------------------------
-// Helper Functions
-// ---------------------------
-func interpretHeartRate(bpm uint) string {
-	if bpm < 60 {
-		return "หัวใจเต้นช้า"
-	} else if bpm <= 100 {
-		return "ปกติ"
-	}
-	return "หัวใจเต้นเร็ว"
-}
-
-func suggestHeartRate(bpm uint) string {
-	if bpm < 60 {
-		return "ควรตรวจสุขภาพเพิ่มเติม"
-	} else if bpm <= 100 {
-		return "อัตราการเต้นหัวใจปกติดี"
-	}
-	return "ควรพักผ่อนและลดความเครียด"
-}
-
-func interpretSteps(steps int64) string {
-	if steps < 5000 {
-		return "เดินน้อย"
-	} else if steps < 10000 {
-		return "พอใช้"
-	}
-	return "เดินครบเป้าหมาย"
-}
-
-func suggestSteps(steps int64) string {
-	if steps < 5000 {
-		return "ควรเดินเพิ่ม"
-	} else if steps < 10000 {
-		return "ใกล้ครบเป้าหมายแล้ว"
-	}
-	return "วันนี้คุณทำได้ดีมาก"
-}
-
-func interpretSleep(sleep string) string {
-	if sleep == "0" {
-		return "ยังไม่ได้นอน"
-	}
-	return "นอนหลับ"
-}
-
-func suggestSleep(sleep string) string {
-	if sleep == "0" {
-		return "ควรนอนหลับพักผ่อนให้เพียงพอ"
-	}
-	return "การนอนหลับเหมาะสม"
-}
-
-func interpretCalories(calories float64) string {
-	if calories < 200 {
-		return "เผาผลาญพลังงานน้อย"
-	}
-	return "เผาผลาญพลังงานดี"
-}
-
-func suggestCalories(calories float64) string {
-	if calories < 200 {
-		return "ควรออกกำลังกายเพิ่ม"
-	}
-	return "อยู่ในเกณฑ์ที่ดี"
-}
-
-func interpretSpo2(spo2 float64) string {
-	if spo2 < 95 {
-		return "ค่าออกซิเจนต่ำ"
-	}
-	return "ปกติ"
-}
-
-func suggestSpo2(spo2 float64) string {
-	if spo2 < 95 {
-		return "ควรพบแพทย์"
-	}
-	return "อยู่ในเกณฑ์ที่ดี"
-}
-
-func interpretBodyTemp(temp float64) string {
-	if temp < 36.0 {
-		return "อุณหภูมิต่ำ"
-	} else if temp <= 37.5 {
-		return "ปกติ"
-	}
-	return "มีไข้"
-}
-
-func suggestBodyTemp(temp float64) string {
-	if temp < 36.0 {
-		return "ควรเพิ่มความอบอุ่นร่างกาย"
-	} else if temp <= 37.5 {
-		return "อยู่ในเกณฑ์ที่ดี"
-	}
-	return "ควรพักผ่อนและดื่มน้ำมากๆ"
-}
+// ลบฟังก์ชัน helper ทั้งหมดที่อยู่ท้ายไฟล์นี้ออกแล้ว

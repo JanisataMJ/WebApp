@@ -7,6 +7,7 @@ import { UsersInterface } from '../../../interface/profile_interface/IProfile';
 
 interface StepsData {
   time: string;
+  minutes: number;
   steps: number;
   cumulativeSteps: number;
   hour: number;
@@ -33,6 +34,20 @@ interface CustomTooltipProps {
   payload?: Array<{ value: number; payload?: StepsData }>;
   label?: string;
 }
+
+// แปลง "HH:mm" → จำนวนนาที
+const toMinutes = (time: string) => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+};
+
+// แปลงนาที → "HH:mm" สำหรับแกน X
+const formatTime = (minutes: number) => {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
 
 const DairySteps: React.FC = () => {
   const [data, setData] = useState<StepsData[]>([]);
@@ -88,18 +103,17 @@ const DairySteps: React.FC = () => {
 
         // 4. Map Data โดยใช้ Weight และ Stride Length จริง
         const stepsArray: StepsData[] = rawSteps.map((item: any, index: number) => {
-          // ... (ส่วนคำนวณ Steps/CumulativeSteps เดิม)
           const steps = index === 0
             ? item.steps || 0
             : (item.steps || 0) - (rawSteps[index - 1].steps || 0);
           const cumulativeSteps = item.steps || 0;
 
-          // คำนวณ Distance & Calories ที่ใช้ actualWeight/actualStepLengthM
           const distance = steps * actualStepLengthM / 1000;
           const calories = (distance * actualWeight * 0.5) || 0;
 
           return {
             time: item.time || '',
+            minutes: toMinutes(item.time || "00:00"),
             steps,
             cumulativeSteps,
             hour: item.hour || 0,
@@ -110,7 +124,11 @@ const DairySteps: React.FC = () => {
           };
         });
 
+        // ✅ เรียงตามเวลา
+        stepsArray.sort((a, b) => a.minutes - b.minutes);
+
         setData(stepsArray);
+
       } catch (error) {
         console.error('Error fetching data:', error);
         setData([]);
@@ -250,6 +268,14 @@ const DairySteps: React.FC = () => {
     );
   };
 
+  // หาเวลาต่ำสุด–สูงสุดจากข้อมูล
+  const minMinutes = Math.min(...data.map(d => d.minutes));
+  const maxMinutes = Math.max(...data.map(d => d.minutes));
+
+  // ขยายช่วงออกไป 1 ชั่วโมง
+  const domain = [minMinutes - 60, maxMinutes + 60];
+
+
   return (
     <div className="steps-container">
       <div className="header-section-step">
@@ -271,7 +297,7 @@ const DairySteps: React.FC = () => {
         </div>
 
         {data.length === 0 && (
-          <div className="no-data-message"  style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลการเดินของวันนี้</div>
+          <div className="no-data-message" style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลการเดินของวันนี้</div>
         )}
 
         {/* สถิติสรุป */}
@@ -356,18 +382,29 @@ const DairySteps: React.FC = () => {
           <h3 className="chart-title-step">📈 ก้าวสะสมตลอดวัน</h3>
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <defs>
+                <linearGradient id="stepsGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis
-                dataKey="time"
-                stroke="#666"
-                tick={{ fontSize: 12 }}
+                dataKey="minutes"
+                type="number"
+                domain={domain}              // ✅ ใช้ domain ที่เราคำนวณ
+                tickFormatter={formatTime}
               />
               <YAxis
                 stroke="#666"
                 tick={{ fontSize: 12 }}
                 label={{ value: 'ก้าวสะสม', angle: -90, position: 'insideLeft' }}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip
+                labelFormatter={(v) => formatTime(v as number)}
+                content={<CustomTooltip />}
+              />
               <Area
                 type="monotone"
                 dataKey="cumulativeSteps"
@@ -375,13 +412,7 @@ const DairySteps: React.FC = () => {
                 strokeWidth={3}
                 fill="url(#stepsGradient)"
               />
-              <defs>
-                <linearGradient id="stepsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
-                  <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.6} />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
-                </linearGradient>
-              </defs>
+
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -391,24 +422,24 @@ const DairySteps: React.FC = () => {
           <h3 className="chart-title-step">📊 ก้าวรายชั่วโมง</h3>
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={hourlyData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="hour"
-                stroke="#666"
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis
-                stroke="#666"
-                tick={{ fontSize: 12 }}
-                label={{ value: 'จำนวนก้าว', angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip />
-              <Bar
-                dataKey="steps"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
+  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+  <XAxis
+    dataKey="minutes"
+    type="number"
+    domain={domain}
+    tickFormatter={formatTime}
+    ticks={Array.from({ length: 24 }, (_, i) => i * 60)}   // ✅ 00:00–23:00
+  />
+  <YAxis stroke="#666" tick={{ fontSize: 12 }} />
+  <Tooltip labelFormatter={(v) => formatTime(v as number)} />
+  <Bar
+    dataKey="steps"
+    fill="#3b82f6"
+    radius={[4, 4, 0, 0]}
+    barSize={30}    // ✅ ความกว้างของแท่ง (เล็กลง)
+  />
+</BarChart>
+
           </ResponsiveContainer>
         </div>
       </div>

@@ -2,12 +2,12 @@ import { HealthAnalysisInterface } from "../health_analysis_interface/health_ana
 
 export interface RealTimeInterface {
     ID:             number;       
-    Timestamp:           string;       
-    Bpm:        number;
+    Timestamp:      string;       
+    Bpm:            number;
     Steps:          number;
-    SleepHours:    number;
-    CaloriesBurned:       number;
-    Spo2:       number;
+    SleepHours:     number | string;
+    CaloriesBurned: number;
+    Spo2:           number;
 
     HealthAnalysis: HealthAnalysisInterface[]; 
 }

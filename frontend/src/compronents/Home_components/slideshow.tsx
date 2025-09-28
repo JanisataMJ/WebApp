@@ -16,6 +16,58 @@ type HealthItem = {
   bgGradient: string;
 };
 
+// 👇 helper: แปลง "8h 30m" → 8.5
+/* const parseSleepToHours = (val: string | number | null | undefined): number => {
+  if (!val) return 0;
+  if (typeof val === "number") return val;
+
+  const match = val.match(/(\d+)h\s*(\d+)?m?/);
+  if (!match) return 0;
+
+  const hours = parseInt(match[1], 10);
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+
+  return hours + minutes / 60;
+}; */
+
+// 👉 helper function แปลง string/number → "7.10 ชม."
+const formatSleepHours = (val: string | number | null | undefined): string => {
+  if (!val) return "ไม่มีข้อมูล";
+
+  if (typeof val === "number") {
+    return `${val.toFixed(2)} ชม.`; // กรณี backend ส่งตัวเลขทศนิยม
+  }
+
+  const match = val.match(/(\d+)h\s*(\d+)?m?/);
+  if (!match) return "ไม่มีข้อมูล";
+
+  const hours = parseInt(match[1], 10);
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+
+  const formatted = `${hours}.${minutes.toString().padStart(2, "0")}`;
+  return `${formatted} ชม.`;
+};
+
+
+// 👇 helper: หาค่าล่าสุด (ถ้า null → ไปดู record ก่อนหน้า)
+const getLatestNonNull = <K extends keyof RealTimeInterface>(
+  data: RealTimeInterface[],
+  key: K
+): RealTimeInterface[K] | 0 => {
+  for (const d of data) {
+    const val = d[key];
+    if (
+      val !== null &&
+      val !== undefined &&
+      !(typeof val === "string" && val.trim() === "")
+    ) {
+      return val;
+    }
+  }
+  return 0 as RealTimeInterface[K];
+};
+
+
 const Slider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [healthItems, setHealthItems] = useState<HealthItem[]>([]);
@@ -24,6 +76,12 @@ const Slider: React.FC = () => {
   const findAnalysis = (data: RealTimeInterface, category: string) => {
     return data.HealthAnalysis?.find(a => a.Category === category);
   };
+
+  const formatSleep = (val: string): string => {
+    if (!val) return "ไม่มีข้อมูล";
+    return val.replace("h", " ชม.").replace("m", " นาที");
+  };
+
 
 
   const mapHealthData = (data: RealTimeInterface): HealthItem[] => [
@@ -37,7 +95,7 @@ const Slider: React.FC = () => {
     },
     {
       icon: Activity,
-      label: "พลังงานที่ใช้ไป",
+      label: "พลังงานที่เผาผลาญ",
       value: String(data.CaloriesBurned.toFixed(0)),
       sub: findAnalysis(data, "พลังงานที่ใช้ไป")?.Interpretation || "ไม่มีข้อมูล",
       color: "#f59e0b",
@@ -54,8 +112,8 @@ const Slider: React.FC = () => {
     {
       icon: Moon,
       label: "การนอนหลับ",
-      value: (data.SleepHours || "ไม่มีข้อมูล") as string,
-      sub: findAnalysis(data, "การนอนหลับ")?.Interpretation || "ไม่มีข้อมูล",
+      value: formatSleepHours(data.SleepHours),
+      //sub: findAnalysis(data, "การนอนหลับ")?.Interpretation || "ไม่มีข้อมูล",
       color: "#6366f1",
       bgGradient: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)"
     },
@@ -69,78 +127,57 @@ const Slider: React.FC = () => {
     },
   ];
 
-  /* useEffect(() => {
-    const fetchHealthdatas = async () => {
-      try {
-        const res = await getHealthDataByUserID(UserID);
 
-        const sorted = res.sort(
-          (a: RealTimeInterface, b: RealTimeInterface) =>
-            new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
-        );
-
-        if (sorted.length > 0) {
-          const latest = sorted[0];
-
-          // ✅ วันที่ปัจจุบัน (Asia/Bangkok)
-          const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
-          const latestDate = new Date(latest.Timestamp).toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
-
-          if (latestDate === today) {
-            setHealthItems(mapHealthData(latest));
-          } else {
-            console.warn("ข้อมูลล่าสุดไม่ใช่ของวันนี้:", latestDate);
-            setHealthItems([]); // ❌ ไม่ต้องแสดงค่า
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch health data:", error);
-      }
-    };
-
-    fetchHealthdatas();
-  }, [UserID]); */
   useEffect(() => {
     const fetchHealthdatas = async () => {
       try {
         const res = await getHealthDataByUserID(UserID);
 
-        const sorted = res.sort(
-          (a: RealTimeInterface, b: RealTimeInterface) =>
-            new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
+        // sort ใหม่ → เก่า
+        const sorted = [...res].sort(
+          (a, b) => new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime()
         );
 
-        if (sorted.length > 0) {
-          const latest = sorted[0];
-
-          // ✅ วันที่ปัจจุบัน (Asia/Bangkok)
-          const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
-          const latestDate = new Date(latest.Timestamp).toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
-
-          if (latestDate === today) {
-            // ข้อมูลวันนี้ → ใช้จริง
-            setHealthItems(mapHealthData(latest));
-          } else {
-            // ❌ ไม่ใช่วันนี้ → สร้าง dummy ค่า 0
-            const emptyData: RealTimeInterface = {
-              ...latest,
-              Bpm: 0,
-              CaloriesBurned: 0,
-              Spo2: 0,
-              SleepHours: 0,
-              Steps: 0,
-              HealthAnalysis: [] // ล้าง interpret
-            };
-
-            // แปลงแล้วใส่ข้อความว่าไม่มีข้อมูล
-            const items = mapHealthData(emptyData).map(item => ({
-              ...item,
-              sub: "ไม่พบข้อมูลสุขภาพตอนนี้"
-            }));
-
-            setHealthItems(items);
-          }
+        if (sorted.length === 0) {
+          // ไม่มีข้อมูลเลย
+          const emptyData: RealTimeInterface = {
+            ID: 0,
+            Timestamp: new Date().toISOString(),
+            Bpm: 0,
+            CaloriesBurned: 0,
+            Spo2: 0,
+            SleepHours: 0,
+            Steps: 0,
+            HealthAnalysis: []
+          };
+          setHealthItems(
+            mapHealthData(emptyData).map(i => ({ ...i, sub: "ไม่พบข้อมูลสุขภาพตอนนี้" }))
+          );
+          return;
         }
+
+        // ✅ หาค่า latest แบบ fallback ไป record ก่อนหน้า
+        const latestBpm = getLatestNonNull(sorted, "Bpm") ?? 0;
+        const latestCalories = getLatestNonNull(sorted, "CaloriesBurned") ?? 0;
+        const latestSpo2 = getLatestNonNull(sorted, "Spo2") ?? 0;
+
+        /* const latestSleepRaw = getLatestNonNull(sorted, "SleepHours") ?? 0;
+        const latestSleep = parseSleepToHours(latestSleepRaw); */
+        const latestSleep = getLatestNonNull(sorted, "SleepHours") || "ไม่มีข้อมูล";
+
+        const latestSteps = getLatestNonNull(sorted, "Steps") ?? 0;
+
+        const mergedData: RealTimeInterface = {
+          ...sorted[0], // clone field อื่น เช่น HealthAnalysis
+          Bpm: latestBpm,
+          CaloriesBurned: latestCalories,
+          Spo2: latestSpo2,
+          SleepHours: latestSleep,
+          Steps: latestSteps,
+          HealthAnalysis: sorted[0].HealthAnalysis ?? []
+        };
+
+        setHealthItems(mapHealthData(mergedData));
       } catch (error) {
         console.error("Failed to fetch health data:", error);
       }

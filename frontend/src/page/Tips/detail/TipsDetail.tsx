@@ -7,6 +7,12 @@ import "./TipsDetail.css";
 import Headers from '../../../compronents/Pubblic_components/headerselect';
 import moment from "moment";
 
+// 💡 Helper function สำหรับแปลง \n เป็น <br /> และใช้เพื่อฉีด HTML
+const createMarkup = (text: string) => {
+  // ต้องแปลง \n เป็น <br /> ก่อน เพื่อให้การขึ้นบรรทัดใหม่ยังทำงานได้
+  return { __html: text.replace(/\n/g, '<br />') };
+};
+
 const TipsDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<ArticleInterface | null>(null);
@@ -65,10 +71,10 @@ const TipsDetail: React.FC = () => {
           <article className="tips-detail-article">
             <header className="tips-detail-header">
               <h1 className="tips-detail-title">{article.Title}</h1>
-              
+
               {article.PublishDate && (
                 <div className="tips-detail-meta">
-                  <time 
+                  <time
                     className={`tips-detail-publish-date ${article.Published ? "tips-detail-published" : "tips-detail-unpublished"}`}
                     dateTime={article.PublishDate}
                   >
@@ -90,9 +96,10 @@ const TipsDetail: React.FC = () => {
             )}
 
             <div className="tips-detail-content">
-              <div className="tips-detail-information">
-                <p>{article.Information}</p>
-              </div>
+              <div className="tips-detail-information"
+
+                dangerouslySetInnerHTML={createMarkup(article.Information)}
+              />
 
               {article.Reference && (
                 <footer className="tips-detail-reference">
@@ -100,7 +107,8 @@ const TipsDetail: React.FC = () => {
                     <span className="tips-detail-reference-icon">📚</span>
                     <h3>แหล่งอ้างอิง</h3>
                   </div>
-                  <p className="tips-detail-reference-text">{article.Reference}</p>
+                  <div className="tips-detail-reference-text"
+                  dangerouslySetInnerHTML={createMarkup(article.Reference)}/>
                 </footer>
               )}
             </div>

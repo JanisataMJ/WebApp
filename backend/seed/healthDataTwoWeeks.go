@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/JanisataMJ/WebApp/config"
+	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/entity"
 
@@ -17,7 +17,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	// ---------------------------
 	// 1️⃣ สร้าง RiskLevel
 	// ---------------------------
-	var lGood, lNormal, lBad entity.RiskLevel
+	var lNormal entity.RiskLevel
 	Rlevels := []entity.RiskLevel{
 		{Rlevel: "ดี"},
 		{Rlevel: "ปกติ"},
@@ -26,26 +26,16 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	for i, level := range Rlevels {
 		db.FirstOrCreate(&Rlevels[i], entity.RiskLevel{Rlevel: level.Rlevel})
 	}
-	lGood = Rlevels[0]
+
 	lNormal = Rlevels[1]
-	lBad = Rlevels[2]
 
 	// ---------------------------
-	// 2️⃣ สร้าง User ตัวอย่าง (UserID=4)
+	// 2️⃣ ดึง User ที่มีอยู่แล้ว (สร้างจาก dc.go) โดยใช้ Email หรือ ID
 	// ---------------------------
 	var user entity.User
-	hashedPassword, _ := config.HashPassword("123456")
-
-	db.FirstOrCreate(&user, entity.User{
-		Email: "user6@gmail.com",
-	}, entity.User{
-		Username:  "user6",
-		Password:  hashedPassword,
-		FirstName: "User6",
-		LastName:  "Fulldata",
-		RoleID:    2, // User role
-		GenderID:  1, // Male
-	})
+	if err := db.Where("email = ?", "user1@gmail.com").First(&user).Error; err != nil {
+		log.Fatalf("ไม่พบ User ที่ต้องการใช้งาน: %v", err)
+	}
 
 	rand.Seed(time.Now().UnixNano())
 	now := time.Now().Truncate(24 * time.Hour)
@@ -59,8 +49,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	for daysAgo := 13; daysAgo >= 0; daysAgo-- {
 		day := startOfDay.AddDate(0, 0, -daysAgo)
 
-		// ✅ สุ่มชั่วโมงการนอนของวันนั้น (6.0 - 9.0 ชั่วโมง)
-		sleepDuration := 6 + rand.Float64()*3 // 6-9 ชม.
+		sleepDuration := 6 + rand.Float64()*3
 		hours := int(sleepDuration)
 		minutes := int((sleepDuration - float64(hours)) * 60)
 
@@ -78,19 +67,18 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 		cumulativeCalories := 0.0
 
 		for hour := 0; hour <= maxHour; hour++ {
-			// สุ่มก้าวเดินของชั่วโมงนี้
-			stepsThisHour := int64(rand.Intn(200) + 50) // เช่น 50-250 ก้าว/ชม.
+
+			stepsThisHour := int64(rand.Intn(200) + 50)
 			cumulativeSteps += stepsThisHour
 
-			// สุ่มแคลอรี่ที่เผาผลาญของชั่วโมงนี้
-			caloriesThisHour := 50 + rand.Float64()*30 // เช่น 50-80 kcal/ชม.
+			caloriesThisHour := 50 + rand.Float64()*30
 			cumulativeCalories += caloriesThisHour
 
 			hd := entity.HealthData{
 				Timestamp:      day.Add(time.Duration(hour) * time.Hour),
 				Bpm:            uint(60 + rand.Intn(40)),
 				Steps:          cumulativeSteps,
-				CaloriesBurned: cumulativeCalories, // 👈 ใช้ cumulative
+				CaloriesBurned: cumulativeCalories,
 				Spo2:           95 + float64(rand.Intn(4)),
 				SleepHours:     sleepString,
 				UserID:         user.ID,
@@ -101,50 +89,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 			}
 
 			db.Create(&hd)
-
-			analyses := []entity.HealthAnalysis{
-				{
-					Category:       "อัตราการเต้นหัวใจ",
-					Value:          fmt.Sprintf("%d bpm", hd.Bpm),
-					Interpretation: interpretHeartRate(hd.Bpm),
-					Suggestion:     suggestHeartRate(hd.Bpm),
-					RiskLevelID:    mapRiskLevelHeartRate(hd.Bpm, lGood, lNormal, lBad),
-					HealthDataID:   hd.ID,
-				},
-				{
-					Category:       "จำนวนก้าว",
-					Value:          fmt.Sprintf("%d ก้าว", hd.Steps),
-					Interpretation: interpretSteps(hd.Steps),
-					Suggestion:     suggestSteps(hd.Steps),
-					RiskLevelID:    mapRiskLevelSteps(hd.Steps, lGood, lNormal, lBad),
-					HealthDataID:   hd.ID,
-				},
-				{
-					Category:       "การนอนหลับ",
-					Value:          hd.SleepHours,
-					Interpretation: interpretSleep(hd.SleepHours),
-					Suggestion:     suggestSleep(hd.SleepHours),
-					RiskLevelID:    lNormal.ID,
-					HealthDataID:   hd.ID,
-				},
-				{
-					Category:       "พลังงานที่ใช้ไป",
-					Value:          fmt.Sprintf("%.2f kcal", hd.CaloriesBurned),
-					Interpretation: interpretCalories(hd.CaloriesBurned),
-					Suggestion:     suggestCalories(hd.CaloriesBurned),
-					RiskLevelID:    mapRiskLevelCalories(hd.CaloriesBurned, lGood, lNormal, lBad),
-					HealthDataID:   hd.ID,
-				},
-				{
-					Category:       "ออกซิเจนในเลือด",
-					Value:          fmt.Sprintf("%.0f %%", hd.Spo2),
-					Interpretation: interpretSpo2(hd.Spo2),
-					Suggestion:     suggestSpo2(hd.Spo2),
-					RiskLevelID:    mapRiskLevelSpo2(hd.Spo2, lGood, lNormal, lBad),
-					HealthDataID:   hd.ID,
-				},
-			}
-			db.Create(&analyses)
+			healthAnalysis.ProcessNewHealthData(db, &hd)
 		}
 	}
 
@@ -152,10 +97,10 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	// 4️⃣ สร้าง HealthSummary รายสัปดาห์ 2 สัปดาห์
 	// ---------------------------
 	for week := 0; week < 2; week++ {
-		start := now.AddDate(0, 0, -(13 - week*7)) // วันจันทร์
-		end := start.AddDate(0, 0, 6)              // วันอาทิตย์
+		start := now.AddDate(0, 0, -(13 - week*7))
+		end := start.AddDate(0, 0, 6).Add(23*time.Hour + 59*time.Minute + 59*time.Second) // สิ้นสุดวันอาทิตย์
 
-		_, week := now.ISOWeek() // คำนวณ ISO week ก่อน
+		_, currentWeekNum := now.ISOWeek()
 
 		var healthDatas []entity.HealthData
 		db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", user.ID, start, end).Find(&healthDatas)
@@ -166,7 +111,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 		}
 		avgSleep := 0.0
 		if len(healthDatas) > 0 {
-			avgSleep = totalSleep / float64(len(healthDatas))
+			avgSleep = totalSleep / float64(7)
 		}
 
 		summary := entity.HealthSummary{
@@ -177,10 +122,10 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 			MaxBpm:      100 + uint(rand.Intn(10)),
 			AvgSteps:    7000 + rand.Float64()*2000,
 			TotalSteps:  49000 + rand.Intn(10000),
-			AvgSleep:    avgSleep, // ✅ ใช้ avgSleep จาก HealthData
+			AvgSleep:    avgSleep,
 			AvgCalories: 2200 + rand.Float64()*500,
 			AvgSpo2:     95 + rand.Float64()*3,
-			WeekNumber:  uint(week),
+			WeekNumber:  uint(currentWeekNum) - uint(week),
 			UserID:      user.ID,
 			TrendsID:    2,
 			RiskLevelID: lNormal.ID,
@@ -189,13 +134,12 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 
 		// Seed Notification สำหรับ summary
 		notif := entity.Notification{
-			Timestamp:       time.Now(),
-			Title:           fmt.Sprintf("Weekly Health Summary Week %d", week+1),
-			Message:         "ตัวอย่างข้อความสรุปสุขภาพ",
-			UserID:          user.ID,
-			HealthSummaryID: &summary.ID,
-			HealthTypeID:    1,
-			//TrendsID:             2,
+			Timestamp:            time.Now(),
+			Title:                fmt.Sprintf("Weekly Health Summary Week %d", summary.WeekNumber),
+			Message:              "ตัวอย่างข้อความสรุปสุขภาพ",
+			UserID:               user.ID,
+			HealthSummaryID:      &summary.ID,
+			HealthTypeID:         1,
 			NotificationStatusID: 2,
 		}
 		db.Create(&notif)

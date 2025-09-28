@@ -133,13 +133,17 @@ func CheckForCriticalAlerts(ctx context.Context) {
 				continue
 			}
 
-			criticalHeartRate := 120
+			criticalHeartRateHigh := 120
+			criticalHeartRateLow := 50
 			criticalSpo2 := 90.0
 
 			alerts := ""
 			// NOTE: SpO2 ใน HealthData เป็น float64 หรือไม่? (ใช้ %.2f) ถ้าเป็น float64 ต้องแปลงค่า 90.0 เป็น float64
-			if latestHealthData.Bpm >= uint(criticalHeartRate) {
+			if latestHealthData.Bpm >= uint(criticalHeartRateHigh) {
 				alerts += fmt.Sprintf("- อัตราการเต้นของหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
+			}
+			if latestHealthData.Bpm >= uint(criticalHeartRateLow) {
+				alerts += fmt.Sprintf("- อัตราการเต้นของหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
 			}
 			if latestHealthData.Spo2 <= criticalSpo2 {
 				alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", latestHealthData.Spo2)

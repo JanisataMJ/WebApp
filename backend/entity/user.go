@@ -30,7 +30,6 @@ type User struct {
 	HealthSummary		[]HealthSummary 	`gorm:"foreignKey:UserID"`
 	HealthData 			[]HealthData 		`gorm:"foreignKey:UserID"`
 	SmartwatchDevice 	*SmartwatchDevice 	`gorm:"foreignKey:UserID"`
-	MoodData 			[]MoodData 			`gorm:"foreignKey:UserID"`
 	Notification 		[]Notification 		`gorm:"foreignKey:UserID"`
 	Article 			[]Article 			`gorm:"foreignKey:UserID"`
 }

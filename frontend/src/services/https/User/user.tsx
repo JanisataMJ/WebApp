@@ -3,25 +3,6 @@ import { UsersInterface ,SignInInterface,InterfaceStatusWriter,InterfaceIncome} 
 
 const apiUrl = "http://localhost:8000";
 
-/*const postRequestOptions = (body: any) => {
-  const Authorization = localStorage.getItem("token");
-  const Bearer = localStorage.getItem("token_type");
-
-  let headers: Record<string, string> = {
-    Authorization: `${Bearer} ${Authorization}`,
-  };
-
-  if (!(body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  return {
-    method: "POST",
-    headers: headers, 
-    body: body instanceof FormData ? body : JSON.stringify(body), 
-  };
-};*/
-
 const Authorization = localStorage.getItem("token");
 const Bearer = localStorage.getItem("token_type");
 

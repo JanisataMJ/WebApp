@@ -8,6 +8,7 @@ import (
 	"time"
 
 	appConfig "github.com/JanisataMJ/WebApp/config"
+	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/entity"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -272,15 +273,15 @@ func GetHealthSummary(c *gin.Context) {
 
 // GET /health-summary/weekly/:id
 // 💡 ดึงข้อมูลสรุปแบบ Real-Time จาก HealthData โดยใช้ CalculateSummary
-func GetWeeklySummary(c *gin.Context) {
+/* func GetWeeklySummary(c *gin.Context) {
 	db := appConfig.DB() // 💡 ใช้ appConfig.DB() แทน c.MustGet("db")
 	userID := c.Param("id")
 	mode := c.DefaultQuery("mode", "currentweek") // 💡 เปลี่ยน default เป็น "currentweek"
-	
+
 	// 🔥🔥 DEBUG PRINT: ตรวจสอบว่า Go ได้รับ Mode อะไร
-	fmt.Println("Received mode:", mode) 
+	fmt.Println("Received mode:", mode)
 	// 🔥🔥
-	
+
 	today := time.Now()
 	var startDate, endDate time.Time
 
@@ -302,12 +303,12 @@ func GetWeeklySummary(c *gin.Context) {
 		// ย้อนหลัง 7 วันรวมวันนี้
 		startDate = today.AddDate(0, 0, -6).Truncate(24 * time.Hour)
 		endDate = time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 0, today.Location())
-	
+
 	case "lastweek":
 		// สัปดาห์ที่แล้ว (จันทร์-อาทิตย์) เช่น 2025-09-22 ถึง 2025-09-28
 		startDate = startOfLastWeek
 		endDate = endOfLastWeek
-	
+
 	case "last2weeks":
 		// 2 สัปดาห์ก่อนหน้า (จันทร์ของ 2 สัปดาห์ก่อน - อาทิตย์ของ 2 สัปดาห์ก่อน)
 		// 1. วันอาทิตย์ของ 2 สัปดาห์ก่อน (ย้อนไป 7 วันจาก endOfLastWeek)
@@ -317,7 +318,7 @@ func GetWeeklySummary(c *gin.Context) {
 
 		// 💡 DEBUG: ยืนยันช่วงเวลาที่ถูกคำนวณ
         fmt.Printf("Mode last2weeks calculated period: %s to %s\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-	
+
 	case "currentweek": // 💡 สัปดาห์ปัจจุบัน (จันทร์-ปัจจุบัน)
 		fallthrough
 	default:
@@ -336,7 +337,77 @@ func GetWeeklySummary(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, summaryData)
+} */
+// internal function แยกจาก Gin handler
+
+
+func GetWeeklySummary(c *gin.Context) {
+	userID := c.Param("id")
+	mode := c.DefaultQuery("mode", "currentweek")
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	// เรียก internal func ดึงข้อมูลรายวัน
+	dailyData, err := healthData.GetWeeklyHealthDataInternal(db, userID, mode)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(dailyData) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No health data found"})
+		return
+	}
+
+	var sumBpm, sumSpo2, sumCalories float64
+	var sumSteps int64
+	var totalSleepMinutes int64
+	var sleepCount int64 // สำหรับกรณีวันไหนไม่มีค่า sleep
+
+	for _, d := range dailyData {
+		sumBpm += d.AvgBpm
+		sumSpo2 += d.AvgSpo2
+		sumCalories += d.Calories
+		sumSteps += d.Steps
+
+		// แปลง SleepHours เป็นนาที เช่น "7h 10m"
+		if d.SleepHours != "" {
+			var h, m int64
+			fmt.Sscanf(d.SleepHours, "%dh %dm", &h, &m)
+			totalSleepMinutes += h*60 + m
+			sleepCount++
+		}
+	}
+
+	count := float64(len(dailyData))
+
+	// เฉลี่ย
+	avgBpm := sumBpm / count
+	avgSpo2 := sumSpo2 / count
+	avgCalories := sumCalories / count
+
+	// เฉลี่ยเวลานอน
+	var avgSleep string
+	if sleepCount > 0 {
+		minutes := totalSleepMinutes / sleepCount
+		h := minutes / 60
+		m := minutes % 60
+		avgSleep = fmt.Sprintf("%dh %dm", h, m)
+	} else {
+		avgSleep = "0h 0m"
+	}
+
+	summary := map[string]interface{}{
+		"avg_bpm":      avgBpm,
+		"avg_spo2":     avgSpo2,
+		"total_steps":  sumSteps,
+		"avg_calories": avgCalories,
+		"avg_sleep":    avgSleep,
+	}
+
+	c.JSON(http.StatusOK, summary)
 }
+
 
 // ----------------------------------------------------
 // ✅ Public Service Function for Job Runner (main.go)

@@ -90,7 +90,7 @@ func getDailyMetric(c *gin.Context, field string, alias string) {
 		}
 
 		response = append(response, map[string]interface{}{
-			"time": d.Timestamp.In(loc).Format("15:04"),
+			"time": d.Timestamp.Format("15:04"),
 			alias:  value,
 		})
 

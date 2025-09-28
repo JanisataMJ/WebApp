@@ -7,7 +7,6 @@ import { UsersInterface } from '../../../interface/profile_interface/IProfile';
 
 interface StepsData {
   time: string;
-  minutes: number;
   steps: number;
   cumulativeSteps: number;
   hour: number;
@@ -34,19 +33,6 @@ interface CustomTooltipProps {
   payload?: Array<{ value: number; payload?: StepsData }>;
   label?: string;
 }
-
-// แปลง "HH:mm" → จำนวนนาที
-const toMinutes = (time: string) => {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-};
-
-// แปลงนาที → "HH:mm" สำหรับแกน X
-const formatTime = (minutes: number) => {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-};
 
 
 const DairySteps: React.FC = () => {
@@ -113,7 +99,6 @@ const DairySteps: React.FC = () => {
 
           return {
             time: item.time || '',
-            minutes: toMinutes(item.time || "00:00"),
             steps,
             cumulativeSteps,
             hour: item.hour || 0,
@@ -124,8 +109,7 @@ const DairySteps: React.FC = () => {
           };
         });
 
-        // ✅ เรียงตามเวลา
-        stepsArray.sort((a, b) => a.minutes - b.minutes);
+        stepsArray.sort((a, b) => a.time.localeCompare(b.time));
 
         setData(stepsArray);
 
@@ -140,15 +124,32 @@ const DairySteps: React.FC = () => {
     fetchAllData();
   }, [UserIDString]);
 
-  /* if (loading) return <div>กำลังโหลดข้อมูล...</div>;
-  if (!data || data.length === 0) return <div>ไม่พบข้อมูลการเดินของวันนี้</div>; */
+  // 1) Group by hour → เลือก cumulativeSteps สูงสุดในแต่ละชั่วโมง
+  const grouped: { [hour: string]: StepsData } = {};
+  data.forEach(d => {
+    const hour = d.time.split(":")[0]; // เอาเฉพาะชั่วโมง
+    if (!grouped[hour] || d.cumulativeSteps > grouped[hour].cumulativeSteps) {
+      grouped[hour] = d;
+    }
+  });
 
-  const hourlyData = data.map(item => ({
-    hour: item.time,
-    steps: item.steps,
-    activity: item.activity,
-    intensity: item.intensity
-  }));
+  // 2) เรียงตามเวลา
+  const sorted = Object.values(grouped).sort((a, b) =>
+    a.time.localeCompare(b.time)
+  );
+
+  // 3) คำนวณ diff (ปัจจุบัน - ก่อนหน้า) → ได้จำนวนก้าวของแต่ละชั่วโมง
+  const hourlyData: StepsData[] = sorted.map((d, i) => {
+    if (i === 0) {
+      return { ...d, steps: d.cumulativeSteps }; // ชั่วโมงแรกเอาตามจริง
+    }
+    const prev = sorted[i - 1];
+    return {
+      ...d,
+      steps: d.cumulativeSteps - prev.cumulativeSteps // diff
+    };
+  });
+
 
   const stepsSummary: StepsSummary = (() => {
     if (!data || data.length === 0) return {
@@ -268,13 +269,6 @@ const DairySteps: React.FC = () => {
     );
   };
 
-  // หาเวลาต่ำสุด–สูงสุดจากข้อมูล
-  const minMinutes = Math.min(...data.map(d => d.minutes));
-  const maxMinutes = Math.max(...data.map(d => d.minutes));
-
-  // ขยายช่วงออกไป 1 ชั่วโมง
-  const domain = [minMinutes - 60, maxMinutes + 60];
-
 
   return (
     <div className="steps-container">
@@ -391,10 +385,11 @@ const DairySteps: React.FC = () => {
 
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis
-                dataKey="minutes"
-                type="number"
-                domain={domain}              // ✅ ใช้ domain ที่เราคำนวณ
-                tickFormatter={formatTime}
+                dataKey="time"
+              />
+              <Tooltip
+                labelFormatter={(v) => v}   // ✅ แสดงเวลา string ตรง ๆ
+                content={<CustomTooltip />}
               />
               <YAxis
                 stroke="#666"
@@ -402,9 +397,10 @@ const DairySteps: React.FC = () => {
                 label={{ value: 'ก้าวสะสม', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip
-                labelFormatter={(v) => formatTime(v as number)}
+                labelFormatter={(v) => v}
                 content={<CustomTooltip />}
               />
+
               <Area
                 type="monotone"
                 dataKey="cumulativeSteps"
@@ -422,24 +418,20 @@ const DairySteps: React.FC = () => {
           <h3 className="chart-title-step">📊 ก้าวรายชั่วโมง</h3>
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={hourlyData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-  <XAxis
-    dataKey="minutes"
-    type="number"
-    domain={domain}
-    tickFormatter={formatTime}
-    ticks={Array.from({ length: 24 }, (_, i) => i * 60)}   // ✅ 00:00–23:00
-  />
-  <YAxis stroke="#666" tick={{ fontSize: 12 }} />
-  <Tooltip labelFormatter={(v) => formatTime(v as number)} />
-  <Bar
-    dataKey="steps"
-    fill="#3b82f6"
-    radius={[4, 4, 0, 0]}
-    barSize={30}    // ✅ ความกว้างของแท่ง (เล็กลง)
-  />
-</BarChart>
-
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis
+                dataKey="time"
+                tickFormatter={(v) => v}
+              />
+              <YAxis stroke="#666" tick={{ fontSize: 12 }} />
+              <Tooltip labelFormatter={(v) => v} />
+              <Bar
+                dataKey="steps"
+                fill="#3b82f6"
+                radius={[4, 4, 0, 0]}
+                barSize={30}
+              />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>

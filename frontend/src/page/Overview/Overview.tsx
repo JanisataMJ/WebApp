@@ -30,7 +30,7 @@ const Overview = () => {
   const [vitalSigns, setVitalSigns] = useState<VitalCard[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<"weekly" | "last7days" | "lastweek">("weekly");
+  const [mode, setMode] = useState<"weekly" | "lastweek">("weekly");
   const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
@@ -39,9 +39,11 @@ const Overview = () => {
         const latestWeek: HealthSummaryInterface = await GetWeeklySummary(UserID, mode);
 
         let previousWeek: HealthSummaryInterface | null = null;
-        if (mode === "weekly" || mode === "last7days") {
+        if (mode === "weekly") {
+          console.log("Fetching comparison: lastweek"); // DEBUG
           previousWeek = await GetWeeklySummary(UserID, "lastweek");
         } else if (mode === "lastweek") {
+          console.log("Fetching comparison: last2weeks"); // DEBUG
           previousWeek = await GetWeeklySummary(UserID, "last2weeks");
         }
 
@@ -210,7 +212,6 @@ const Overview = () => {
 
   const modeLabel: Record<typeof mode, string> = {
     weekly: "สัปดาห์นี้",
-    last7days: "7 วันที่ผ่านมา",
     lastweek: "สัปดาห์ที่แล้ว",
   };
 
@@ -247,69 +248,67 @@ const Overview = () => {
   // ชื่อหัวตาราง
   const comparisonTitleMap: Record<typeof mode, string> = {
     weekly: "เปรียบเทียบสัปดาห์นี้ vs สัปดาห์ที่แล้ว",
-    last7days: "เปรียบเทียบ 7 วันล่าสุด vs 7 วันก่อนหน้า",
     lastweek: "เปรียบเทียบสัปดาห์ที่แล้ว vs 2 สัปดาห์ก่อนหน้า",
   };
 
   // ชื่อคอลัมน์
   const comparisonColumnMap: Record<typeof mode, { thisWeek: string; lastWeek: string }> = {
     weekly: { thisWeek: "สัปดาห์นี้", lastWeek: "สัปดาห์ที่แล้ว" },
-    last7days: { thisWeek: "7 วันล่าสุด", lastWeek: "7 วันก่อนหน้า" },
     lastweek: { thisWeek: "สัปดาห์ที่แล้ว", lastWeek: "2 สัปดาห์ก่อนหน้า" },
   };
 
- 
+
   const columns: ColumnsType<typeof comparisonData[0]> = [
-  {
-    title: "ข้อมูลสุขภาพ",
-    dataIndex: "metric",
-    key: "metric",
-    align: "center",
-    className: "col-metric",
-  },
-  {
-    title: comparisonColumnMap[mode].lastWeek,
-    dataIndex: "lastWeek",
-    key: "lastWeek",
-    align: "center",
-    className: "col-lastweek",
-  },
-  {
-    title: comparisonColumnMap[mode].thisWeek,
-    dataIndex: "thisWeek",
-    key: "thisWeek",
-    align: "center",
-    className:
-      "col-thisweek " +
-      (["weekly", "last7days", "lastweek"].includes(mode)
-        ? "highlight-col"
-        : ""),
-    render: (value: any, record: any) => {
-      const prevValue = Number(record.lastWeek);
-      const currentValue = Number(value);
-
-      if (!prevValue || isNaN(prevValue) || isNaN(currentValue)) {
-        return <span>{value}</span>;
-      }
-
-      let icon = null;
-      if (currentValue > prevValue) {
-        icon = <TrendingUp size={18} color="green" />;
-      } else if (currentValue < prevValue) {
-        icon = <TrendingDown size={18} color="red" />;
-      } else {
-        icon = <ArrowRightLeft size={18} color="gray" />;
-      }
-
-      return (
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-          {value}
-          {icon}
-        </span>
-      );
+    {
+      title: "ข้อมูลสุขภาพ",
+      dataIndex: "metric",
+      key: "metric",
+      align: "center",
+      className: "col-metric",
     },
-  },
-];
+    {
+      title: comparisonColumnMap[mode].lastWeek,
+      dataIndex: "lastWeek",
+      key: "lastWeek",
+      align: "center",
+      className: "col-lastweek",
+    },
+    {
+      title: comparisonColumnMap[mode].thisWeek,
+      dataIndex: "thisWeek",
+      key: "thisWeek",
+      align: "center",
+      className:
+        "col-thisweek " +
+        (["weekly","lastweek"].includes(mode)
+          ? "highlight-col"
+          : ""),
+      render: (value: any, record: any) => {
+        const prevValue = Number(record.lastWeek);
+        const currentValue = Number(value);
+
+        if (!prevValue || isNaN(prevValue) || isNaN(currentValue)) {
+          return <span>{value}</span>;
+        }
+
+        let icon = null;
+        if (currentValue > prevValue) {
+          icon = <TrendingUp size={18} color="green" />;
+        } else if (currentValue < prevValue) {
+          icon = <TrendingDown size={18} color="red" />;
+        } else {
+          icon = <ArrowRightLeft size={18} color="gray" />;
+        }
+
+        return (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            {value}
+            {icon}
+          </span>
+        );
+      },
+    },
+  ];
 
 
   return (
@@ -328,7 +327,6 @@ const Overview = () => {
               className="custom-radio-group-overview"
             >
               <Radio.Button value="weekly">สัปดาห์นี้</Radio.Button>
-              <Radio.Button value="last7days">7 วันล่าสุด</Radio.Button>
               <Radio.Button value="lastweek">สัปดาห์ที่แล้ว</Radio.Button>
             </Radio.Group>
           </div>

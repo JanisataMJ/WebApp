@@ -6,6 +6,8 @@ const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backen
 
 const getRequestOptions = () => {
   const token = localStorage.getItem("token");
+  // 💡 แนะนำ: หากมีการเก็บ token_type ไว้ใน localStorage ควรดึงมาใช้ด้วย
+  // const Bearer = localStorage.getItem("token_type") || "Bearer";
   return {
     headers: {
       "Content-Type": "application/json",
@@ -134,7 +136,7 @@ export const getDailySleep = async (
 
 export const GetWeeklyHealthData = async (
   userId: number,
-  mode: "weekly" | "last7days" | "lastweek" | "last2weeks" = "weekly"
+  mode: "weekly" | "lastweek" | "last2weeks" = "weekly"
 ): Promise<HealthDataInterface[]> => {
   try {
     const requestOptions = getRequestOptions();

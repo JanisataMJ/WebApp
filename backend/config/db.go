@@ -151,6 +151,25 @@ func SetupDatabase() {
 	}
 	db.FirstOrCreate(Admin2, &entity.User{Email: "admin2@gmail.com"})
 
+	User6 := &entity.User{
+		Username:    "MaeMae",
+		Password:    hashedPassword,
+		Email:       "user6@gmail.com",
+		FirstName:   "MaeMae",
+		LastName:    "MaeMae",
+		Birthdate:   BirthDay,
+		Phonenumber: "0615871759",
+		Profile:     "uploads/Profiles/profile2.jpeg",
+		Height:      166,
+		Weight:      55,
+		Bust:        33,
+		Waist:       25,
+		Hip:         37,
+		RoleID:      2,
+		GenderID:    2,
+	}
+	db.FirstOrCreate(User6, &entity.User{Email: "user6@gmail.com"})
+
 
 	// 4. Seed Data อื่นๆ
 	initialCalendars := []entity.MoodData{

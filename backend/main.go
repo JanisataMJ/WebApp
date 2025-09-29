@@ -8,19 +8,19 @@ import (
 	"strconv"
 
 	"github.com/JanisataMJ/WebApp/config"
-	// 💡 แก้ไข Alias: count เป็น admin_count
-	adminCount "github.com/JanisataMJ/WebApp/controller/admin_count" 
+	// ✅ เปลี่ยน Alias: admin_count
+	adminCount "github.com/JanisataMJ/WebApp/controller/admin_count"
 	"github.com/JanisataMJ/WebApp/controller/article"
-	// 💡 แก้ไข Alias: genders เป็น gender
-	"github.com/JanisataMJ/WebApp/controller/gender" 
+	// ✅ เปลี่ยน Alias: gender
+	gender "github.com/JanisataMJ/WebApp/controller/gender"
 	"github.com/JanisataMJ/WebApp/controller/gmail"
 	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
 	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/controller/smartwatchDevice"
-	// 💡 แก้ไข Alias: users เป็น user
-	user "github.com/JanisataMJ/WebApp/controller/user" 
+	// ✅ เปลี่ยน Alias: user
+	user "github.com/JanisataMJ/WebApp/controller/user"
 	"github.com/JanisataMJ/WebApp/middlewares"
 	"github.com/JanisataMJ/WebApp/seed"
 	"github.com/gin-gonic/gin"
@@ -54,39 +54,40 @@ func main() {
 	//seed.SeedHealthData(gormDB)
 	seed.SeedHealthDataTwoWeeks(gormDB)
 
-	//*** เรียกใช้ Backfill Health Analysis ที่นี่ ***
-	//healthAnalysis.BackfillHealthAnalysis(gormDB)
-
 	sqlDB, err := gormDB.DB()
 	if err != nil {
 		log.Fatalf("Failed to get *sql.DB from GORM: %v", err)
 	}
 
-	// *** เรียกใช้ Setup และ Import จาก Controller ใหม่ ***
+	// 💡 การแก้ไขที่สำคัญ: ต้องใช้ SetupConfigTable เวอร์ชันที่รองรับหลายชีท
 	if err := healthData.SetupConfigTable(sqlDB); err != nil {
 		log.Fatalf("Failed to setup config table: %v", err)
 	}
 
-	// Initial import
-	healthData.ImportHealthData(sqlDB)
+	// Initial import: เรียกใช้ ImportSheetData สำหรับแต่ละชีท
+	// 🚩 ImportSheetData ถูกสร้างขึ้นเพื่อแทนที่ ImportHealthData เดิม
+	log.Println("▶️ Starting initial data import for HealthData_Daily...")
+	healthData.ImportSheetData(sqlDB, "HealthData_Daily")
+	
+	log.Println("▶️ Starting initial data import for HealthData_LatestAll...")
+	healthData.ImportSheetData(sqlDB, "HealthData_LatestAll")
 	// ----------------------------------------------------
-	// ✅ ตำแหน่งที่ควรเรียกใช้ AnalyzeHealthData
-	// ----------------------------------------------------
-	log.Println("▶️ Starting initial Health Analysis...")
-	healthAnalysis.AnalyzeHealthData(gormDB) // 💡 ต้องเรียกใช้ตรงนี้!
-	log.Println("✅ Initial Health Analysis completed.")
-    
-    // ----------------------------------------------------
-    // 🚩 การเรียกใช้ Backfill Summary (รันเพียงครั้งเดียวเมื่อต้องการสร้างย้อนหลัง)
-    // ----------------------------------------------------
-    log.Println("▶️ Starting FULL BACKFILL Summary Job...")
-    // ตั้งค่า isBackfill เป็น true เพื่อให้สร้าง Summary ย้อนหลังทุกสัปดาห์
-    healthSummary.RunSummaryJob(gormDB, true) 
-    log.Println("✅ FULL BACKFILL Summary Job completed.")
-    // ----------------------------------------------------
 
-	// Start data import job
-	go healthData.StartDataImportJob(sqlDB)
+	log.Println("▶️ Starting initial Health Analysis...")
+	healthAnalysis.AnalyzeHealthData(gormDB) // 💡 เรียกใช้ Analysis หลัง Import
+	log.Println("✅ Initial Health Analysis completed.")
+	
+	// ----------------------------------------------------
+	// 🚩 การเรียกใช้ Backfill Summary
+	// ----------------------------------------------------
+	log.Println("▶️ Starting FULL BACKFILL Summary Job...")
+	healthSummary.RunSummaryJob(gormDB, true) 
+	log.Println("✅ FULL BACKFILL Summary Job completed.")
+	// ----------------------------------------------------
+
+	// Start data import job (จะเรียกใช้ ImportSheetData สองครั้งซ้ำๆ)
+	// 💡 ต้องแน่ใจว่า healthData.StartDataImportJob ถูกแก้ไขให้เรียก ImportSheetData()
+	go healthData.StartDataImportJob(sqlDB) 
 
 	// Gin framework setup
 	r := gin.Default()
@@ -103,8 +104,8 @@ func main() {
 		router.Use(middlewares.Authorizes())
 		r.Static("/uploads", "./uploads")
 		router.PUT("/user/:id", user.Update) // ใช้ Alias 'user'
-		router.GET("/users", user.GetAll)    // ใช้ Alias 'user'
-		router.GET("/user/:id", user.Get)    // ใช้ Alias 'user'
+		router.GET("/users", user.GetAll) 	// ใช้ Alias 'user'
+		router.GET("/user/:id", user.Get) 	// ใช้ Alias 'user'
 		router.DELETE("/user/:id", user.Delete) // ใช้ Alias 'user'
 		router.POST("/create-notification/:id", notification.CreateNotification)
 		router.GET("/notification/:id", notification.GetNotificationsByUserID)
@@ -142,7 +143,7 @@ func main() {
 		router.GET("/admin-counts", adminCount.GetAdminCounts) // ใช้ Alias 'adminCount'
 	}
 
-	r.GET("/genders", genders.GetAll) // ใช้ Alias 'gender'
+	r.GET("/genders", gender.GetAll) // ใช้ Alias 'gender'
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})

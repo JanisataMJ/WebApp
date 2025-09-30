@@ -203,12 +203,38 @@ func runWeeklyAnalysis(ctx context.Context) {
 	for _, user := range users {
 		log.Printf("Starting weekly analysis for user ID: %d\n", user.ID)
 
-		lastWeek := time.Now().AddDate(0, 0, -7)
-		var healthData []entity.HealthData
-		if err := config.DB().Where("user_id = ? AND created_at >= ?", user.ID, lastWeek).Find(&healthData).Error; err != nil {
-			log.Printf("Error retrieving health data for user %d: %v\n", user.ID, err)
-			continue
-		}
+        // 1. คำนวณจุดเริ่มต้นของสัปดาห์ (วันจันทร์ 00:00:00)
+        now := time.Now()
+        
+        // Go's Weekday: Sunday=0, Monday=1, Tuesday=2, ...
+        // คำนวณจำนวนวันที่ต้องย้อนกลับไปหา Monday
+        daysToMonday := int(now.Weekday() - time.Monday) 
+        if daysToMonday < 0 {
+            // ถ้าวันนี้คือ Sunday (0 - 1 = -1), ต้องย้อนกลับไป 6 วันเพื่อหา Monday ที่ผ่านมา
+            daysToMonday = 6
+        }
+
+        startOfWeek := now.AddDate(0, 0, -daysToMonday)
+        // ตั้งเวลาเป็น 00:00:00 ของวันจันทร์
+        startOfWeek = time.Date(startOfWeek.Year(), startOfWeek.Month(), startOfWeek.Day(), 0, 0, 0, 0, now.Location())
+        
+        // จุดสิ้นสุดของช่วงวิเคราะห์คือเวลาปัจจุบันที่ Job รัน
+        endOfRange := now 
+
+        var healthData []entity.HealthData
+        
+        // 2. ดึงข้อมูลในช่วง (วันจันทร์ 00:00:00) ถึง (ปัจจุบัน) 
+        //    โดยใช้คอลัมน์ 'timestamp'
+        if err := config.DB().
+            Where("user_id = ?", user.ID).
+            // กรองข้อมูลที่ timestamp อยู่ระหว่าง startOfWeek ถึง endOfRange
+            Where("timestamp >= ? AND timestamp <= ?", startOfWeek, endOfRange).
+            Order("timestamp ASC"). // จัดเรียงเวลาให้ Gemini วิเคราะห์แนวโน้มได้
+            Find(&healthData).Error; err != nil {
+            
+            log.Printf("Error retrieving health data for user %d: %v\n", user.ID, err)
+            continue
+        }
 
 		// *** เรียกใช้ฟังก์ชันจาก geminiAnalysis.go ***
 		analysis, err := AnalyzeHealthDataWithGemini(ctx, user.ID, healthData)

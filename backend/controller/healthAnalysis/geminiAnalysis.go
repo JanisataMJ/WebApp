@@ -57,7 +57,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 		sleepValue := ParseSleepHours(item.SleepHours, userID)
 		
 		dataString.WriteString(fmt.Sprintf("%s,%d,%d,%.2f,%.2f,%f\n",
-			item.CreatedAt.Format("2006-01-02"),
+			item.Timestamp.Format("2006-01-02"), // ✅ ถูกต้อง
 			item.Bpm,
 			item.Steps,
 			item.Spo2,

@@ -11,6 +11,7 @@ import (
    "github.com/JanisataMJ/WebApp/config"
    "github.com/JanisataMJ/WebApp/entity"
    "github.com/JanisataMJ/WebApp/services"
+   "github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 )
 
 
@@ -118,6 +119,9 @@ func SignIn(c *gin.Context) {
        c.JSON(http.StatusBadRequest, gin.H{"error": "error signing token"})
        return
    }
+
+    go healthAnalysis.StartUserRealtimeAlertMonitoring(user.ID, 5) // เช็คทุก 5 วินาที
+
    c.JSON(http.StatusOK, 
         gin.H{  "token_type":   "Bearer", 
                 "token":        signedToken, 

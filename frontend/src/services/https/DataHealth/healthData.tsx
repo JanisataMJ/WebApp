@@ -2,12 +2,10 @@ import axios from "axios";
 import { HealthDataInterface } from "../../../interface/health_data_interface/health_data";
 import { RealTimeInterface } from "../../../interface/health_data_interface/realtime";
 
-const apiUrl = "http://localhost:8000"; // เปลี่ยนตาม backend จริง
+const apiUrl = "http://localhost:8000";
 
 const getRequestOptions = () => {
   const token = localStorage.getItem("token");
-  // 💡 แนะนำ: หากมีการเก็บ token_type ไว้ใน localStorage ควรดึงมาใช้ด้วย
-  // const Bearer = localStorage.getItem("token_type") || "Bearer";
   return {
     headers: {
       "Content-Type": "application/json",
@@ -99,7 +97,6 @@ export const getDailyCalories = async (
   }
 };
 
-
 export const getDailySpo2 = async (
   userId: number,
   withStats = false
@@ -136,7 +133,7 @@ export const getDailySleep = async (
 
 export const GetWeeklyHealthData = async (
   userId: number,
-  mode: "weekly" | "lastweek" | "last2weeks" = "weekly"
+  mode: "weekly" | "lastweek" | "last2weeks"
 ): Promise<HealthDataInterface[]> => {
   try {
     const requestOptions = getRequestOptions();

@@ -87,3 +87,11 @@ export const sendRealtimeAlert = async (healthData: any): Promise<string | any> 
     return error.response;
   }
 };
+
+
+// ไม่ต้องเขียน SSE function เพราะ React ใช้ EventSource
+// แต่สามารถสร้างฟังก์ชันส่ง Notification ใหม่ให้ backend
+export const sendNotification = async (notif: Partial<NotificationInterface>) => {
+  const res = await axios.post(`${apiUrl}/create-notification/${notif.UserID}`, notif);
+  return res.data;
+};

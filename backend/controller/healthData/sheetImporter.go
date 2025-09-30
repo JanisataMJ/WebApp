@@ -15,8 +15,8 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
-	
-	appConfig "github.com/JanisataMJ/WebApp/config" 
+
+	appConfig "github.com/JanisataMJ/WebApp/config"
 	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 )
 
@@ -37,7 +37,7 @@ func getClient(config *oauth2.Config) *http.Client {
 
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	fmt.Printf("Go to the following link in your browser then type the " +
+	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 
 	var authCode string
@@ -150,13 +150,13 @@ func ImportHealthData(db *sql.DB) {
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
-    // 💡 เปลี่ยนชื่อตัวแปร 'config' เป็น 'oauthConfig'
-	oauthConfig, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope) 
+	// 💡 เปลี่ยนชื่อตัวแปร 'config' เป็น 'oauthConfig'
+	oauthConfig, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-    // 💡 ใช้ชื่อใหม่ในการเรียก getClient
-	client := getClient(oauthConfig) 
+	// 💡 ใช้ชื่อใหม่ในการเรียก getClient
+	client := getClient(oauthConfig)
 	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
@@ -198,7 +198,7 @@ func ImportHealthData(db *sql.DB) {
 
 	dataRows := resp.Values
 	rowsProcessed := 0
-	
+
 	userIndex, timeIndex, heartRateIndex, stepsIndex, spo2Index, sleepIndex, caloriesIndex := 0, 1, 2, 3, 4, 5, 6
 
 	for _, row := range dataRows {
@@ -233,12 +233,24 @@ func ImportHealthData(db *sql.DB) {
 
 		sleepHours := fmt.Sprintf("%v", row[sleepIndex])
 
-		var caloriesBurned int
+		var caloriesBurned float64
 		caloriesStr := fmt.Sprintf("%v", row[caloriesIndex])
 		if caloriesStr != "" && caloriesStr != "<nil>" && caloriesStr != "null" {
-			caloriesBurned, _ = strconv.Atoi(caloriesStr)
+			// ลองแปลงเป็น float ก่อน
+			if val, err := strconv.ParseFloat(caloriesStr, 64); err == nil {
+				caloriesBurned = val
+			} else {
+				log.Printf("Failed to parse calories '%s': %v", caloriesStr, err)
+			}
 		}
 
+		// จากนั้นเปลี่ยน SQL statement ให้ใช้ float64 แทน int
+		stmt, err := tx.Prepare("INSERT OR IGNORE INTO health_data(user_id, timestamp, bpm, steps , spo2, sleep_hours, calories_burned) VALUES(?, ?, ?, ?, ?, ?, ?)")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// ใน stmt.Exec ส่ง caloriesBurned เป็น float64
 		_, err = stmt.Exec(userID, formattedTime, bpm, steps, spo2, sleepHours, caloriesBurned)
 		if err != nil {
 			log.Printf("Failed to insert row for user %d at time %s: %v", userID, formattedTime, err)
@@ -260,9 +272,9 @@ func ImportHealthData(db *sql.DB) {
 		}
 		fmt.Printf("Data import finished. Successfully processed %d new rows. Next read will start at row %d.\n", rowsProcessed, newLastRow)
 		fmt.Println("Starting HealthAnalysis...")
-        // 💡 เรียกใช้ฟังก์ชันวิเคราะห์ โดยดึง *gorm.DB จาก config.DB()
-        healthAnalysis.AnalyzeHealthData(appConfig.DB()) 
-        fmt.Println("HealthAnalysis completed.")
+		// 💡 เรียกใช้ฟังก์ชันวิเคราะห์ โดยดึง *gorm.DB จาก config.DB()
+		healthAnalysis.AnalyzeHealthData(appConfig.DB())
+		fmt.Println("HealthAnalysis completed.")
 	} else {
 		fmt.Println("Data import finished. No new rows were processed.")
 	}

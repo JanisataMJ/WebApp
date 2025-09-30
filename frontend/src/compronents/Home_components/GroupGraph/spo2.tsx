@@ -33,19 +33,19 @@ const DairySpo2: React.FC = () => {
     const fetchData = async () => {
       try {
         const res = await getDailySpo2(UserID);
-
-        // ถ้า res.data ไม่มีค่า → ให้ fallback เป็น array ว่าง
         const rawData = res?.data ?? [];
 
         const mappedData: SpO2Data[] = rawData.map((d: any) => {
           let status: 'normal' | 'low' | 'critical' | 'severe' | 'none';
           const spo2 = Number(d.spo2?.toFixed(2) ?? 0);
+
           if (spo2 >= 96) status = 'normal';
           else if (spo2 >= 90) status = 'low';
           else if (spo2 >= 85) status = 'critical';
           else status = 'severe';
 
           const [hour, minute] = (d.time || "00:00").split(":").map(Number);
+
           return {
             time: `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`,
             spo2,
@@ -53,28 +53,9 @@ const DairySpo2: React.FC = () => {
             status,
           };
         });
+        const sortedData = mappedData.sort((a, b) => a.hour - b.hour);
 
-        // ✅ สร้างช่วงเวลา 0:00 → เวลาปัจจุบัน
-        const now = new Date();
-        const currentHour = now.getHours();
-        // const currentMinute = now.getMinutes(); // ไม่ได้ใช้
-
-        const fullDay: SpO2Data[] = [];
-        for (let h = 0; h <= currentHour; h++) {
-          const hourData = mappedData.filter(d => d.hour === h);
-          if (hourData.length > 0) {
-            fullDay.push(...hourData); // เอาทุกจุดของชั่วโมงนั้น
-          } else {
-            fullDay.push({
-              time: `${h.toString().padStart(2, "0")}:00`,
-              spo2: null,
-              hour: h,
-              status: "none",
-            });
-          }
-        }
-
-        setData(fullDay);
+        setData(sortedData);
       } catch (err) {
         console.error(err);
         setData([]);
@@ -83,22 +64,23 @@ const DairySpo2: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, [UserID]);
+
 
   const chartData = [...data]
-    .map(d => ({ ...d, spo2: d.spo2 !== null ? d.spo2 : undefined }))
-    .sort((a, b) => {
-      const [ah, am] = a.time.split(':').map(Number);
-      const [bh, bm] = b.time.split(':').map(Number);
-      return ah * 60 + am - (bh * 60 + bm);
-    });
-
+    .map(d => ({
+      ...d,
+      spo2: d.spo2 !== null ? d.spo2 : undefined,
+      hour: d.hour
+    }))
+    .sort((a, b) => a.hour - b.hour);
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
   const validSpo2Data = data.filter(d => d.spo2 !== null) as { time: string; spo2: number; hour: number; status: SpO2Data['status'] }[];
-  //if (validSpo2Data.length === 0) return <div>ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>;
 
-  // คำนวณ stats จากข้อมูลที่ 'มีค่า' เท่านั้น
   const spo2Values = validSpo2Data.map(d => d.spo2);
 
   const avgSpO2 = spo2Values.length > 0
@@ -127,8 +109,6 @@ const DairySpo2: React.FC = () => {
     { name: 'อันตราย', value: ((statusCounts.severe || 0) / totalValidCount) * 100, count: statusCounts.severe || 0, color: '#991b1b' }
   ].filter(item => item.count > 0);
 
-  //const currentSpO2 = validSpo2Data[validSpo2Data.length - 1]?.spo2 || 98; // Fallback เป็น 98 ถ้าไม่มีข้อมูลที่มีค่าเลย
-
   function getStatusColor(spo2: number): string {
     if (spo2 >= 96) return '#10b981';
     if (spo2 >= 90) return '#f59e0b';
@@ -136,14 +116,14 @@ const DairySpo2: React.FC = () => {
     return '#991b1b';
   }
 
+
   const getStatusText = (status: string) => {
     switch (status) {
       case 'normal': return '🟢 ปกติ';
       case 'low': return '🟡 ต่ำ';
       case 'critical': return '🔴 วิกฤต';
       case 'severe': return '🆘 อันตราย';
-      // ลบ case 'none' ออกจากที่นี่ เพราะไม่ควรส่งค่า 'none' มาตรงๆ
-      default: return 'ไม่ทราบ'; // หรืออาจเปลี่ยนเป็น 'ไม่มีข้อมูลล่าสุด' ถ้า status เป็น 'none'
+      default: return 'ไม่ทราบ';
     }
   };
 
@@ -182,7 +162,7 @@ const DairySpo2: React.FC = () => {
   };
 
   const radialData = [{ name: 'SpO2', value: currentSpO2, fill: getStatusColor(currentSpO2) }];
-  const currentSpO2Status = getSpO2Status(currentSpO2); // 👈 **ใช้ค่านี้**
+  const currentSpO2Status = getSpO2Status(currentSpO2);
 
 
   return (
@@ -194,7 +174,6 @@ const DairySpo2: React.FC = () => {
           <div className="no-data-message" style={{ textAlign: "center", color: "red" }}>⚠️ ไม่พบข้อมูลออกซิเจนในเลือดของวันนี้</div>
         )}
 
-        {/* สถิติสรุป */}
         <div className="stats-grid-spo2">
           <div className="stat-card-spo2">
             <div className="stat-value-spo2 current">{currentSpO2}%</div>
@@ -214,7 +193,6 @@ const DairySpo2: React.FC = () => {
           </div>
         </div>
 
-        {/* Current Status Radial */}
         <div className="current-status-spo2">
           <h3 className="status-title-spo2">📊 สถานะปัจจุบัน</h3>
           <div className="radial-container-spo2">
@@ -256,26 +234,22 @@ const DairySpo2: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts Container */}
       <div className="charts-section-spo2">
-        {/* Line Chart */}
         <div className="chart-container-spo2 line-chart-spo2">
           <h3 className="chart-title-spo2">📈 แนวโน้ม SpO2 ตลอดวัน</h3>
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-
-              {/* เส้นอ้างอิง */}
               <ReferenceLine y={96} stroke="#10b981" strokeDasharray="5 5" label="ปกติ (≥96%)" />
               <ReferenceLine y={90} stroke="#f59e0b" strokeDasharray="5 5" label="ต่ำ (90-95%)" />
               <ReferenceLine y={85} stroke="#ef4444" strokeDasharray="5 5" label="วิกฤต (<90%)" />
 
+              {/* แกน X ใช้เวลาจริง */}
               <XAxis
                 dataKey="time"
+                type="category"
                 stroke="#666"
                 tick={{ fontSize: 12 }}
-                type="category"   // ใช้ category ตามข้อมูลจริง
-                allowDuplicatedCategory={false}
               />
               <YAxis
                 stroke="#666"
@@ -290,33 +264,23 @@ const DairySpo2: React.FC = () => {
                 dataKey="spo2"
                 stroke="#3b82f6"
                 strokeWidth={3}
-                dot={true} // ✅ เปิด dot ทุกค่า
                 connectNulls={true}
                 activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
-              />
-
-              <Customized
-                component={({ points }: any) =>
-                  points?.map((point: any, index: number) =>
-                    point?.value !== undefined ? (
-                      <circle
-                        key={index}
-                        cx={point.x}
-                        cy={point.y}
-                        r={5}
-                        fill={getStatusColor(point.value)}
-                        stroke="white"
-                        strokeWidth={2}
-                      />
-                    ) : null
-                  )
-                }
+                dot={({ cx, cy, value }) => (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={6}
+                    fill={getStatusColor(value)}
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                )}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Pie Chart */}
         <div className="chart-container-spo2 pie-chart-spo2">
           <h3 className="chart-title-spo2">🥧 การกระจายสถานะ</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -344,7 +308,6 @@ const DairySpo2: React.FC = () => {
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Legend */}
           <div className="pie-legend-spo2">
             {statusDistribution.map((item, index) => (
               <div key={index} className="legend-item-spo2">
@@ -361,7 +324,6 @@ const DairySpo2: React.FC = () => {
         </div>
       </div>
 
-      {/* สถานะแยกตามช่วง */}
       <div className="status-section-spo2">
         <h3 className="status-title-spo2">🚦 สรุปสถานะตามช่วงเวลา</h3>
         <div className="status-grid-spo2">
@@ -388,7 +350,6 @@ const DairySpo2: React.FC = () => {
         </div>
       </div>
 
-      {/* คำแนะนำ */}
       <div className="info-section-spo2">
         <p className="info-title-spo2">🫁 <strong>ข้อมูล SpO2 (ออกซิเจนในเลือด):</strong></p>
         <ul className="info-list-spo2">

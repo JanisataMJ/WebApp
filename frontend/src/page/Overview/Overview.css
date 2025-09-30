@@ -86,17 +86,17 @@
 .vital-icon.heart-rate {
   color: #ef4444;
 }
-
-.vital-icon.blood-oxygen {
-  color: #3b82f6;
+.vital-icon.spo2 {
+  color: #10b981;
 }
-
-.vital-icon.temperature {
+.vital-icon.calories {
   color: #f97316;
 }
-
-.vital-icon.blood-pressure {
-  color: #10b981;
+.vital-icon.steps {
+  color: #3b82f6;
+}
+.vital-icon.sleep {
+  color: #8b5cf6;
 }
 
 .vital-icon .icon {
@@ -187,13 +187,17 @@
 .chart-icon.heart-rate {
   color: #ef4444;
 }
-
-.chart-icon.blood-pressure {
+.chart-icon.sleep {
+  color: #8b5cf6;
+}
+.chart-icon.calories {
+  color: #f97316;
+}
+.chart-icon.steps {
   color: #3b82f6;
 }
-
-.chart-icon.sleep {
-  color: #6366f1;
+.chart-icon.spo2 {
+  color: #10b981;
 }
 
 .trend-icon {

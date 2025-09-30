@@ -132,7 +132,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 		}
 		db.Create(&summary)
 
-		// Seed Notification สำหรับ summary
+		/* // Seed Notification สำหรับ summary
 		notif := entity.Notification{
 			Timestamp:            time.Now(),
 			Title:                fmt.Sprintf("Weekly Health Summary Week %d", summary.WeekNumber),
@@ -142,7 +142,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 			HealthTypeID:         1,
 			NotificationStatusID: 2,
 		}
-		db.Create(&notif)
+		db.Create(&notif) */
 	}
 
 	log.Println("Seed data for 2 weeks created successfully!")

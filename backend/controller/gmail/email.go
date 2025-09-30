@@ -64,7 +64,7 @@ func SendImmediateAlert(c *gin.Context, db *gorm.DB, user entity.User, healthTyp
 		Title:              "🚨 แจ้งเตือนสุขภาพผิดปกติ",
 		Message:            message,
 		UserID:             user.ID,
-		HealthTypeID:       healthTypeID,
+		HealthTypeID:       2,
 		NotificationStatusID: 2,
 	}
 
@@ -99,7 +99,7 @@ func SendImmediateAlertBackground(db *gorm.DB, user entity.User, healthTypeID ui
 		Title:              "🚨 แจ้งเตือนสุขภาพผิดปกติ",
 		Message:            message,
 		UserID:             user.ID,
-		HealthTypeID:       healthTypeID,
+		HealthTypeID:       2,
 		NotificationStatusID: 2,
 	}
 

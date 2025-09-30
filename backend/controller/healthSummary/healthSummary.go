@@ -31,7 +31,7 @@ type HealthSummaryResponse struct {
 }
 
 // ----------------------------------------------------
-// 💡 Utility Function
+// 💡 Utility Functions
 // ----------------------------------------------------
 
 // ParseSleepHours แปลง "7 h. 30 m." เป็น 7.5
@@ -64,6 +64,23 @@ func ParseSleepHours(s string) float64 {
 	return h + (m / 60.0)
 }
 
+// StartOfWeek คำนวณวันเริ่มต้นสัปดาห์ (วันจันทร์) ที่ 00:00:00 UTC
+// 💡 เพื่อความสอดคล้องกับ Time Zone ในฐานข้อมูล
+func StartOfWeek(t time.Time) time.Time {
+	t = t.In(time.UTC) // เปลี่ยนเป็น UTC ก่อนคำนวณ
+
+	// Monday = 1, Sunday = 0. ปรับให้วันจันทร์เป็นวันที่ 0 ในการคำนวณ
+	weekday := int(t.Weekday())
+	if weekday == int(time.Sunday) {
+		weekday = 7 // Sunday ให้ถือเป็นวันที่ 7
+	}
+	// ลบวันเพื่อให้ถึงวันจันทร์
+	daysToSubtract := weekday - int(time.Monday)
+	
+	// Truncate เพื่อให้เป็น 00:00:00 UTC
+	return t.AddDate(0, 0, -daysToSubtract).Truncate(24 * time.Hour)
+}
+
 // ----------------------------------------------------
 // ✅ Core Logic: Calculate Summary
 // ----------------------------------------------------
@@ -72,7 +89,7 @@ func ParseSleepHours(s string) float64 {
 func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) (HealthSummaryResponse, error) {
 	var healthDatas []entity.HealthData
 
-	// 💡 ปรับให้ค้นหาตาม UserID และช่วงเวลา
+	// 💡 ค้นหาตาม UserID และช่วงเวลา (UTC)
 	if err := db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", userID, startDate, endDate).
 		Find(&healthDatas).Error; err != nil {
 		return HealthSummaryResponse{}, fmt.Errorf("failed to fetch health data: %w", err)
@@ -84,7 +101,7 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 
 	var totalSleep, totalBpm, totalCalories, totalSpo2 float64
 	var totalSteps int64
-	var minBpm, maxBpm uint = 300, 0 // กำหนดค่าเริ่มต้นเพื่อให้ Min/Max ทำงานถูกต้อง
+	var minBpm, maxBpm uint = 300, 0 
 
 	for i, hd := range healthDatas {
 		// การคำนวณ MinBpm, MaxBpm ต้องตรวจสอบเฉพาะค่าที่มีความหมาย (Bpm > 0)
@@ -116,8 +133,9 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 	// ดึง RiskLevel ล่าสุด (ใช้ในการแสดงผล API)
 	var healthSummary entity.HealthSummary
 	riskLevelStr := "ไม่ระบุ"
+	// Query หา Summary ล่าสุด
 	if err := db.Preload("RiskLevel").
-		Where("user_id = ? AND period_start <= ?", userID, time.Now()). // หา Summary ล่าสุด
+		Where("user_id = ? AND period_start <= ?", userID, endDate). 
 		Order("period_start DESC").
 		First(&healthSummary).Error; err == nil && healthSummary.RiskLevel.Rlevel != "" {
 		riskLevelStr = healthSummary.RiskLevel.Rlevel
@@ -149,35 +167,31 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 // 💡 ฟังก์ชันนี้จะถูกเรียกใช้หลังจากการ Import/Analysis เสร็จสิ้น
 func CreateWeeklySummaries(db *gorm.DB, userID string) {
 	// 1. กำหนดช่วงเวลาที่ต้องการสร้าง Summary (สัปดาห์ที่แล้ว)
-	today := time.Now()
+	today := time.Now().In(time.UTC) // 💡 ใช้ UTC เป็นหลัก
+	
+	// StartOfThisWeek คือวันจันทร์ 00:00:00 UTC ของสัปดาห์ปัจจุบัน
+	startOfThisWeek := StartOfWeek(today) 
 
-	// หาสัปดาห์ที่แล้ว (เริ่มวันจันทร์, จบวันอาทิตย์)
-	weekday := int(today.Weekday())
-	if weekday == 0 {
-		weekday = 7
-	} // Sunday = 7
+	// StartOfLastWeek คือวันจันทร์ 00:00:00 UTC ของสัปดาห์ที่แล้ว
+	startOfLastWeek := startOfThisWeek.AddDate(0, 0, -7)
+	// EndOfLastWeek คือวันอาทิตย์ 23:59:59 UTC ของสัปดาห์ที่แล้ว
+	endOfLastWeek := startOfLastWeek.AddDate(0, 0, 6).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 
-	// ตั้งเวลา EndDate เป็น 23:59:59 ของวันอาทิตย์ที่แล้ว
-	endOfLastWeek := time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 0, today.Location()).AddDate(0, 0, -weekday)
-	// ตั้งเวลา StartDate เป็น 00:00:00 ของวันจันทร์ที่แล้ว
-	startOfLastWeek := time.Date(endOfLastWeek.Year(), endOfLastWeek.Month(), endOfLastWeek.Day(), 0, 0, 0, 0, endOfLastWeek.Location()).AddDate(0, 0, -6)
-
-	// 💡 เพิ่ม Log เพื่อตรวจสอบช่วงเวลา
-	fmt.Printf("Attempting to create summary for User: %s, Period: %s to %s\n", userID, startOfLastWeek.Format("2006-01-02"), endOfLastWeek.Format("2006-01-02"))
+	// 💡 Log แสดงช่วงเวลาที่เป็น UTC
+	fmt.Printf("Attempting to create summary for User: %s, Period (UTC): %s to %s\n", userID, startOfLastWeek.Format("2006-01-02"), endOfLastWeek.Format("2006-01-02"))
 
 	// 2. คำนวณ Summary
 	summaryData, err := CalculateSummary(db, userID, startOfLastWeek, endOfLastWeek)
 
 	if err != nil {
-		// 💡 หากมี Error จะหยุดทำงานตรงนี้
 		fmt.Printf("Warning: Skipping summary creation for User %s: %v\n", userID, err)
-		return // ⚠️ หาก err คือ "no health data found for summary period" แสดงว่าช่วงเวลาผิด
+		return
 	}
 
 	// 3. เตรียม RiskLevelID (ต้องดึงค่า ID ที่ถูกต้องจาก DB)
 	var lNormal entity.RiskLevel
-	// ⚠️ ตรวจสอบ Error ในการค้นหา RiskLevel
-	if err := db.First(&lNormal, "rlevel = ?", "ปกติ").Error; err != nil {
+	// 🟢 FIX: ใช้ "r_level" เพื่อแก้ปัญหา "no such column"
+	if err := db.Where("r_level = ?", "ปกติ").First(&lNormal).Error; err != nil {
 		fmt.Printf("Error: Could not find RiskLevel 'ปกติ'. Please run seed data. %v\n", err)
 		return // หยุดทำงานถ้าหา RiskLevel ไม่เจอ
 	}
@@ -191,20 +205,20 @@ func CreateWeeklySummaries(db *gorm.DB, userID string) {
 
 	// 4. สร้าง Entity สำหรับบันทึก/อัปเดต
 	summaryEntity := entity.HealthSummary{
-		PeriodStart: startOfLastWeek,
+		PeriodStart: startOfLastWeek, // 💡 สำคัญ: ใช้ UTC
 		PeriodEnd:   endOfLastWeek,
 		AvgBpm:      summaryData.AvgBpm,
 		MinBpm:      summaryData.MinBpm,
 		MaxBpm:      summaryData.MaxBpm,
 		AvgSteps:    summaryData.AvgSteps,
-		TotalSteps:  int(summaryData.TotalSteps), // แปลงกลับเป็น int
+		TotalSteps:  int(summaryData.TotalSteps), 
 		AvgSleep:    summaryData.AvgSleep,
 		AvgCalories: summaryData.AvgCalories,
 		AvgSpo2:     summaryData.AvgSpo2,
 		WeekNumber:  summaryData.WeekNumber,
 		UserID:      uint(userIDUint),
-		RiskLevelID: lNormal.ID, // ใช้ ID ที่ดึงมา
-		TrendsID:    1,          // ตั้งค่าเริ่มต้น
+		RiskLevelID: lNormal.ID, 
+		TrendsID:    1, 		
 	}
 
 	// 5. บันทึก/อัปเดต HealthSummary (Upsert Logic)
@@ -216,13 +230,18 @@ func CreateWeeklySummaries(db *gorm.DB, userID string) {
 		if createErr := db.Create(&summaryEntity).Error; createErr != nil {
 			fmt.Printf("GORM ERROR on CREATE Summary: %v\n", createErr)
 		} else {
-			fmt.Println("SUCCESS: New HealthSummary record created.") // 💡 ยืนยัน
+			fmt.Println("SUCCESS: New HealthSummary record created.") 
 		}
 	} else {
+		if result.Error != nil {
+			fmt.Printf("GORM ERROR on querying existing Summary: %v\n", result.Error)
+			return
+		}
+
 		if updateErr := db.Model(&existingSummary).Updates(summaryEntity).Error; updateErr != nil {
 			fmt.Printf("GORM ERROR on UPDATE Summary: %v\n", updateErr)
 		} else {
-			fmt.Println("SUCCESS: Existing HealthSummary record updated.") // 💡 ยืนยัน
+			fmt.Println("SUCCESS: Existing HealthSummary record updated.") 
 		}
 	}
 }
@@ -381,7 +400,6 @@ func CreateSummariesForAllRecentUsers(db *gorm.DB) {
 	var distinctUserIDs []uint
 
 	// 1. ดึง UserID ที่ไม่ซ้ำกันทั้งหมดจาก HealthData ที่มีการบันทึกไว้
-	//    ใช้ Pluck เพื่อดึงคอลัมน์ user_id เท่านั้น (รวดเร็วกว่า)
 	result := db.Model(&entity.HealthData{}).
 		Distinct().
 		Pluck("user_id", &distinctUserIDs)
@@ -424,35 +442,22 @@ func BackfillAllWeeklySummaries(db *gorm.DB, userID string) {
 		return
 	}
 
-	// 2. กำหนดช่วงเวลาเริ่มต้นและสิ้นสุด
+	// 2. กำหนดช่วงเวลาเริ่มต้นและสิ้นสุด (ใช้ UTC ทั้งหมด)
+	
+	// StartOfFirstWeek: วันจันทร์ 00:00:00 UTC ของสัปดาห์ที่มีข้อมูลเก่าสุด
+	startOfFirstWeek := StartOfWeek(firstRecord.Timestamp)
 
-	// หาวันจันทร์ของสัปดาห์ที่เก่าสุด
-	oldestDate := firstRecord.Timestamp
-	weekday := int(oldestDate.Weekday())
-	if weekday == 0 {
-		weekday = 7 // Sunday is the 7th day
-	}
-	// startOfFirstWeek คือ วันจันทร์ 00:00:00 ของสัปดาห์ที่มีข้อมูลเก่าสุด
-	startOfFirstWeek := oldestDate.AddDate(0, 0, -(weekday - 1)).Truncate(24 * time.Hour)
-
-	// กำหนดช่วงเวลาเริ่มต้นในการวนลูป: วันจันทร์ของสัปดาห์ปัจจุบัน (หรือสัปดาห์ที่ผ่านมา)
-	today := time.Now()
-	todayWeekday := int(today.Weekday())
-	if todayWeekday == 0 {
-		todayWeekday = 7
-	}
-	// เริ่มจากวันจันทร์ของสัปดาห์ปัจจุบัน (เพื่อย้อนกลับไป)
-	currentStart := today.AddDate(0, 0, -(todayWeekday - 1)).Truncate(24 * time.Hour)
+	// currentStart: วันจันทร์ 00:00:00 UTC ของสัปดาห์ปัจจุบัน (เพื่อย้อนกลับไป)
+	currentStart := StartOfWeek(time.Now())
 
 	count := 0
 
 	// 3. วนลูปย้อนหลังไปทีละสัปดาห์
-	// วนลูปจนกว่าวันเริ่มต้นของสัปดาห์ (currentStart) จะก่อนวันเริ่มต้นของสัปดาห์แรก (startOfFirstWeek)
 	for currentStart.After(startOfFirstWeek) || currentStart.Equal(startOfFirstWeek) {
 
-		// กำหนด Period End ให้เป็นวันอาทิตย์ 23:59:59 ของสัปดาห์นั้น
-		endDate := currentStart.AddDate(0, 0, 6).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+		// กำหนด Period End ให้เป็นวันอาทิตย์ 23:59:59 UTC ของสัปดาห์นั้น
 		startDate := currentStart
+		endDate := currentStart.AddDate(0, 0, 6).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 
 		// 4. คำนวณและบันทึก Summary สำหรับช่วงเวลา (startDate - endDate)
 		summaryData, err := CalculateSummary(db, userID, startDate, endDate)
@@ -460,10 +465,10 @@ func BackfillAllWeeklySummaries(db *gorm.DB, userID string) {
 		if err == nil {
 			// Logic การบันทึก/อัปเดต (Upsert)
 			var lNormal entity.RiskLevel
-			if err := db.First(&lNormal, "rlevel = ?", "ปกติ").Error; err != nil {
-				// หากหา RiskLevel ไม่เจอ ให้ Log แล้วข้าม
+			// 🟢 FIX: ใช้ "r_level" เพื่อแก้ปัญหา "no such column"
+			if err := db.Where("rlevel = ?", "ปกติ").First(&lNormal).Error; err != nil {
 				fmt.Printf("Error: Could not find RiskLevel 'ปกติ'. Please run seed data. %v\n", err)
-				currentStart = currentStart.AddDate(0, 0, -7) // เลื่อนไปสัปดาห์ถัดไป
+				currentStart = currentStart.AddDate(0, 0, -7)
 				continue
 			}
 
@@ -487,6 +492,8 @@ func BackfillAllWeeklySummaries(db *gorm.DB, userID string) {
 			}
 
 			var existingSummary entity.HealthSummary
+			// ค้นหา Summary ของ User และช่วงเวลาที่ตรงกัน
+			// ⚠️ บรรทัดนี้ (เดิมคือ 490) คือที่ทำให้เกิด Log 'record not found' เมื่อไม่พบข้อมูล ซึ่งเป็นเรื่องปกติ
 			result := db.Where("user_id = ? AND period_start = ?", summaryEntity.UserID, summaryEntity.PeriodStart).First(&existingSummary)
 
 			if result.Error == gorm.ErrRecordNotFound {
@@ -497,6 +504,12 @@ func BackfillAllWeeklySummaries(db *gorm.DB, userID string) {
 					count++
 				}
 			} else {
+				if result.Error != nil {
+					fmt.Printf("GORM ERROR on querying existing Summary for backfill: %v\n", result.Error)
+					currentStart = currentStart.AddDate(0, 0, -7)
+					continue
+				}
+
 				if updateErr := db.Model(&existingSummary).Updates(summaryEntity).Error; updateErr != nil {
 					fmt.Printf("GORM ERROR on BACKFILL UPDATE Summary (%s): %v\n", startDate.Format("2006-01-02"), updateErr)
 				} else {
@@ -520,7 +533,6 @@ func BackfillAllWeeklySummaries(db *gorm.DB, userID string) {
 // ----------------------------------------------------
 
 // RunSummaryJob ดึง UserID ทั้งหมดจาก HealthData และเรียกใช้ฟังก์ชัน Summary ตามโหมดที่กำหนด
-// 💡 แทนที่ CreateSummariesForAllRecentUsers ด้วยฟังก์ชันนี้
 func RunSummaryJob(db *gorm.DB, isBackfill bool) {
 	var distinctUserIDs []uint
 

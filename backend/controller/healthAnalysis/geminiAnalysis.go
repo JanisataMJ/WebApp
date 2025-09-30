@@ -40,6 +40,7 @@ func ParseSleepHours(sleepStr string, userID uint) float64 {
 
 // AnalyzeHealthDataWithGemini ส่งข้อมูลสุขภาพไปให้ Gemini วิเคราะห์
 func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []entity.HealthData) (string, error) {
+	log.Printf("Analyzing health data for UserID: %d. Number of records received: %d", userID, len(healthData))
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
 		return "", fmt.Errorf("GEMINI_API_KEY environment variable not set")
@@ -71,7 +72,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 			"ข้อมูลประกอบด้วย: อัตราการเต้นหัวใจ (BPM), จำนวนก้าว, ออกซิเจนในเลือด (SpO2), ชั่วโมงการนอนหลับ (แปลงเป็นทศนิยม), และแคลอรี่ที่ใช้ไป\n"+
 			"ข้อมูลดิบ:\n"+
 			"%s\n"+
-			"โปรดสรุปแนวโน้มโดยรวมของสุขภาพ และให้คำแนะนำที่สามารถนำไปปฏิบัติได้จริงเพื่อปรับปรุงสุขภาพ",
+			"โปรดสรุปแนวโน้มโดยรวมของสุขภาพสั้นกระชับ ไม่ยาวจนเกินไป และให้คำแนะนำที่สามารถนำไปปฏิบัติได้จริงเพื่อปรับปรุงสุขภาพ โปรดเว้นวรรค ย่อหน้า ให้สวยงามด้วย",
 		dataString.String(),
 	)
 
@@ -82,7 +83,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 	}
 	defer client.Close()
 
-	model := client.GenerativeModel("gemini-1.5-flash-latest")
+	model := client.GenerativeModel("gemini-2.5-flash")
 	resp, err := model.GenerateContent(ctx, genai.Text(promptText))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate content from Gemini: %w", err)

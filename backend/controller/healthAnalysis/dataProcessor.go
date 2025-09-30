@@ -17,15 +17,15 @@ func ProcessNewHealthData(db *gorm.DB, hd *entity.HealthData) {
 
 	// 1. ดึง RiskLevel entities ที่จำเป็นมาก่อน
 	var lGood, lNormal, lBad entity.RiskLevel
-	if err := db.Where("r_level = ?", "ดี").First(&lGood).Error; err != nil {
+	if err := db.Where("rlevel = ?", "ดี").First(&lGood).Error; err != nil {
 		log.Printf("Error finding RiskLevel 'ดี': %v", err)
 		return
 	}
-	if err := db.Where("r_level = ?", "ปกติ").First(&lNormal).Error; err != nil {
+	if err := db.Where("rlevel = ?", "ปกติ").First(&lNormal).Error; err != nil {
 		log.Printf("Error finding RiskLevel 'ปกติ': %v", err)
 		return
 	}
-	if err := db.Where("r_level = ?", "เสี่ยง").First(&lBad).Error; err != nil {
+	if err := db.Where("rlevel = ?", "เสี่ยง").First(&lBad).Error; err != nil {
 		log.Printf("Error finding RiskLevel 'เสี่ยง': %v", err)
 		return
 	}

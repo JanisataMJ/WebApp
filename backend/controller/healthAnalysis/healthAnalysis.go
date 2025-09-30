@@ -14,7 +14,7 @@ import (
 
 	"github.com/JanisataMJ/WebApp/config"
 	"github.com/JanisataMJ/WebApp/controller/gmail"
-	"github.com/JanisataMJ/WebApp/controller/notification"
+	/* "github.com/JanisataMJ/WebApp/controller/notification" */
 	"github.com/JanisataMJ/WebApp/entity"
 )
 
@@ -285,30 +285,30 @@ func checkUserHealth(userID uint) {
 	userAlertStatus.RUnlock()
 
 	if shouldAlert && !alertAlreadySent {
-		// สร้าง Notification และส่ง SSE
+		/* // สร้าง Notification และส่ง SSE
 		notif := entity.Notification{
 			Title:                "Realtime Health Alert",
 			Message:              fmt.Sprintf("BPM: %d, SpO2: %.2f%%", latest.Bpm, latest.Spo2),
 			Timestamp:            time.Now(),
 			UserID:               userID,
 			NotificationStatusID: 1,
-		}
+		} */
 
-		// บันทึกและส่ง SSE
+		/* // บันทึกและส่ง SSE
 		if err := notification.CreateAndBroadcastNotification(notif); err != nil {
 			log.Printf("Error creating notification: %v", err)
-		}
+		} */
 
 		// ส่งอีเมลแจ้งเตือน background
 		alertText := ""
 		if latest.Bpm >= 120 {
-			alertText += fmt.Sprintf("- Heart rate too high: %d bpm\n", latest.Bpm)
+			alertText += fmt.Sprintf("- อัตราการเต้นหัวใจสูง : %d bpm\n", latest.Bpm)
 		}
 		if latest.Bpm <= 50 {
-			alertText += fmt.Sprintf("- Heart rate too low: %d bpm\n", latest.Bpm)
+			alertText += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำ: %d bpm\n", latest.Bpm)
 		}
 		if latest.Spo2 <= 90.0 {
-			alertText += fmt.Sprintf("- SpO2 too low: %.2f%%\n", latest.Spo2)
+			alertText += fmt.Sprintf("- ออกซิเจนในเลือดต่ำ: %.2f%%\n", latest.Spo2)
 		}
 
 		var user entity.User

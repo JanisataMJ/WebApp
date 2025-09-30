@@ -61,14 +61,11 @@ const DairySteps: React.FC = () => {
       let actualHeight = 160;
 
       try {
-        // 1. ดึงข้อมูล User (ส่วนสูง/น้ำหนัก)
         if (UserIDString) {
-          // ✅ แก้ไข: ใช้ UserIDString (string)
           const userRes = await GetUsersById(UserIDString);
           const userData = userRes?.data as UsersInterface;
 
           if (userData) {
-            // ✅ แก้ไข: ใช้ Optional Chaining และ Nullish Coalescing เพื่อเลี่ยง undefined
             actualWeight = (userData.weight ?? 0) > 0 ? userData.weight! : 60;
             actualHeight = (userData.height ?? 0) > 0 ? userData.height! : 160;
 
@@ -78,16 +75,10 @@ const DairySteps: React.FC = () => {
             console.log('actualHeight:', actualHeight);
           }
         }
-
-        // 2. คำนวณความยาวก้าวจริงจากส่วนสูง
         const actualStepLengthM = calculateStrideLength(actualHeight);
-
-        // 3. ดึงข้อมูล Steps
-        // ✅ แก้ไข: ใช้ UserIDNumber (number)
         const response = await getDailySteps(UserIDNumber);
         const rawSteps: Partial<StepsData>[] = Array.isArray(response) ? response : response.data || [];
 
-        // 4. Map Data โดยใช้ Weight และ Stride Length จริง
         const stepsArray: StepsData[] = rawSteps.map((item: any, index: number) => {
           const steps = index === 0
             ? item.steps || 0
@@ -120,14 +111,14 @@ const DairySteps: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchAllData();
-  }, [UserIDString]);
+    const interval = setInterval(fetchAllData, 30000);
+    return () => clearInterval(interval);
+  }, [UserIDString, UserIDNumber]);
 
-  // 1) Group by hour → เลือก cumulativeSteps สูงสุดในแต่ละชั่วโมง
   const grouped: { [hour: string]: StepsData } = {};
   data.forEach(d => {
-    const hour = d.time.split(":")[0]; // เอาเฉพาะชั่วโมง
+    const hour = d.time.split(":")[0]; 
     if (!grouped[hour] || d.cumulativeSteps > grouped[hour].cumulativeSteps) {
       grouped[hour] = d;
     }

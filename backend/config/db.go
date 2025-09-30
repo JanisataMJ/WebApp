@@ -28,21 +28,21 @@ func ConnectionDB() {
 
 func SetupDatabase() {
 
-   db.AutoMigrate(
-       &entity.User{},
-       &entity.Role{},
-       &entity.Gender{},
-       &entity.Notification{},
-       &entity.Trends{},
-       &entity.HealthType{},
-       &entity.NotificationStatus{},
-       &entity.HealthAnalysis{},
-       &entity.RiskLevel{},
-       &entity.HealthSummary{},
-       &entity.HealthData{},
-       &entity.SmartwatchDevice{},
-       &entity.Article{},
-   )
+	db.AutoMigrate(
+		&entity.User{},
+		&entity.Role{},
+		&entity.Gender{},
+		&entity.Notification{},
+		&entity.Trends{},
+		&entity.HealthType{},
+		&entity.NotificationStatus{},
+		&entity.HealthAnalysis{},
+		&entity.RiskLevel{},
+		&entity.HealthSummary{},
+		&entity.HealthData{},
+		&entity.SmartwatchDevice{},
+		&entity.Article{},
+	)
 
 	GenderMale := entity.Gender{Gender: "Male"}
 	GenderFemale := entity.Gender{Gender: "Female"}
@@ -60,46 +60,6 @@ func SetupDatabase() {
 
 	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 
-	User1 := &entity.User{
-        Username:       "James",
-        Password:       hashedPassword,
-        Email:          "user1@gmail.com",
-        FirstName:      "James",
-        LastName:       "Smith",
-        Birthdate:      BirthDay,
-        Phonenumber:    "0866666666",
-        Profile:        "uploads/Profiles/profile1.jpeg",
-        Height:         186,
-        Weight:         75,
-        Bust:           42,
-        Waist:          35,
-        Hip:            37,
-        RoleID:         2,
-        GenderID:       1,
-   }
-   db.FirstOrCreate(User1, &entity.User{Email: "user1@gmail.com"})
-
-	// User 2 (ID=2)
-	User2 := &entity.User{
-		Username:    "Emily",
-		Password:    hashedPassword,
-		Email:       "user2@gmail.com",
-		FirstName:   "Emily",
-		LastName:    "Davis",
-		Birthdate:   BirthDay,
-		Phonenumber: "0861234567",
-		Profile:     "uploads/Profiles/profile2.jpeg",
-		Height:      166,
-		Weight:      55,
-		Bust:        33,
-		Waist:       25,
-		Hip:         37,
-		RoleID:      2,
-		GenderID:    2,
-	}
-	db.FirstOrCreate(User2, &entity.User{Email: "user2@gmail.com"})
-
-	// User 3 (ID=3)
 	UserEmail := &entity.User{
 		Username:    "William",
 		Password:    hashedPassword,
@@ -118,45 +78,34 @@ func SetupDatabase() {
 		GenderID:    1,
 	}
 	db.FirstOrCreate(UserEmail, &entity.User{Email: "usercpe21@gmail.com"})
-    
-    // Admin 1 (ID=4)
-	Admin1 := &entity.User{
-		Username:    "Admin1",
-		Password:    hashedPassword,
-		Email:       "admin1@gmail.com",
-		FirstName:   "Olivia",
-		LastName:    "Wilson",
-		Birthdate:   BirthDay,
-		Phonenumber: "0871914646",
-		Profile:     "uploads/Profiles/profile4.jpeg",
-		RoleID:      1,
-		GenderID:    2,
-	}
-	db.FirstOrCreate(Admin1, &entity.User{Email: "admin1@gmail.com"})
 
-    // Admin 2 (ID=5)
-	Admin2 := &entity.User{
-		Username:    "Admin2",
+	User2 := &entity.User{
+		Username:    "James",
 		Password:    hashedPassword,
-		Email:       "admin2@gmail.com",
-		FirstName:   "Michael",
-		LastName:    "Johnson",
+		Email:       "user2@gmail.com",
+		FirstName:   "James",
+		LastName:    "Smith",
 		Birthdate:   BirthDay,
-		Phonenumber: "0642339911",
-		Profile:     "uploads/Profiles/profile5.jpeg",
-		RoleID:      1,
+		Phonenumber: "0866666666",
+		Profile:     "uploads/Profiles/profile1.jpeg",
+		Height:      186,
+		Weight:      75,
+		Bust:        42,
+		Waist:       35,
+		Hip:         37,
+		RoleID:      2,
 		GenderID:    1,
 	}
-	db.FirstOrCreate(Admin2, &entity.User{Email: "admin2@gmail.com"})
+	db.FirstOrCreate(User2, &entity.User{Email: "user2@gmail.com"})
 
-	User6 := &entity.User{
-		Username:    "MaeMae",
+	User3 := &entity.User{
+		Username:    "Emily",
 		Password:    hashedPassword,
-		Email:       "user6@gmail.com",
-		FirstName:   "MaeMae",
-		LastName:    "MaeMae",
+		Email:       "user3@gmail.com",
+		FirstName:   "Emily",
+		LastName:    "Davis",
 		Birthdate:   BirthDay,
-		Phonenumber: "0615871759",
+		Phonenumber: "0861234567",
 		Profile:     "uploads/Profiles/profile2.jpeg",
 		Height:      166,
 		Weight:      55,
@@ -166,34 +115,75 @@ func SetupDatabase() {
 		RoleID:      2,
 		GenderID:    2,
 	}
-	db.FirstOrCreate(User6, &entity.User{Email: "user6@gmail.com"})
+	db.FirstOrCreate(User3, &entity.User{Email: "user3@gmail.com"})
 
-	// 5. Seed Data สำหรับ HealthData (สำคัญ: เพื่อรับประกันว่าจะมีข้อมูลให้วิเคราะห์ แม้การดึง Sheet จะไม่สำเร็จ)
-	// HealthData ของ User 2
-	healthDataSample1 := entity.HealthData{
-		Timestamp:      time.Now(),
-		Bpm:            79,
-		Steps:          10000,
-		SleepHours:     "8 h. 30 m.",
-		CaloriesBurned: 550,
-		Spo2:           98.0,
-		UserID:         2,
+	User4 := &entity.User{
+		Username:    "MaeMae",
+		Password:    hashedPassword,
+		Email:       "user4@gmail.com",
+		FirstName:   "MaeMae",
+		LastName:    "MaeMae",
+		Birthdate:   BirthDay,
+		Phonenumber: "0615871759",
+		Profile:     "uploads/Profiles/profile4.jpeg",
+		Height:      166,
+		Weight:      55,
+		Bust:        33,
+		Waist:       25,
+		Hip:         37,
+		RoleID:      2,
+		GenderID:    2,
 	}
-	db.FirstOrCreate(&healthDataSample1, entity.HealthData{Bpm: 79, UserID: 2})
+	db.FirstOrCreate(User4, &entity.User{Email: "user4@gmail.com"})
 
-	// HealthData ของ User 3
-	healthDataSample2 := entity.HealthData{
-		Timestamp:      time.Now().Add(-24 * time.Hour),
-		Bpm:            120,
-		Steps:          100,
-		SleepHours:     "5 h. 0 m.",
-		CaloriesBurned: 150,
-		Spo2:           92.0,
-		UserID:         3,
+	User5 := &entity.User{
+		Username:    "MaeMae",
+		Password:    hashedPassword,
+		Email:       "user5@gmail.com",
+		FirstName:   "MaeMae",
+		LastName:    "MaeMae",
+		Birthdate:   BirthDay,
+		Phonenumber: "0615871759",
+		Profile:     "uploads/Profiles/profile3.jpeg",
+		Height:      166,
+		Weight:      55,
+		Bust:        33,
+		Waist:       25,
+		Hip:         37,
+		RoleID:      2,
+		GenderID:    1,
 	}
-	db.FirstOrCreate(&healthDataSample2, entity.HealthData{Bpm: 120, UserID: 3})
+	db.FirstOrCreate(User5, &entity.User{Email: "user5@gmail.com"})
 
-	// 6. RiskLevel (ต้องสร้างก่อน HealthAnalysis)
+	Admin1 := &entity.User{
+		Username:    "Admin1",
+		Password:    hashedPassword,
+		Email:       "admin1@gmail.com",
+		FirstName:   "Olivia",
+		LastName:    "Wilson",
+		Birthdate:   BirthDay,
+		Phonenumber: "0871914646",
+		Profile:     "uploads/Profiles/profile6.jpeg",
+		RoleID:      1,
+		GenderID:    2,
+	}
+	db.FirstOrCreate(Admin1, &entity.User{Email: "admin1@gmail.com"})
+
+	Admin2 := &entity.User{
+		Username:    "Admin2",
+		Password:    hashedPassword,
+		Email:       "admin2@gmail.com",
+		FirstName:   "Michael",
+		LastName:    "Johnson",
+		Birthdate:   BirthDay,
+		Phonenumber: "0642339911",
+		Profile:     "uploads/Profiles/profile7.jpeg",
+		RoleID:      1,
+		GenderID:    1,
+	}
+	db.FirstOrCreate(Admin2, &entity.User{Email: "admin2@gmail.com"})
+
+
 	Rlevels := []entity.RiskLevel{
 		{Rlevel: "ดี"},
 		{Rlevel: "ปกติ"},
@@ -202,8 +192,8 @@ func SetupDatabase() {
 	for i, level := range Rlevels {
 		db.FirstOrCreate(&Rlevels[i], entity.RiskLevel{Rlevel: level.Rlevel})
 	}
-	
-	// 7. Trends
+
+
 	trend := []entity.Trends{
 		{Trend: "ดีขึ้น"},
 		{Trend: "คงที่"},
@@ -212,8 +202,8 @@ func SetupDatabase() {
 	for i, ttrend := range trend {
 		db.FirstOrCreate(&trend[i], entity.Trends{Trend: ttrend.Trend})
 	}
-    
-    // 8. NotificatonStatus
+
+
 	notiStatus := []entity.NotificationStatus{
 		{Status: "อ่านแล้ว"},
 		{Status: "ยังไม่อ่าน"},
@@ -222,8 +212,8 @@ func SetupDatabase() {
 	for i, status := range notiStatus {
 		db.FirstOrCreate(&notiStatus[i], entity.NotificationStatus{Status: status.Status})
 	}
-    
-    // 9. HealthType
+
+	// 9. HealthType
 	healthTypes := []entity.HealthType{
 		{Type: "ปลอดภัย"},
 		{Type: "เตือน"},
@@ -233,10 +223,11 @@ func SetupDatabase() {
 		db.FirstOrCreate(&healthTypes[i], entity.HealthType{Type: htype.Type})
 	}
 
-	// 10. Article
+
+	t1 := time.Now().AddDate(0, -3, 0)
 	article1 := entity.Article{
-		Title:          "เคล็ดลับดูแลสุขภาพหัวใจ",
-		Information:    `โรคหัวใจ เป็นสาเหตุอันดับต้น ๆ ของการเสียชีวิต โดยพบว่าคนไทยป่วยเป็นโรคหัวใจเป็นจำนวนมาก อย่างไรก็ตาม แม้ว่าโรคหัวใจจะเป็นโรคที่มีความรุนแรงและทำให้ถึงแก่ชีวิต แต่โรคหัวใจสามารถป้องกัน และสามารถรักษาให้หายได้ โดยวิธีการหรือแนวทางในการรักษาขึ้นอยู่กับอาการ และร่างกายของคนไข้ ว่าเหมาะกับการรักษาวิธีใด
+		Title: "เคล็ดลับดูแลสุขภาพหัวใจ",
+		Information: `โรคหัวใจ เป็นสาเหตุอันดับต้น ๆ ของการเสียชีวิต โดยพบว่าคนไทยป่วยเป็นโรคหัวใจเป็นจำนวนมาก อย่างไรก็ตาม แม้ว่าโรคหัวใจจะเป็นโรคที่มีความรุนแรงและทำให้ถึงแก่ชีวิต แต่โรคหัวใจสามารถป้องกัน และสามารถรักษาให้หายได้ โดยวิธีการหรือแนวทางในการรักษาขึ้นอยู่กับอาการ และร่างกายของคนไข้ ว่าเหมาะกับการรักษาวิธีใด
 
 <b>วิธีการ ดูแลหัวใจ มีดังนี้</b>
 - ปรับเปลี่ยนพฤติกรรมที่เป็นปัจจัยเสี่ยงต่อโรคหลอดเลือดหัวใจ
@@ -261,14 +252,16 @@ func SetupDatabase() {
 - โยคะ เล่นโยคะหัวใจแข็งแรง เพิ่มความยืดหยุ่นของกล้ามเนื้อและข้อต่อ ลดระดับไตรกลีเซอไรด์ ช่วยควบคุมความดันโลหิต
 
 การออกกำลังถือเป็นสิ่งที่ควรปฏิบัติสำหรับทุกคน ไม่ว่าคุณจะอยู่ในวัยใดก็ตาม โดยเราควรออกกำลังกายเป็นเวลานาน 30 – 60 นาทีต่อวัน อย่างน้อยสัปดาห์ละ 5 วัน เพื่อให้มีสุขภาพร่างกายและสุขภาพหัวใจที่แข็งแรง สำหรับผู้ป่วยโรคหัวใจ อย่าลืม ปรึกษาแพทย์ประจำตัวก่อนที่จะเริ่มออกกำลังกายกันด้วยนะ`,
-		Reference:      "โรงพยาบาลศิครินทร์",
-		Image:          "uploads/Articles/article1.png",
-		Published:      true,
-		UserID:         5,
+		Reference: "โรงพยาบาลศิครินทร์",
+		Image:     "uploads/Articles/article1.png",
+		PublishDate: &t1,
+		Published: true,
+		UserID:    5,
 	}
+	t2 := time.Now().AddDate(0, -2, 0)
 	article2 := entity.Article{
-		Title:          "อะไรจะเกิดขึ้น ถ้าปล่อยให้ น้ำตาลในเลือดสูง",
-		Information:    `คนที่ชอบกินหวาน ชอบกินแป้ง ต้องระวังให้มากขึ้น เมื่อของกินอร่อยปากอาจทำให้เสี่ยง ภาวะน้ำตาลในเลือดสูง ที่นำไปสู่ โรคเบาหวาน ได้
+		Title: "อะไรจะเกิดขึ้น ถ้าปล่อยให้ น้ำตาลในเลือดสูง",
+		Information: `คนที่ชอบกินหวาน ชอบกินแป้ง ต้องระวังให้มากขึ้น เมื่อของกินอร่อยปากอาจทำให้เสี่ยง ภาวะน้ำตาลในเลือดสูง ที่นำไปสู่ โรคเบาหวาน ได้
 
 <b>ภาวะน้ำตาลในเลือดสูงคืออะไร</b>
 ภาวะน้ำตาลในเลือดสูง หมายถึง ภาวะที่ร่างกายมีระดับน้ำตาลในเลือดเกินกว่า 100 มิลลิกรัม/เดซิลิตร โดยปกติร่างกายคนเรามีน้ำตาลในเลือดอยู่แล้ว เพราะร่างกายต้องใช้น้ำตาล และต้องขนส่งน้ำตาลผ่านเลือดไปยังอวัยวะต่าง ๆ
@@ -306,18 +299,20 @@ func SetupDatabase() {
 - ลดอาหารประเภทคาร์โบไฮเดรต เช่น จำกัดปริมาณข้าวที่กิน
 - ออกกำลังกายอย่างสม่ำเสมอ ไม่ปล่อยให้อ้วน
 หากคนไข้มีภาวะน้ำตาลในเลือดสูงจนเป็นโรคเบาหวาน และหมอให้ใช้การรักษาด้วยยาแล้ว คนไข้ต้องกินยาอย่างสม่ำเสมอ และตรวจติดตามอาการทุก 3-4 เดือน เพื่อดูว่าค่าระดับน้ำตาลในเลือดอยู่ในเกณฑ์ปกติหรือไม่ หากมีการปรับเปลี่ยนพฤติกรรมและดูแลสุขภาพอย่างดีก็มีโอกาสควบคุมโรคได้`,
-		Reference:      `ผศ. นพ.สิระ กอไพศาล
+		Reference: `ผศ. นพ.สิระ กอไพศาล
 
 สาขาวิชาโรคต่อมไร้ท่อและเมแทบอลิซึม ภาควิชาอายุรศาสตร์
 
 คณะแพทยศาสตร์โรงพยาบาลรามาธิบดี มหาวิทยาลัยมหิดล`,
-		Image:          "uploads/Articles/article2.png",
-		Published:      true,
-		UserID:         4,
+		Image:     "uploads/Articles/article2.png",
+		PublishDate: &t2,
+		Published: true,
+		UserID:    4,
 	}
+	t3 := time.Now().Add(-24 * time.Hour)
 	article3 := entity.Article{
-		Title:          "อาหารเสริมภูมิต้านทาน",
-		Information:    `ในปัจจุบันนี้ทุกคนต่างๆต้องใช้ชีวิตอย่างระมัดระวัง เพื่อดูแลป้องกันตัวเองจากเจ้าเชื้อ “โคโรน่าไวรัส (COVID-19)”  เวลาออกจากบ้านก็ต้องใส่หน้ากากป้องกัน ล้างมือ กินอาหารที่สุกสะอาด ปราศจากเชื้อโรค และที่สำคัญคือการทำร่างกายให้แข็งแรงอยู่เสมอ  ซึ่งเรื่องอาหารก็จะเป็นอีกสิ่งที่จะสามารถช่วยเสริมสร้างความแข็งแรง เสริมสร้างภูมิคุ้มกันของร่างกายได้  และอาหารก็ป็นสิ่งที่เราทุกคนสามารถดูแลได้ไม่ยากเพราะอาหารนั้นเป็นเรื่องที่ใกล้ตัว และคงปฏิเสธไม่ได้ว่าเราจำเป็นต้องกินอาหารทุกวันเพื่อให้มีกำลังในการดำเนินชีวิต แต่ถ้าเราให้ความใส่ใจมากขึ้นในการเลือกอาหารที่มีส่วนช่วยเสริมสร้างภูมิต้านทาน ก็ถือว่าเป็นความคุ้มค่าอย่างมากกับสุขภาพของเราที่จะได้รับจากอาหารเลยค่ะ
+		Title: "อาหารเสริมภูมิต้านทาน",
+		Information: `ในปัจจุบันนี้ทุกคนต่างๆต้องใช้ชีวิตอย่างระมัดระวัง เพื่อดูแลป้องกันตัวเองจากเจ้าเชื้อ “โคโรน่าไวรัส (COVID-19)”  เวลาออกจากบ้านก็ต้องใส่หน้ากากป้องกัน ล้างมือ กินอาหารที่สุกสะอาด ปราศจากเชื้อโรค และที่สำคัญคือการทำร่างกายให้แข็งแรงอยู่เสมอ  ซึ่งเรื่องอาหารก็จะเป็นอีกสิ่งที่จะสามารถช่วยเสริมสร้างความแข็งแรง เสริมสร้างภูมิคุ้มกันของร่างกายได้  และอาหารก็ป็นสิ่งที่เราทุกคนสามารถดูแลได้ไม่ยากเพราะอาหารนั้นเป็นเรื่องที่ใกล้ตัว และคงปฏิเสธไม่ได้ว่าเราจำเป็นต้องกินอาหารทุกวันเพื่อให้มีกำลังในการดำเนินชีวิต แต่ถ้าเราให้ความใส่ใจมากขึ้นในการเลือกอาหารที่มีส่วนช่วยเสริมสร้างภูมิต้านทาน ก็ถือว่าเป็นความคุ้มค่าอย่างมากกับสุขภาพของเราที่จะได้รับจากอาหารเลยค่ะ
 
 เมื่อพูดถึงอาหารที่ช่วยเสริมสร้างภูมิต้านทาน ทุกคนอาจจะนึกถึง วิตามินซี อย่างแน่นอนเลย แต่นอกจากวิตามินซีแล้วยังมีวิตามินและแร่ธาตุตัวอื่นๆที่สามารถช่วยเสริมสร้างภูมิต้านทานให้ร่างกายเราได้นะคะ ไปดูกันเลยว่ามีอะไรบ้าง
 
@@ -347,14 +342,16 @@ func SetupDatabase() {
     – ส่วนซีลีเนียม จะพบในถั่ว (โดยเฉพาะถั่วบราซิล) เนื้อสัตว์, ซีเรียล และเห็ด เป็นต้น
 
 คราวนี้เราก็ทราบแล้วว่าอาหารอะไรบ้างที่จะช่วยเสริมสร้างภูมิต้านทานให้กับเรา ก็เลือกนำมารับประทานหรือมาปรุงประกอบอาหาร สรรค์สร้างเมนุอาหารกันได้ตามชอบเลยน้า เน้นแปรรูปน้อยๆ เลือกเฉพาะที่สะอาดปลอภัย เพื่อจะได้รับประโยชน์เต็มๆ และมีภูมิต้านทานที่แข็งแรงๆกันนะคะ`,
-		Reference:      "โรงพยาบาลกรุงเทพพัทยา",
-		Image:          "uploads/Articles/article3.png",
-		Published:      true,
-		UserID:         5,
+		Reference: "โรงพยาบาลกรุงเทพพัทยา",
+		Image:     "uploads/Articles/article3.png",
+		PublishDate: &t3,
+		Published: true,
+		UserID:    5,
 	}
+	t4 := time.Now().Add(-3 * time.Hour)
 	article4 := entity.Article{
-		Title:          "นอนหลับอย่างไรให้ได้คุณภาพ",
-		Information:    `ร่างกายของเราทุกคนต้องนอนหลับพักผ่อนตามตารางของนาฬิกาชีวิต แต่จะหลับอย่างไรจึงจะดีต่อสุขภาพมากที่สุด แล้วตื่นมาพร้อมความรู้สึกสดชื่น
+		Title: "นอนหลับอย่างไรให้ได้คุณภาพ",
+		Information: `ร่างกายของเราทุกคนต้องนอนหลับพักผ่อนตามตารางของนาฬิกาชีวิต แต่จะหลับอย่างไรจึงจะดีต่อสุขภาพมากที่สุด แล้วตื่นมาพร้อมความรู้สึกสดชื่น
 
 เรื่องของการนอนต้องคำนึง 2 อย่างคือ
 
@@ -392,15 +389,16 @@ func SetupDatabase() {
 ฉะนั้นถ้ามีโอกาสที่จะหลับซ่อมแซมหรือหลับชดเชยควรนอนให้ครบชั่วโมง การนอนที่เหมาะสม จะทำให้สภาพร่างกายกลับมาเหมือนเดิมได้ในระยะเวลาไม่กี่วันหรือถ้าหากมีโอกาสหลับเต็มที่หนึ่งวันเต็ม ๆ หลังจากอดนอนมา 3 วัน”
 
 อย่างไรก็ตาม ปัจจัยเหล่านี้ยังขึ้นอยู่กับวัยอีกด้วย เนื่องจากการทำงานของสมองแต่ละช่วงวัยไม่เหมือนกัน ถ้าอายุน้อยโอกาสกลับมาเหมือนเดิมเร็ว แต่ถ้าอายุมากขึ้นจะฟื้นตัวช้า ดังนั้นการนอนชดเชยจึงไม่มีสูตรสำเร็จแน่นอนตายตัว ขึ้นอยู่กับสภาพร่างกายของแต่ละคน ว่าจะสามารถกลับมาได้เหมือนเดิมมากน้อยแค่ไหน`,
-		Reference:      "โรงพยาบาลกรุงเทพอินเตอร์ฯ เพื่อสมองและกระดูก",
-		Image:          "uploads/Articles/article4.jpg",
-		Published:      true,
-		UserID:         4,
+		Reference: "โรงพยาบาลกรุงเทพอินเตอร์ฯ เพื่อสมองและกระดูก",
+		Image:     "uploads/Articles/article4.jpg",
+		PublishDate: &t4,
+		Published: true,
+		UserID:    4,
 	}
-	t := time.Now().AddDate(0, 0, -2) // 2 วันที่แล้ว
+	t5 := time.Now().AddDate(0, 0, -2) // 2 วันที่แล้ว
 	article5 := entity.Article{
-		Title:          "5 วิธีออกกำลังกายในบ้าน แม้พื้นที่น้อยก็ทำได้!",
-		Information:    `ในช่วงที่โลกกำลังเผชิญกับภาวะโรคระบาดแบบนี้ ทำให้หลายคนเลือกที่จะอยู่บ้านเป็นหลัก และออกไปข้างนอกเท่าที่จำเป็น เพื่อลดความเสี่ยงในการแพร่เชื้อ ซึ่งพอใช้ชีวิตอยู่แต่ในบ้านนานเข้า รู้ตัวอีกทีน้ำหนักก็ขึ้น แถมร่างกายก็ไม่ฟิตเหมือนเดิมซะแล้ว
+		Title: "5 วิธีออกกำลังกายในบ้าน แม้พื้นที่น้อยก็ทำได้!",
+		Information: `ในช่วงที่โลกกำลังเผชิญกับภาวะโรคระบาดแบบนี้ ทำให้หลายคนเลือกที่จะอยู่บ้านเป็นหลัก และออกไปข้างนอกเท่าที่จำเป็น เพื่อลดความเสี่ยงในการแพร่เชื้อ ซึ่งพอใช้ชีวิตอยู่แต่ในบ้านนานเข้า รู้ตัวอีกทีน้ำหนักก็ขึ้น แถมร่างกายก็ไม่ฟิตเหมือนเดิมซะแล้ว
 
 แต่ความจำเป็นที่ต้องอยู่บ้านนั้นไม่ใช่ข้ออ้างของการไม่ได้ออกกำลังกาย เพราะจริงๆ แล้วยังมีรูปแบบการออกกำลังกายหลากหลายประเภทที่สามารถทำได้ในบ้าน ใช้พื้นที่น้อย และไม่จำเป็นต้องจ่ายเงินเพื่อซื้ออุปกรณ์ที่มีราคาสูงเลย
 
@@ -438,11 +436,11 @@ kdms มี 5 วิธีออกกำลังกายในบ้านม
 การทำแพลงกิ้งที่ถูกต้องเริ่มจากการนอนคว่ำ แล้วใช้ข้อศอกยันพื้นในระดับความกว้างเสมอไหล่ ยกตัวขึ้นบนปลายเท้าให้ขนานกับพื้นมากที่สุด ทำค้างไว้ 20 วินาที แล้วพัก 10 วินาที ทำซ้ำทั้งหมด 3 เซท
 
 การทำแพลงกิ้งจะเป็นการเกร็งกล้ามเนื้อช่วงหน้าท้องและแผ่นหลัง ซึ่งจะทำให้กล้ามเนื้อหน้าท้องและกล้ามเนื้อด้านข้างของกระดูกสันหลังมีความแข็งแรง จึงลดความเสี่ยงที่จะเกิดอาการบาดเจ็บในบริเวณดังกล่าวได้ อีกทั้งการทำแพลงกิ้งที่ถูกต้องยังช่วยลดอาการปวดหลังที่เกิดจากการนั่งนานๆ ได้อีกด้วย`,
-		Reference:      "บริษัท โรงพยาบาลเฉพาะทางกระดูกและข้อ ข้อดีมีสุข จำกัด (สำนักงานใหญ่)",
-		Image:          "uploads/Articles/article5.jpg",
-		PublishDate:    &t,
-		Published:      true,
-		UserID:         4,
+		Reference:   "บริษัท โรงพยาบาลเฉพาะทางกระดูกและข้อ ข้อดีมีสุข จำกัด (สำนักงานใหญ่)",
+		Image:       "uploads/Articles/article5.jpg",
+		PublishDate: &t5,
+		Published:   true,
+		UserID:      4,
 	}
 
 	db.Where(entity.Article{Title: article1.Title}).FirstOrCreate(&article1)
@@ -450,6 +448,6 @@ kdms มี 5 วิธีออกกำลังกายในบ้านม
 	db.Where(entity.Article{Title: article3.Title}).FirstOrCreate(&article3)
 	db.Where(entity.Article{Title: article4.Title}).FirstOrCreate(&article4)
 	db.Where(entity.Article{Title: article5.Title}).FirstOrCreate(&article5)
-    
-    // ⚠️ สิ้นสุด SetupDatabase() - ไม่มีโค้ดวิเคราะห์ HealthAnalysis ตรงนี้
+
+	// ⚠️ สิ้นสุด SetupDatabase() - ไม่มีโค้ดวิเคราะห์ HealthAnalysis ตรงนี้
 }

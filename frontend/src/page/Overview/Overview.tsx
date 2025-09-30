@@ -22,6 +22,18 @@ interface VitalCard {
   change?: number;
 }
 
+const parseSleepToHours = (s?: string | number | null): number => {
+  if (!s) return 0;
+  if (typeof s === "number") return s;
+
+  const hMatch = s.match(/(\d+)h/);
+  const mMatch = s.match(/(\d+)m/);
+  const hours = hMatch ? parseInt(hMatch[1], 10) : 0;
+  const minutes = mMatch ? parseInt(mMatch[1], 10) : 0;
+  return hours + minutes / 60;
+};
+
+
 const Overview = () => {
   const [summary, setSummary] = useState<HealthSummaryInterface | null>(null);
   const [prevSummary, setPrevSummary] = useState<HealthSummaryInterface | null>(null);
@@ -32,6 +44,8 @@ const Overview = () => {
   const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
+
     const fetchVitals = async () => {
       try {
         const modeBackend = mode === "weekly" ? "weekly" : "lastweek";
@@ -41,7 +55,7 @@ const Overview = () => {
         if (mode === "weekly") {
           previousWeek = await GetWeeklySummary(UserID, "lastweek");
         } else if (mode === "lastweek") {
-          previousWeek = await GetWeeklySummary(UserID, "weekly"); // หรือสัปดาห์ก่อนของ lastweek
+          previousWeek = await GetWeeklySummary(UserID, "last2weeks"); // ✅ 2 สัปดาห์ก่อนหน้า
         }
 
         setSummary(latestWeek);
@@ -77,7 +91,7 @@ const Overview = () => {
             unit: "kcal",
             status: latestWeek.risk_level || "ไม่ระบุ",
             color: "calories",
-            icon: Thermometer,
+            icon: Flame,
             trend: previousWeek
               ? Number(latestWeek.avg_calories) > Number(previousWeek.avg_calories)
                 ? "up"
@@ -95,7 +109,7 @@ const Overview = () => {
             unit: "steps",
             status: latestWeek.risk_level || "ไม่ระบุ",
             color: "steps",
-            icon: Activity,
+            icon: Footprints,
             trend: previousWeek
               ? Number(latestWeek.total_steps) > Number(previousWeek.total_steps)
                 ? "up"
@@ -112,8 +126,8 @@ const Overview = () => {
             value: latestWeek.avg_spo2?.toFixed(0) || 0,
             unit: "%",
             status: latestWeek.risk_level || "ไม่ระบุ",
-            color: "blood-oxygen",
-            icon: Droplets,
+            color: "spo2",
+            icon: Activity,
             trend: previousWeek
               ? Number(latestWeek.avg_spo2) > Number(previousWeek.avg_spo2)
                 ? "up"
@@ -127,7 +141,7 @@ const Overview = () => {
           },
           {
             label: "การนอนหลับ",
-            value: latestWeek.avg_sleep?.toFixed(1) || 0,
+            value: parseSleepToHours(latestWeek.avg_sleep).toFixed(1),
             unit: "hrs",
             status: latestWeek.risk_level || "ไม่ระบุ",
             color: "sleep",
@@ -152,10 +166,14 @@ const Overview = () => {
       }
     };
     fetchVitals();
+    intervalId = setInterval(fetchVitals, 30000);
+    return () => clearInterval(intervalId);
   }, [UserID, mode]);
 
 
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
+
     const fetchData = async () => {
       try {
         const data = await GetWeeklyHealthData(UserID, mode);
@@ -212,6 +230,8 @@ const Overview = () => {
       }
     };
     fetchData();
+    intervalId = setInterval(fetchData, 30000);
+    return () => clearInterval(intervalId);
   }, [UserID, mode]);
 
 
@@ -220,7 +240,7 @@ const Overview = () => {
     { key: "calories", label: "ค่าเฉลี่ยพลังงานที่เผาผลาญ", color: "#f97316", fill: "#ffedd5", icon: <Flame className="chart-icon calories" /> },
     { key: "avgSteps", label: "จำนวนก้าวเดินทั้งหมด", color: "#3b82f6", fill: "#dbeafe", icon: <Footprints className="chart-icon steps" /> },
     { key: "avg_spo2", label: "ค่าเฉลี่ยออกซิเจนในเลือด", color: "#10b981", fill: "#d1fae5", icon: <Activity className="chart-icon spo2" /> },
-    { key: "sleep_hours", label: "ค่าเฉลี่ยจำนวนการนอน", color: "#8b5cf6", fill: "#ede9fe", icon: <Bed className="chart-icon sleep" /> },
+    { key: "sleep_hours", label: "ค่าเฉลี่ยจำนวนการนอน", color: "#8b5cf6", fill: "#ede9fe", icon: <Moon className="chart-icon sleep" /> },
   ];
 
 
@@ -255,24 +275,21 @@ const Overview = () => {
     },
     {
       metric: "ค่าเฉลี่ยจำนวนการนอน",
-      thisWeek: summary?.avg_sleep?.toFixed(1),
-      lastWeek: prevSummary?.avg_sleep?.toFixed(1),
-    },
+      thisWeek: parseSleepToHours(summary?.avg_sleep)?.toFixed(1),
+      lastWeek: parseSleepToHours(prevSummary?.avg_sleep)?.toFixed(1),
+    }
+
   ];
 
-
-  // ชื่อหัวตาราง
   const comparisonTitleMap: Record<typeof mode, string> = {
     weekly: "เปรียบเทียบสัปดาห์นี้ vs สัปดาห์ที่แล้ว",
     lastweek: "เปรียบเทียบสัปดาห์ที่แล้ว vs 2 สัปดาห์ก่อนหน้า",
   };
 
-  // ชื่อคอลัมน์
   const comparisonColumnMap: Record<typeof mode, { thisWeek: string; lastWeek: string }> = {
     weekly: { thisWeek: "สัปดาห์นี้", lastWeek: "สัปดาห์ที่แล้ว" },
     lastweek: { thisWeek: "สัปดาห์ที่แล้ว", lastWeek: "2 สัปดาห์ก่อนหน้า" },
   };
-
 
   const columns: ColumnsType<typeof comparisonData[0]> = [
     {

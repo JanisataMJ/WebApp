@@ -3,16 +3,18 @@ package healthAnalysis
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"os"
+	//"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
-	"github.com/gin-gonic/gin"
 
 	"github.com/JanisataMJ/WebApp/config"
 	"github.com/JanisataMJ/WebApp/controller/gmail"
+	"github.com/JanisataMJ/WebApp/controller/notification"
 	"github.com/JanisataMJ/WebApp/entity"
 )
 
@@ -72,7 +74,6 @@ func GetSleepAnalysisByUser(c *gin.Context) {
 	c.JSON(http.StatusOK, analyses)
 }
 
-
 // ✅ Handler สำหรับ Endpoint API ที่เรียกใช้ Gemini
 func AnalyzeWithGeminiHandler(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("userID"), 10, 32)
@@ -95,7 +96,7 @@ func AnalyzeWithGeminiHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Health analysis completed successfully",
+		"message":  "Health analysis completed successfully",
 		"analysis": analysis,
 	})
 }
@@ -107,60 +108,81 @@ func AnalyzeWithGeminiHandler(c *gin.Context) {
 //----------------------------------- Background Jobs -----------------------------------
 
 // CheckForCriticalAlerts ทำงานเป็น Goroutine สำหรับแจ้งเตือนแบบเรียลไทม์
-func CheckForCriticalAlerts(ctx context.Context) {
-	intervalStr := os.Getenv("CHECK_INTERVAL_MIN")
-	interval, err := strconv.Atoi(intervalStr)
-	if err != nil || interval <= 0 {
-		interval = 5
-	}
-	checkInterval := time.Duration(interval) * time.Minute
+/* func CheckForCriticalAlerts(userID uint) {
+    intervalStr := os.Getenv("CHECK_INTERVAL_MIN")
+    interval, err := strconv.Atoi(intervalStr)
+    if err != nil || interval <= 0 {
+        interval = 5
+    }
+    checkInterval := time.Duration(interval) * time.Minute
 
-	for {
-		var users []entity.User
-		if err := config.DB().Find(&users).Error; err != nil {
-			log.Printf("Error retrieving users for critical alerts: %v\n", err)
-			time.Sleep(checkInterval)
-			continue
-		}
+    for {
+        // ดึง HealthData ล่าสุดของ user
+        var latestHealthData entity.HealthData
+        if err := config.DB().
+            Where("user_id = ?", userID).
+            Order("created_at desc").
+            First(&latestHealthData).Error; err != nil {
+            time.Sleep(checkInterval)
+            continue
+        }
 
-		for _, user := range users {
-			var latestHealthData entity.HealthData
-			if err := config.DB().Where("user_id = ?", user.ID).Order("created_at desc").First(&latestHealthData).Error; err != nil {
-				continue
-			}
+        alerts := ""
+        if latestHealthData.Bpm >= 120 {
+            alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
+        }
+        if latestHealthData.Bpm <= 50 {
+            alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
+        }
+        if latestHealthData.Spo2 <= 90.0 {
+            alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", latestHealthData.Spo2)
+        }
 
-			criticalHeartRateHigh := 120
-			criticalHeartRateLow := 50
-			criticalSpo2 := 90.0
+        if alerts != "" {
+            var user entity.User
+            if err := config.DB().First(&user, userID).Error; err == nil {
+                gmail.SendImmediateAlertBackground(config.DB(), user, 1, alerts)
+            }
+        }
 
-			alerts := ""
-			// NOTE: SpO2 ใน HealthData เป็น float64 หรือไม่? (ใช้ %.2f) ถ้าเป็น float64 ต้องแปลงค่า 90.0 เป็น float64
-			if latestHealthData.Bpm >= uint(criticalHeartRateHigh) {
-				alerts += fmt.Sprintf("- อัตราการเต้นของหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
-			}
-			if latestHealthData.Bpm <= uint(criticalHeartRateLow) {
-				alerts += fmt.Sprintf("- อัตราการเต้นของหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
-			}
-			if latestHealthData.Spo2 <= criticalSpo2 {
-				alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", latestHealthData.Spo2)
-			}
+        time.Sleep(checkInterval)
+    }
+} */
+/*  func CheckCriticalAlertOnce(userID uint) {
+    var latestHealthData entity.HealthData
+    err := config.DB().
+        Where("user_id = ?", userID).
+        Order("created_at desc").
+        First(&latestHealthData).Error
+    if err != nil {
+        return
+    }
 
-			if alerts != "" {
-				if user.RoleID == 2 {
-					gmail.SendImmediateAlertBackground(config.DB(), user, 1, alerts)
-				}
-			}
-		}
+    alerts := ""
+    if latestHealthData.Bpm >= 120 {
+        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
+    }
+    if latestHealthData.Bpm <= 50 {
+        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
+    }
+    if latestHealthData.Spo2 <= 90.0 {
+        alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", latestHealthData.Spo2)
+    }
 
-		time.Sleep(checkInterval)
-	}
-}
+    if alerts != "" {
+        // ส่งแจ้งเตือนไปที่ email
+        var user entity.User
+        if err := config.DB().First(&user, userID).Error; err == nil {
+            gmail.SendImmediateAlertBackground(config.DB(), user, 1, alerts)
+        }
+    }
+} */
 
 // WeeklyAnalysisJob ทำงานเป็น Goroutine สำหรับการวิเคราะห์รายสัปดาห์
 func WeeklyAnalysisJob(ctx context.Context) {
 	// *** เดิม: วนลูปทันที ***
 	runWeeklyAnalysis(ctx) // รันครั้งแรกทันที
-	
+
 	select {
 	case <-ctx.Done():
 		log.Println("Weekly analysis job stopped.")
@@ -187,7 +209,7 @@ func runWeeklyAnalysis(ctx context.Context) {
 			log.Printf("Error retrieving health data for user %d: %v\n", user.ID, err)
 			continue
 		}
-		
+
 		// *** เรียกใช้ฟังก์ชันจาก geminiAnalysis.go ***
 		analysis, err := AnalyzeHealthDataWithGemini(ctx, user.ID, healthData)
 		if err != nil {
@@ -214,11 +236,11 @@ func runWeeklyAnalysis(ctx context.Context) {
 
 		// สร้าง entity.Notification (ใช้ข้อความดิบเพื่อบันทึกลงฐานข้อมูล)
 		notif := entity.Notification{
-			Timestamp: time.Now(),
-			Title: "สรุปข้อมูลสุขภาพรายสัปดาห์",
-			Message: analysis, // เก็บข้อความดิบ
-			UserID: user.ID,
-			NotificationStatusID: 1,
+			Timestamp:            time.Now(),
+			Title:                "สรุปข้อมูลสุขภาพรายสัปดาห์",
+			Message:              analysis, // เก็บข้อความดิบ
+			UserID:               user.ID,
+			NotificationStatusID: 2,
 		}
 		if err := config.DB().Create(&notif).Error; err != nil {
 			log.Printf("Failed to save weekly summary notification for user %d: %v", user.ID, err)
@@ -229,5 +251,80 @@ func runWeeklyAnalysis(ctx context.Context) {
 		if err := gmail.SendEmail(user.Email, "Weekly Health Summary", emailBody, "text/html"); err != nil {
 			log.Printf("Failed to send email to user %d: %v", user.ID, err)
 		}
+	}
+}
+
+// เก็บสถานะ alert ของ user เดียว
+var userAlertStatus = struct {
+	sync.RWMutex
+	alertSent bool
+}{alertSent: false}
+
+// StartUserRealtimeAlertMonitoring เริ่มตรวจสอบ HealthData สำหรับ userID เฉพาะ
+func StartUserRealtimeAlertMonitoring(userID uint, intervalSeconds int) {
+	for {
+		checkUserHealth(userID)
+		time.Sleep(time.Duration(intervalSeconds) * time.Second)
+	}
+}
+
+func checkUserHealth(userID uint) {
+	var latest entity.HealthData
+	if err := config.DB().
+		Where("user_id = ?", userID).
+		Order("created_at desc").
+		First(&latest).Error; err != nil {
+		log.Printf("No health data for user %d yet", userID)
+		return
+	}
+
+	shouldAlert := latest.Bpm >= 120 || latest.Bpm <= 50 || latest.Spo2 <= 90.0
+
+	userAlertStatus.RLock()
+	alertAlreadySent := userAlertStatus.alertSent
+	userAlertStatus.RUnlock()
+
+	if shouldAlert && !alertAlreadySent {
+		// สร้าง Notification และส่ง SSE
+		notif := entity.Notification{
+			Title:                "Realtime Health Alert",
+			Message:              fmt.Sprintf("BPM: %d, SpO2: %.2f%%", latest.Bpm, latest.Spo2),
+			Timestamp:            time.Now(),
+			UserID:               userID,
+			NotificationStatusID: 1,
+		}
+
+		// บันทึกและส่ง SSE
+		if err := notification.CreateAndBroadcastNotification(notif); err != nil {
+			log.Printf("Error creating notification: %v", err)
+		}
+
+		// ส่งอีเมลแจ้งเตือน background
+		alertText := ""
+		if latest.Bpm >= 120 {
+			alertText += fmt.Sprintf("- Heart rate too high: %d bpm\n", latest.Bpm)
+		}
+		if latest.Bpm <= 50 {
+			alertText += fmt.Sprintf("- Heart rate too low: %d bpm\n", latest.Bpm)
+		}
+		if latest.Spo2 <= 90.0 {
+			alertText += fmt.Sprintf("- SpO2 too low: %.2f%%\n", latest.Spo2)
+		}
+
+		var user entity.User
+		user.ID = userID
+		go gmail.SendImmediateAlertBackground(config.DB(), user, 1, alertText)
+
+		// อัปเดตสถานะ alert
+		userAlertStatus.Lock()
+		userAlertStatus.alertSent = true
+		userAlertStatus.Unlock()
+	}
+
+	// ถ้าค่ากลับสู่ปกติ ให้รีเซ็ตสถานะ alert
+	if !shouldAlert && alertAlreadySent {
+		userAlertStatus.Lock()
+		userAlertStatus.alertSent = false
+		userAlertStatus.Unlock()
 	}
 }

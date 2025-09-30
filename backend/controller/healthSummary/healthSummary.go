@@ -271,87 +271,53 @@ func GetHealthSummary(c *gin.Context) {
 	c.JSON(http.StatusOK, summary)
 }
 
-// GET /health-summary/weekly/:id
-// 💡 ดึงข้อมูลสรุปแบบ Real-Time จาก HealthData โดยใช้ CalculateSummary
-/* func GetWeeklySummary(c *gin.Context) {
-	db := appConfig.DB() // 💡 ใช้ appConfig.DB() แทน c.MustGet("db")
-	userID := c.Param("id")
-	mode := c.DefaultQuery("mode", "currentweek") // 💡 เปลี่ยน default เป็น "currentweek"
-
-	// 🔥🔥 DEBUG PRINT: ตรวจสอบว่า Go ได้รับ Mode อะไร
-	fmt.Println("Received mode:", mode)
-	// 🔥🔥
-
-	today := time.Now()
-	var startDate, endDate time.Time
-
-	// 💡 Logic คำนวณวันในสัปดาห์ (Sunday=7, Monday=1, ... )
-	weekday := int(today.Weekday())
-	if weekday == 0 {
-		weekday = 7
-	}
-
-	// 💡 คำนวณจุดอ้างอิง: วันอาทิตย์ที่ผ่านมา (23:59:59)
-	endOfLastWeek := time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 0, today.Location()).AddDate(0, 0, -weekday)
-	// 💡 คำนวณจุดอ้างอิง: วันจันทร์ที่ผ่านมา (00:00:00)
-	startOfLastWeek := endOfLastWeek.AddDate(0, 0, -6).Truncate(24 * time.Hour)
-
-
-	// เลือกช่วงเวลาตาม mode
-	switch mode {
-	case "last7days":
-		// ย้อนหลัง 7 วันรวมวันนี้
-		startDate = today.AddDate(0, 0, -6).Truncate(24 * time.Hour)
-		endDate = time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 0, today.Location())
-
-	case "lastweek":
-		// สัปดาห์ที่แล้ว (จันทร์-อาทิตย์) เช่น 2025-09-22 ถึง 2025-09-28
-		startDate = startOfLastWeek
-		endDate = endOfLastWeek
-
-	case "last2weeks":
-		// 2 สัปดาห์ก่อนหน้า (จันทร์ของ 2 สัปดาห์ก่อน - อาทิตย์ของ 2 สัปดาห์ก่อน)
-		// 1. วันอาทิตย์ของ 2 สัปดาห์ก่อน (ย้อนไป 7 วันจาก endOfLastWeek)
-		endDate = endOfLastWeek.AddDate(0, 0, -7) // 2025-09-28 -> 2025-09-21
-		// 2. วันจันทร์ของ 2 สัปดาห์ก่อน (ย้อนไป 7 วันจาก startOfLastWeek)
-		startDate = startOfLastWeek.AddDate(0, 0, -7) // 2025-09-22 -> 2025-09-15
-
-		// 💡 DEBUG: ยืนยันช่วงเวลาที่ถูกคำนวณ
-        fmt.Printf("Mode last2weeks calculated period: %s to %s\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-
-	case "currentweek": // 💡 สัปดาห์ปัจจุบัน (จันทร์-ปัจจุบัน)
-		fallthrough
-	default:
-		// สัปดาห์นี้ (จันทร์-วันนี้)
-		startDate = today.AddDate(0, 0, -(weekday - 1)).Truncate(24 * time.Hour) 	// จันทร์ (00:00:00)
-		endDate = time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 59, 0, today.Location()) // สิ้นสุดวันนี้
-	}
-
-	// 💡 เรียกใช้ CalculateSummary
-	summaryData, err := CalculateSummary(db, userID, startDate, endDate)
-
-	if err != nil {
-		// หากไม่พบข้อมูล (No health data found) ให้คืนค่าโครงสร้างเปล่าหรือสถานะ 404
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, summaryData)
-} */
-// internal function แยกจาก Gin handler
-
+// อยู่ใน package healthData หรือ entity
+type DailyData struct {
+	Date       string  `json:"date"`
+	AvgBpm     float64 `json:"avg_bpm"`
+	Steps      int64   `json:"steps"`
+	SleepHours string  `json:"sleep_hours"`
+	Calories   float64 `json:"calories"`
+	AvgSpo2    float64 `json:"avg_spo2"`
+}
 
 func GetWeeklySummary(c *gin.Context) {
 	userID := c.Param("id")
-	mode := c.DefaultQuery("mode", "currentweek")
+	mode := c.DefaultQuery("mode", "weekly") // weekly | lastweek | last2weeks
 
 	db := c.MustGet("db").(*gorm.DB)
 
-	// เรียก internal func ดึงข้อมูลรายวัน
-	dailyData, err := healthData.GetWeeklyHealthDataInternal(db, userID, mode)
+	var internalData []healthData.DailyData
+	var err error
+
+	switch mode {
+	case "weekly":
+		internalData, err = healthData.GetWeeklyHealthDataInternal(db, userID, "weekly")
+	case "lastweek":
+		internalData, err = healthData.GetWeeklyHealthDataInternal(db, userID, "lastweek")
+	case "last2weeks":
+		internalData, err = healthData.GetWeeklyHealthDataInternal(db, userID, "last2weeks")
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mode"})
+		return
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	// แปลง type
+	dailyData := make([]DailyData, len(internalData))
+	for i, d := range internalData {
+		dailyData[i] = DailyData{
+			Date:       d.Date,
+			AvgBpm:     d.AvgBpm,
+			Steps:      d.Steps,
+			SleepHours: d.SleepHours,
+			Calories:   d.Calories,
+			AvgSpo2:    d.AvgSpo2,
+		}
 	}
 
 	if len(dailyData) == 0 {
@@ -359,10 +325,11 @@ func GetWeeklySummary(c *gin.Context) {
 		return
 	}
 
+	// คำนวณ summary เหมือนเดิม
 	var sumBpm, sumSpo2, sumCalories float64
 	var sumSteps int64
 	var totalSleepMinutes int64
-	var sleepCount int64 // สำหรับกรณีวันไหนไม่มีค่า sleep
+	var sleepCount int64
 
 	for _, d := range dailyData {
 		sumBpm += d.AvgBpm
@@ -370,7 +337,6 @@ func GetWeeklySummary(c *gin.Context) {
 		sumCalories += d.Calories
 		sumSteps += d.Steps
 
-		// แปลง SleepHours เป็นนาที เช่น "7h 10m"
 		if d.SleepHours != "" {
 			var h, m int64
 			fmt.Sscanf(d.SleepHours, "%dh %dm", &h, &m)
@@ -380,13 +346,10 @@ func GetWeeklySummary(c *gin.Context) {
 	}
 
 	count := float64(len(dailyData))
-
-	// เฉลี่ย
 	avgBpm := sumBpm / count
 	avgSpo2 := sumSpo2 / count
 	avgCalories := sumCalories / count
 
-	// เฉลี่ยเวลานอน
 	var avgSleep string
 	if sleepCount > 0 {
 		minutes := totalSleepMinutes / sleepCount
@@ -407,7 +370,6 @@ func GetWeeklySummary(c *gin.Context) {
 
 	c.JSON(http.StatusOK, summary)
 }
-
 
 // ----------------------------------------------------
 // ✅ Public Service Function for Job Runner (main.go)

@@ -16,7 +16,7 @@ import (
     "github.com/JanisataMJ/WebApp/entity"
 )
 
-// sendEmail ส่งอีเมลแบบ production-ready
+
 func SendEmail(to string, subject string, body string, attachments ...string) error {
     from := os.Getenv("EMAIL_USER")
     pass := os.Getenv("EMAIL_PASS")
@@ -115,7 +115,7 @@ func SendImmediateAlertBackground(db *gorm.DB, user entity.User, healthTypeID ui
 }
 
 // ✅ [แก้ไข] เปลี่ยนไปใช้ฟังก์ชันใหม่
-func SendRealtimeAlert(c *gin.Context) {
+/* func SendRealtimeAlert(c *gin.Context) {
     var data entity.HealthData
     if err := c.ShouldBindJSON(&data); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -150,7 +150,47 @@ func SendRealtimeAlert(c *gin.Context) {
     } else {
         c.JSON(http.StatusOK, gin.H{"message": "No critical values, no alert sent."})
     }
+} */
+ // POST /check-realtime-alert
+func SendRealtimeAlert(c *gin.Context) {
+    type HealthInput struct {
+        UserID uint    `json:"userID"`
+        Bpm    int     `json:"bpm"`
+        Spo2   float64 `json:"spo2"`
+    }
+
+    var input HealthInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    alerts := ""
+    if input.Bpm >= 120 {
+        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูงผิดปกติ: %d bpm\n", input.Bpm)
+    }
+    if input.Bpm <= 50 {
+        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำผิดปกติ: %d bpm\n", input.Bpm)
+    }
+    if input.Spo2 <= 90.0 {
+        alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", input.Spo2)
+    }
+
+    if alerts != "" {
+        var user entity.User
+        if err := config.DB().First(&user, input.UserID).Error; err != nil {
+            c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+            return
+        }
+        // ส่งอีเมลแจ้งเตือน 1 ครั้ง
+        SendImmediateAlertBackground(config.DB(), user, 1, alerts)
+        c.JSON(http.StatusOK, gin.H{"message": "Alert sent", "alerts": alerts})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "No alert"})
 }
+
 
 // แจ้งเตือนสรุปรายสัปดาห์ (เลือก UserID ได้)
 func SendWeeklySummary(db *gorm.DB, userID uint) {

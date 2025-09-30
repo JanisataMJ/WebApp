@@ -33,7 +33,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	// 2️⃣ ดึง User ที่มีอยู่แล้ว (สร้างจาก dc.go) โดยใช้ Email หรือ ID
 	// ---------------------------
 	var user entity.User
-	if err := db.Where("email = ?", "user1@gmail.com").First(&user).Error; err != nil {
+	if err := db.Where("email = ?", "usercpe21@gmail.com").First(&user).Error; err != nil {
 		log.Fatalf("ไม่พบ User ที่ต้องการใช้งาน: %v", err)
 	}
 

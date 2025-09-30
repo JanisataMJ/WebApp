@@ -46,7 +46,7 @@ export const getHealthSummaryByUserID = async (
 
 export const GetWeeklySummary = async (
   userId: number,
-  mode: "weekly" | "lastweek" | "last2weeks" = "weekly"
+  mode: "weekly" | "lastweek" | "last2weeks"
 ): Promise<HealthSummaryInterface> => {
   const requestOptions = getRequestOptions();
   const response = await axios.get<HealthSummaryInterface>(

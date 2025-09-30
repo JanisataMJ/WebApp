@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  LineChart, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import "./heartrate.css";
 import { getDailyHeartRate } from "../../../services/https/DataHealth/healthData";
 
 interface HeartRatePoint {
-  time: string;      // format เช่น "14:30"
+  time: string; 
   heartRate: number | null;
-  minutes: number;   // ✅ เพิ่ม field ไว้สำหรับแกน X
+  minutes: number;
 }
 
 interface DailyHeartRateResponse {
@@ -18,7 +15,6 @@ interface DailyHeartRateResponse {
   stats?: { avg: number; min: number; max: number };
 }
 
-// helper: แปลง "HH:mm" → จำนวนนาที
 const toMinutes = (time: string) => {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
@@ -30,7 +26,6 @@ const formatTime = (minutes: number) => {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
 
-
 const DairyHeartRate: React.FC = () => {
   const [data, setData] = useState<HeartRatePoint[]>([]);
   const [stats, setStats] = useState<{ avg: number; min: number; max: number }>({ avg: 0, min: 0, max: 0 });
@@ -38,15 +33,16 @@ const DairyHeartRate: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const UserID = Number(localStorage.getItem("id"));
 
-  // เตรียม array ของชั่วโมง 0-23
   const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, "0")}:00`);
   const currentHour = new Date().getHours();
-  const hoursUntilNow = hours.slice(0, currentHour + 1);
+  //const hoursUntilNow = hours.slice(0, currentHour + 1);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res: DailyHeartRateResponse = await getDailyHeartRate(UserID);
+
+        console.log("Fetched data:", res.data);
 
         if (!res.data || res.data.length === 0) {
           setHasData(false);
@@ -55,16 +51,14 @@ const DairyHeartRate: React.FC = () => {
           return;
         }
 
-        // ✅ map: แปลงเวลาจริงเป็น minutes
         const heartData: HeartRatePoint[] = res.data.map((d) => ({
           time: d.time,
           heartRate: d.heartRate,
-          minutes: toMinutes(d.time) // 👉 เพิ่ม field
+          minutes: toMinutes(d.time) 
         })) as any;
 
         setData(heartData);
 
-        // ✅ คำนวณ stats
         const values = heartData.map(d => d.heartRate).filter(v => v !== null) as number[];
         if (values.length > 0) {
           const avg = values.reduce((a, b) => a + b, 0) / values.length;
@@ -76,18 +70,16 @@ const DairyHeartRate: React.FC = () => {
           setStats({ avg: 0, min: 0, max: 0 });
           setHasData(false);
         }
-
       } catch (err) {
         console.error(err);
-        setHasData(false);
-        setData([]);
-        setStats({ avg: 0, min: 0, max: 0 });
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+    const interval = setInterval(fetchData, 30_000);
+    return () => clearInterval(interval);
+  }, [UserID]);
 
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './Notice.css';
-import { Bell , X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, X, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   getNotificationByUserID,
-  sendWeeklySummary,
+  //sendWeeklySummary,
   updateNotificationStatusByID,
 } from '../../../services/https/Notification/notification';
 import { NotificationInterface } from '../../../interface/notification_interface/notification';
@@ -15,7 +15,7 @@ const Notice: React.FC = () => {
   const UserID = Number(localStorage.getItem('id'));
 
   const showModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);  
+  const closeModal = () => setIsModalOpen(false);
 
   // นับจำนวนแจ้งเตือนที่ยังไม่อ่าน
   const unreadCount = notifications.filter(
@@ -53,6 +53,23 @@ const Notice: React.FC = () => {
     fetchNotifications();
   }, [UserID]);
 
+  useEffect(() => {
+    if (!UserID) return;
+
+    const evtSource = new EventSource(`http://localhost:8000/notification/sse/${UserID}`);
+    evtSource.onmessage = (event) => {
+      try {
+        const data: NotificationInterface = JSON.parse(event.data);
+        setNotifications((prev) => [data, ...prev]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    return () => evtSource.close();
+  }, [UserID]);
+
+
   // Toggle การเปิด/ปิดข้อความ notification
   const toggleNotification = async (index: number) => {
     const item = notifications[index];
@@ -61,7 +78,7 @@ const Notice: React.FC = () => {
 
     if (item.NotificationStatus?.Status === 'ยังไม่อ่าน') {
       try {
-       
+
         const updatedNoti = await updateNotificationStatusByID(item.ID, { status: 1 }); // status = 1
 
         // ใช้ default value เผื่อ API คืนไม่ครบ
@@ -110,7 +127,7 @@ const Notice: React.FC = () => {
     <>
       {/* Floating Button */}
       <button className="floating-button" onClick={showModal}>
-        <Bell  className="icon-noti" />
+        <Bell className="icon-noti" />
         {unreadCount > 0 && (
           <span className="badge-noti">{unreadCount}</span>
         )}

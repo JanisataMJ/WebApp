@@ -24,6 +24,8 @@ const DairyCalorie: React.FC = () => {
   const UserID = Number(localStorage.getItem("id"));
 
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
+
     const fetchData = async () => {
       try {
         const res: DailyCalorieResponse = await getDailyCalories(UserID);
@@ -55,19 +57,15 @@ const DairyCalorie: React.FC = () => {
             a.time.localeCompare(b.time)
           );
 
-          // 3) คำนวณ diff (ปัจจุบัน - ก่อนหน้า)
+          // 3) คำนวณ diff
           const diffData: CalorieData[] = sorted.map((d, i) => {
-            if (i === 0) return { ...d }; // ค่าแรกใช้ตามจริง
+            if (i === 0) return { ...d };
             const prev = sorted[i - 1];
-            return {
-              ...d,
-              calories: d.calories - prev.calories
-            };
+            return { ...d, calories: d.calories - prev.calories };
           });
 
           setData(diffData);
           setTotalBurnedCalories(sorted[sorted.length - 1].calories);
-
         }
       } catch (err) {
         console.error("Failed to fetch daily burned calories", err);
@@ -79,7 +77,10 @@ const DairyCalorie: React.FC = () => {
       }
     };
     fetchData();
+    intervalId = setInterval(fetchData, 30000);
+    return () => clearInterval(intervalId);
   }, [UserID]);
+
 
 
   if (loading) return <div>กำลังโหลดข้อมูล...</div>;
@@ -89,12 +90,11 @@ const DairyCalorie: React.FC = () => {
   const progressPercentage = targetCalories > 0 ? (totalBurnedCalories / targetCalories) * 100 : 0;
 
   const CustomBarTooltip: React.FC<any> = ({ active, payload, label }) => {
-    if (active && payload && payload.length && payload[0].payload) {
-      const d = payload[0].payload;
+    if (active && payload && payload.length) {
       return (
         <div className="custom-tooltip-cal">
-          <p className="tooltip-time-cal">{`${d.activity} (${d.originalTime || label})`}</p>
-          <p className="tooltip-calories">{`แคลอรี่: ${payload[0].value} kcal`}</p>
+          <p>{`เวลา: ${label}`}</p>
+          <p>{`แคลอรี่: ${payload[0].value} kcal`}</p>
         </div>
       );
     }

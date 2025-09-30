@@ -22,33 +22,17 @@ func getDailyMetric(c *gin.Context, field string, alias string) {
 	}
 
 	loc, _ := time.LoadLocation("Asia/Bangkok")
-	var start, end time.Time
+	now := time.Now().In(loc)
+	start := now.Truncate(24 * time.Hour)
+	end := start.AddDate(0, 0, 1).Add(-time.Nanosecond)
 
-	if field == "SleepHours" {
-		// ✅ กรณี SleepHours: คิดช่วง 18:00 ของเมื่อวาน → ปัจจุบัน (ไม่แก้ไขตามที่คุณต้องการ)
-		now := time.Now().In(loc)
-		yesterday := now.AddDate(0, 0, -1).Truncate(24 * time.Hour)
-
-		start = yesterday.Add(18 * time.Hour)
-		end = now // สิ้นสุดที่เวลาปัจจุบัน
-	} else {
-		// ✅ Metric ปกติ: วันนี้ตั้งแต่ 00:00 → สิ้นวัน (23:59:59)
-		now := time.Now().In(loc)
-		start = now.Truncate(24 * time.Hour) // 00:00:00 ของวันนี้
-		// กำหนดให้ end เป็น 23:59:59 ของวันนี้ (คือ 00:00:00 ของวันถัดไป - 1 nanosecond)
-		end = start.AddDate(0, 0, 1).Add(-time.Nanosecond)
-	}
-
-	// แปลงเป็น UTC ก่อน query DB
 	startUTC := start.UTC()
 	endUTC := end.UTC()
 
 	var healthData []entity.HealthData
 	var err error
 
-	// 🔹 Query ข้อมูล
 	if field == "SleepHours" {
-		// เดิม: มี filter sleep_hours <> ''
 		err = db.Where("user_id = ? AND timestamp >= ? AND timestamp < ?",
 			userID, startUTC, endUTC).
 			Order("timestamp ASC").
@@ -69,7 +53,6 @@ func getDailyMetric(c *gin.Context, field string, alias string) {
 	log.Printf("Fetched %d records for userID=%s (field=%s, start=%s, end=%s)\n",
 		len(healthData), userID, field, start, end)
 
-	// 🔹 Map response + คำนวณสถิติ
 	var response []map[string]interface{}
 	var total float64
 	var min, max float64
@@ -106,7 +89,6 @@ func getDailyMetric(c *gin.Context, field string, alias string) {
 		}
 	}
 
-	// 🔹 สร้างผลลัพธ์ JSON
 	result := gin.H{
 		"date": start.Format("2006-01-02"),
 		"data": response,
@@ -124,7 +106,6 @@ func getDailyMetric(c *gin.Context, field string, alias string) {
 	c.JSON(http.StatusOK, result)
 }
 
-// 🔹 API Endpoint ย่อย
 func GetDailyHeartRate(c *gin.Context) {
 	getDailyMetric(c, "Bpm", "heartRate")
 }

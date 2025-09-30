@@ -191,7 +191,7 @@ const Notice: React.FC = () => {
 
                       {expanded === index && (
                         <div className="detail-container">
-                          <p className="detail-noti">{item.Message}</p>
+                          <p className="detail-noti">{item.Message.replace(/\*\*/g, '')}</p>
                         </div>
                       )}
                     </div>

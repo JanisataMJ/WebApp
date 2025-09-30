@@ -19,7 +19,51 @@ import (
 )
 
 //----------------------------------- API Handlers ------------------------------------
+// POST /health-data (Handler ที่รับข้อมูลและ Trigger การวิเคราะห์)
+func SaveHealthDataHandler(c *gin.Context) {
+    var newData entity.HealthData
+    if err := c.ShouldBindJSON(&newData); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    // ตรวจสอบ user_id ต้องไม่เป็น 0
+    if newData.UserID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
 
+    // 1. ดึงข้อมูลสุขภาพล่าสุดก่อนที่จะบันทึกรายการใหม่
+    var lastRecordedData entity.HealthData
+    // ใช้ Order("timestamp desc") เพื่อหาเวลาวัดค่าจริงล่าสุด
+    config.DB().Where("user_id = ?", newData.UserID).
+        Order("timestamp desc").
+        Limit(1).
+        Find(&lastRecordedData)
+
+    // 2. บันทึกข้อมูลใหม่ลง DB
+    if err := config.DB().Create(&newData).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save data"})
+        return
+    }
+
+    // 3. ตรวจสอบเงื่อนไข "ข้อมูลใหม่ของวันใหม่"
+    newDayStr := newData.Timestamp.Format("2006-01-02")
+    lastDayStr := lastRecordedData.Timestamp.Format("2006-01-02")
+    
+    // เงื่อนไข: วันที่ต่างกัน และไม่ใช่การบันทึกครั้งแรก
+    if newDayStr != lastDayStr && lastRecordedData.ID != 0 {
+        // Trigger การวิเคราะห์รายสัปดาห์แบบ Asynchronous
+        go func() {
+            // ใช้ context.Background() สำหรับ Background Job
+            ctx := context.Background() 
+            // เรียกใช้ฟังก์ชันวิเคราะห์
+            RunWeeklyAnalysisForSingleUser(ctx, newData.UserID) 
+        }()
+    }
+    
+    c.JSON(http.StatusOK, gin.H{"message": "Data saved and analysis triggered (if new day data)."})
+}
 // GET /list-healthAnalysis
 func ListHealthAnalysis(c *gin.Context) {
 	var analysis []entity.HealthAnalysis
@@ -103,81 +147,6 @@ func AnalyzeWithGeminiHandler(c *gin.Context) {
 
 //----------------------------------- Core Logic ------------------------------------
 
-// ลบ AnalyzeHealthDataWithGemini ออก
-
-//----------------------------------- Background Jobs -----------------------------------
-
-// CheckForCriticalAlerts ทำงานเป็น Goroutine สำหรับแจ้งเตือนแบบเรียลไทม์
-/* func CheckForCriticalAlerts(userID uint) {
-    intervalStr := os.Getenv("CHECK_INTERVAL_MIN")
-    interval, err := strconv.Atoi(intervalStr)
-    if err != nil || interval <= 0 {
-        interval = 5
-    }
-    checkInterval := time.Duration(interval) * time.Minute
-
-    for {
-        // ดึง HealthData ล่าสุดของ user
-        var latestHealthData entity.HealthData
-        if err := config.DB().
-            Where("user_id = ?", userID).
-            Order("created_at desc").
-            First(&latestHealthData).Error; err != nil {
-            time.Sleep(checkInterval)
-            continue
-        }
-
-        alerts := ""
-        if latestHealthData.Bpm >= 120 {
-            alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
-        }
-        if latestHealthData.Bpm <= 50 {
-            alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
-        }
-        if latestHealthData.Spo2 <= 90.0 {
-            alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", latestHealthData.Spo2)
-        }
-
-        if alerts != "" {
-            var user entity.User
-            if err := config.DB().First(&user, userID).Error; err == nil {
-                gmail.SendImmediateAlertBackground(config.DB(), user, 1, alerts)
-            }
-        }
-
-        time.Sleep(checkInterval)
-    }
-} */
-/*  func CheckCriticalAlertOnce(userID uint) {
-    var latestHealthData entity.HealthData
-    err := config.DB().
-        Where("user_id = ?", userID).
-        Order("created_at desc").
-        First(&latestHealthData).Error
-    if err != nil {
-        return
-    }
-
-    alerts := ""
-    if latestHealthData.Bpm >= 120 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูงผิดปกติ: %d bpm\n", latestHealthData.Bpm)
-    }
-    if latestHealthData.Bpm <= 50 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำผิดปกติ: %d bpm\n", latestHealthData.Bpm)
-    }
-    if latestHealthData.Spo2 <= 90.0 {
-        alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", latestHealthData.Spo2)
-    }
-
-    if alerts != "" {
-        // ส่งแจ้งเตือนไปที่ email
-        var user entity.User
-        if err := config.DB().First(&user, userID).Error; err == nil {
-            gmail.SendImmediateAlertBackground(config.DB(), user, 1, alerts)
-        }
-    }
-} */
-
 // WeeklyAnalysisJob ทำงานเป็น Goroutine สำหรับการวิเคราะห์รายสัปดาห์
 func WeeklyAnalysisJob(ctx context.Context) {
 	// *** เดิม: วนลูปทันที ***
@@ -194,90 +163,17 @@ func WeeklyAnalysisJob(ctx context.Context) {
 
 // runWeeklyAnalysis โค้ดหลักของการวิเคราะห์รายสัปดาห์
 func runWeeklyAnalysis(ctx context.Context) {
-	var users []entity.User
-	if err := config.DB().Find(&users).Error; err != nil {
-		log.Printf("Error retrieving users for weekly analysis: %v\n", err)
-		return
-	}
+    var users []entity.User
+    if err := config.DB().Find(&users).Error; err != nil {
+        log.Printf("Error retrieving users for weekly analysis: %v\n", err)
+        return
+    }
 
-	for _, user := range users {
-		log.Printf("Starting weekly analysis for user ID: %d\n", user.ID)
-
-        // 1. คำนวณจุดเริ่มต้นของสัปดาห์ (วันจันทร์ 00:00:00)
-        now := time.Now()
-        
-        // Go's Weekday: Sunday=0, Monday=1, Tuesday=2, ...
-        // คำนวณจำนวนวันที่ต้องย้อนกลับไปหา Monday
-        daysToMonday := int(now.Weekday() - time.Monday) 
-        if daysToMonday < 0 {
-            // ถ้าวันนี้คือ Sunday (0 - 1 = -1), ต้องย้อนกลับไป 6 วันเพื่อหา Monday ที่ผ่านมา
-            daysToMonday = 6
-        }
-
-        startOfWeek := now.AddDate(0, 0, -daysToMonday)
-        // ตั้งเวลาเป็น 00:00:00 ของวันจันทร์
-        startOfWeek = time.Date(startOfWeek.Year(), startOfWeek.Month(), startOfWeek.Day(), 0, 0, 0, 0, now.Location())
-        
-        // จุดสิ้นสุดของช่วงวิเคราะห์คือเวลาปัจจุบันที่ Job รัน
-        endOfRange := now 
-
-        var healthData []entity.HealthData
-        
-        // 2. ดึงข้อมูลในช่วง (วันจันทร์ 00:00:00) ถึง (ปัจจุบัน) 
-        //    โดยใช้คอลัมน์ 'timestamp'
-        if err := config.DB().
-            Where("user_id = ?", user.ID).
-            // กรองข้อมูลที่ timestamp อยู่ระหว่าง startOfWeek ถึง endOfRange
-            Where("timestamp >= ? AND timestamp <= ?", startOfWeek, endOfRange).
-            Order("timestamp ASC"). // จัดเรียงเวลาให้ Gemini วิเคราะห์แนวโน้มได้
-            Find(&healthData).Error; err != nil {
-            
-            log.Printf("Error retrieving health data for user %d: %v\n", user.ID, err)
-            continue
-        }
-
-		// *** เรียกใช้ฟังก์ชันจาก geminiAnalysis.go ***
-		analysis, err := AnalyzeHealthDataWithGemini(ctx, user.ID, healthData)
-		if err != nil {
-			log.Printf("Error analyzing data for user %d: %v\n", user.ID, err)
-			continue
-		}
-
-		// จัดรูปแบบข้อความให้สวยงามด้วยการสร้าง HTML
-		var htmlContent strings.Builder
-		htmlContent.WriteString(fmt.Sprintf("<p>สวัสดีครับ/ค่ะ คุณ %s,</p>", user.FirstName))
-		htmlContent.WriteString("<p>นี่คือสรุปข้อมูลสุขภาพรายสัปดาห์ของคุณจาก Gemini:</p>")
-		htmlContent.WriteString("<ul>")
-
-		// แยกข้อความเป็นบรรทัด และสร้างเป็นรายการแบบจุด
-		lines := strings.Split(analysis, "\n")
-		for _, line := range lines {
-			trimmedLine := strings.TrimSpace(line)
-			if len(trimmedLine) > 0 {
-				// ใช้ <li> สำหรับสร้างรายการ bullet point
-				htmlContent.WriteString("<li>" + trimmedLine + "</li>")
-			}
-		}
-		htmlContent.WriteString("</ul>")
-
-		// สร้าง entity.Notification (ใช้ข้อความดิบเพื่อบันทึกลงฐานข้อมูล)
-		notif := entity.Notification{
-			Timestamp:            time.Now(),
-			Title:                "สรุปข้อมูลสุขภาพรายสัปดาห์",
-			Message:              analysis, // เก็บข้อความดิบ
-			UserID:               user.ID,
-			NotificationStatusID: 2,
-		}
-		if err := config.DB().Create(&notif).Error; err != nil {
-			log.Printf("Failed to save weekly summary notification for user %d: %v", user.ID, err)
-		}
-
-		// ส่งอีเมลด้วยเนื้อหา HTML
-		emailBody := htmlContent.String()
-		if err := gmail.SendEmail(user.Email, "Weekly Health Summary", emailBody, "text/html"); err != nil {
-			log.Printf("Failed to send email to user %d: %v", user.ID, err)
-		}
-	}
+    for _, user := range users {
+        log.Printf("Starting scheduled weekly analysis for user ID: %d\n", user.ID)
+        // ใช้ฟังก์ชันที่แยกออกมา
+        RunWeeklyAnalysisForSingleUser(ctx, user.ID)
+    }
 }
 
 // เก็บสถานะ alert ของ user เดียว
@@ -353,4 +249,82 @@ func checkUserHealth(userID uint) {
 		userAlertStatus.alertSent = false
 		userAlertStatus.Unlock()
 	}
+}
+
+// runWeeklyAnalysisForSingleUser ดำเนินการวิเคราะห์รายสัปดาห์สำหรับผู้ใช้คนเดียว
+// นี่คือฟังก์ชันที่ถูกเรียกใช้เพื่อ Trigger เมื่อมีข้อมูลใหม่ของวันใหม่
+func RunWeeklyAnalysisForSingleUser(ctx context.Context, userID uint) {
+    var user entity.User
+    if err := config.DB().First(&user, userID).Error; err != nil {
+        log.Printf("User not found for analysis: %d\n", userID)
+        return
+    }
+
+    log.Printf("Starting on-demand weekly analysis for user ID: %d\n", user.ID)
+
+    // 1. คำนวณช่วงเวลา: วันจันทร์ (00:00:00) ถึง ปัจจุบัน (now)
+    now := time.Now()
+    
+    daysToMonday := int(now.Weekday() - time.Monday) 
+    if daysToMonday < 0 {
+        daysToMonday = 6
+    }
+    startOfWeek := now.AddDate(0, 0, -daysToMonday)
+    startOfWeek = time.Date(startOfWeek.Year(), startOfWeek.Month(), startOfWeek.Day(), 0, 0, 0, 0, now.Location())
+    endOfRange := now 
+
+    var healthData []entity.HealthData
+    
+    // 2. ดึงข้อมูลในช่วงที่กำหนด โดยใช้คอลัมน์ 'timestamp'
+    if err := config.DB().
+        Where("user_id = ?", user.ID).
+        Where("timestamp >= ? AND timestamp <= ?", startOfWeek, endOfRange).
+        Order("timestamp ASC"). 
+        Find(&healthData).Error; err != nil {
+        
+        log.Printf("Error retrieving health data for user %d: %v\n", user.ID, err)
+        return
+    }
+
+    // 3. เรียกใช้ Gemini (ต้องแน่ใจว่า AnalyzeHealthDataWithGemini ใช้ item.Timestamp ในการสร้าง CSV แล้ว)
+    analysis, err := AnalyzeHealthDataWithGemini(ctx, user.ID, healthData)
+    if err != nil {
+         log.Printf("Error analyzing data for user %d: %v\n", user.ID, err)
+         return
+    }
+    
+    // 4. จัดรูปแบบและส่ง Notification/Email (คัดลอก Logic ส่วนนี้จาก runWeeklyAnalysis เดิม)
+    var htmlContent strings.Builder
+    htmlContent.WriteString(fmt.Sprintf("<p>สวัสดีครับ/ค่ะ คุณ %s,</p>", user.FirstName))
+    htmlContent.WriteString("<p>นี่คือสรุปข้อมูลสุขภาพรายสัปดาห์ของคุณจาก Gemini:</p>")
+    htmlContent.WriteString("<ul>")
+
+    lines := strings.Split(analysis, "\n")
+    for _, line := range lines {
+        trimmedLine := strings.TrimSpace(line)
+        if len(trimmedLine) > 0 {
+            htmlContent.WriteString("<li>" + trimmedLine + "</li>")
+        }
+    }
+    htmlContent.WriteString("</ul>")
+
+    // สร้าง entity.Notification
+    notif := entity.Notification{
+        Timestamp:time.Now(),
+        Title: "สรุปข้อมูลสุขภาพรายสัปดาห์",
+        Message: analysis,
+        UserID:  user.ID,
+        NotificationStatusID: 2,
+    }
+    if err := config.DB().Create(&notif).Error; err != nil {
+        log.Printf("Failed to save weekly summary notification for user %d: %v", user.ID, err)
+    }
+
+    // ส่งอีเมลด้วยเนื้อหา HTML
+    emailBody := htmlContent.String()
+    if err := gmail.SendEmail(user.Email, "Weekly Health Summary Update", emailBody, "text/html"); err != nil {
+        log.Printf("Failed to send email to user %d: %v", user.ID, err)
+    }
+    
+    log.Printf("Completed analysis and notification for user ID: %d\n", user.ID)
 }

@@ -262,6 +262,7 @@
   line-height: 1.6;
   color: #374151;
   margin: 0;
+  white-space: pre-wrap;
 }
 
 /* Close Button */

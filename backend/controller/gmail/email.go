@@ -114,43 +114,7 @@ func SendImmediateAlertBackground(db *gorm.DB, user entity.User, healthTypeID ui
 	}
 }
 
-// ✅ [แก้ไข] เปลี่ยนไปใช้ฟังก์ชันใหม่
-/* func SendRealtimeAlert(c *gin.Context) {
-    var data entity.HealthData
-    if err := c.ShouldBindJSON(&data); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
 
-    db := config.DB()
-
-    var user entity.User
-    if err := db.First(&user, data.UserID).Error; err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-        return
-    }
-
-    alerts := ""
-    if data.Bpm < 50 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำ: %d bpm\n", data.Bpm)
-    } else if data.Bpm > 120 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูง: %d bpm\n", data.Bpm)
-    }
-    if data.Spo2 < 90 {
-        alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำ: %.2f%%\n", data.Spo2)
-    }
-
-    if alerts != "" {
-        if user.RoleID == 2 {
-            go SendImmediateAlertBackground(db, user, 1, alerts)
-            c.JSON(http.StatusOK, gin.H{"message": "Alert detected and email is being sent in the background."})
-        } else {
-            c.JSON(http.StatusOK, gin.H{"message": "Alert detected, but not sending email because Role != User"})
-        }
-    } else {
-        c.JSON(http.StatusOK, gin.H{"message": "No critical values, no alert sent."})
-    }
-} */
  // POST /check-realtime-alert
 func SendRealtimeAlert(c *gin.Context) {
     type HealthInput struct {

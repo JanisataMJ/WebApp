@@ -72,7 +72,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 			"ข้อมูลประกอบด้วย: อัตราการเต้นหัวใจ (BPM), จำนวนก้าว, ออกซิเจนในเลือด (SpO2), ชั่วโมงการนอนหลับ (แปลงเป็นทศนิยม), และแคลอรี่ที่ใช้ไป\n"+
 			"ข้อมูลดิบ:\n"+
 			"%s\n"+
-			"โปรดสรุปแนวโน้มโดยรวมของสุขภาพสั้นกระชับ ไม่ยาวจนเกินไป และให้คำแนะนำที่สามารถนำไปปฏิบัติได้จริงเพื่อปรับปรุงสุขภาพ โปรดเว้นวรรค ย่อหน้า ให้สวยงามด้วย",
+			"โปรดสรุปแนวโน้มโดยรวมของสุขภาพสั้นกระชับ ไม่ยาวจนเกินไป และให้คำแนะนำที่สามารถนำไปปฏิบัติได้จริงเพื่อปรับปรุงสุขภาพ โปรดเว้นวรรค ย่อหน้า ให้สวยงามด้วย โดยแสดงช่วงวันที่ของข้อมูลทีนำมาวิเคราะห์ด้วย",
 		dataString.String(),
 	)
 
@@ -98,5 +98,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 	} else {
 		geminiResponse = "ไม่สามารถรับการวิเคราะห์จาก Gemini ได้"
 	}
-	return geminiResponse, nil
+
+	cleanedResponse := strings.ReplaceAll(geminiResponse, "**", "")
+	return cleanedResponse, nil
 }

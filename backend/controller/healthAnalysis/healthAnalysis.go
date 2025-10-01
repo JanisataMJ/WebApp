@@ -251,80 +251,151 @@ func checkUserHealth(userID uint) {
 	}
 }
 
-// runWeeklyAnalysisForSingleUser ดำเนินการวิเคราะห์รายสัปดาห์สำหรับผู้ใช้คนเดียว
+// RunWeeklyAnalysisForSingleUser ดำเนินการวิเคราะห์รายสัปดาห์สำหรับผู้ใช้คนเดียว
 // นี่คือฟังก์ชันที่ถูกเรียกใช้เพื่อ Trigger เมื่อมีข้อมูลใหม่ของวันใหม่
 func RunWeeklyAnalysisForSingleUser(ctx context.Context, userID uint) {
-    var user entity.User
-    if err := config.DB().First(&user, userID).Error; err != nil {
-        log.Printf("User not found for analysis: %d\n", userID)
-        return
+	var user entity.User
+	if err := config.DB().First(&user, userID).Error; err != nil {
+		log.Printf("User not found for analysis: %d\n", userID)
+		return
+	}
+
+	log.Printf("Starting on-demand weekly analysis for user ID: %d\n", user.ID)
+
+	// --- 1. คำนวณช่วงเวลาเริ่มต้นของสัปดาห์ปัจจุบัน (วันจันทร์ 00:00:00) ---
+	now := time.Now()
+	
+	// หาวันจันทร์ล่าสุด
+	daysToMonday := int(now.Weekday() - time.Monday) 
+	if daysToMonday < 0 {
+		daysToMonday += 7 
+	}
+	currentWeekStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).AddDate(0, 0, -daysToMonday)
+	
+	// --- 2. ดึงข้อมูลสัปดาห์ปัจจุบัน (จันทร์ถึงปัจจุบัน) ---
+	var healthData []entity.HealthData
+	
+	if err := config.DB().
+		Where("user_id = ?", user.ID).
+		Where("timestamp >= ? AND timestamp <= ?", currentWeekStart, now).
+		Order("timestamp ASC"). 
+		Find(&healthData).Error; err != nil {
+		
+		log.Printf("Error retrieving current week health data for user %d: %v\n", user.ID, err)
+		return
+	}
+	
+	// --- 3. LOGIC ตรวจสอบข้อมูลและย้อนกลับไปสัปดาห์ที่แล้ว ---
+	
+	// เกณฑ์ขั้นต่ำ (สามารถปรับได้ตามความถี่ข้อมูล)
+	minRecordsThreshold := 4 
+	
+	analysisRangeStart := currentWeekStart
+	analysisRangeEnd := now
+	
+	// 🚩 ตรวจสอบเงื่อนไขหลัก:
+	// A. ถ้าวันนี้ยังไม่ใช่วันจันทร์ (คือเรายังอยู่ในสัปดาห์นั้นๆ) 
+	// B. หรือข้อมูลสัปดาห์ปัจจุบันมีน้อยเกินไป (ไม่ครบ 7 วันเต็ม)
+	// ให้พิจารณาย้อนไปสัปดาห์ที่แล้ว
+	
+	shouldConsiderPreviousWeek := now.Weekday() != time.Monday || len(healthData) < minRecordsThreshold
+	
+	// ถ้าเข้าเงื่อนไขในการพิจารณาสัปดาห์ที่แล้ว
+	if shouldConsiderPreviousWeek {
+		log.Printf("Current week data is incomplete/early (%d records). Considering previous week data for user %d.\n", len(healthData), user.ID)
+
+		// คำนวณช่วงเวลาสัปดาห์ที่แล้ว (จันทร์-อาทิตย์)
+		previousWeekStart := currentWeekStart.AddDate(0, 0, -7)
+		previousWeekEnd := currentWeekStart.AddDate(0, 0, -1) 
+		previousWeekEnd = time.Date(previousWeekEnd.Year(), previousWeekEnd.Month(), previousWeekEnd.Day(), 23, 59, 59, 999999999, now.Location())
+
+		var previousWeekData []entity.HealthData
+		if err := config.DB().
+			Where("user_id = ?", user.ID).
+			Where("timestamp >= ? AND timestamp <= ?", previousWeekStart, previousWeekEnd).
+			Order("timestamp ASC"). 
+			Find(&previousWeekData).Error; err != nil {
+			
+			log.Printf("Error retrieving previous week health data for user %d: %v\n", user.ID, err)
+			return
+		}
+		
+		// ถ้าสัปดาห์ที่แล้วมีข้อมูลพอ
+		if len(previousWeekData) >= minRecordsThreshold {
+			healthData = previousWeekData // ใช้ชุดข้อมูลสัปดาห์ที่แล้ว
+			analysisRangeStart = previousWeekStart
+			analysisRangeEnd = previousWeekEnd
+			log.Printf("Successfully switched to previous week data (%d records) for user %d. Range: %s to %s\n", 
+				len(healthData), user.ID, analysisRangeStart.Format("2006-01-02"), analysisRangeEnd.Format("2006-01-02"))
+		} else if len(healthData) >= minRecordsThreshold {
+            // ถ้าสัปดาห์ที่แล้วข้อมูลไม่พอ แต่สัปดาห์ปัจจุบันข้อมูลพอ
+            log.Printf("Previous week data insufficient. Reverting to current week data (%d records) for user %d.\n", len(healthData), user.ID)
+            // ใช้ค่า analysisRangeStart, analysisRangeEnd เดิม (currentWeekStart, now)
+        } else {
+			log.Printf("Data still insufficient (%d records in previous week, %d in current). Aborting analysis for user %d.\n", len(previousWeekData), len(healthData), user.ID)
+			return // ข้อมูลไม่พอทั้งสองสัปดาห์
+		}
+	} else {
+        // ถ้าวันนี้เป็นวันจันทร์ และข้อมูลสัปดาห์ที่เพิ่งจบไป (currentWeekStart ถึง now) มีเพียงพอ
+        log.Printf("Current week data is sufficient (%d records). Analyzing current week for user %d.\n", len(healthData), user.ID)
+        // ใช้ค่า analysisRangeStart, analysisRangeEnd เดิม
     }
 
-    log.Printf("Starting on-demand weekly analysis for user ID: %d\n", user.ID)
+	log.Printf("Final analysis range: %s to %s (%d records) for user %d.\n", 
+		analysisRangeStart.Format("2006-01-02"), 
+		analysisRangeEnd.Format("2006-01-02"), 
+		len(healthData), user.ID)
 
-    // 1. คำนวณช่วงเวลา: วันจันทร์ (00:00:00) ถึง ปัจจุบัน (now)
-    now := time.Now()
-    
-    daysToMonday := int(now.Weekday() - time.Monday) 
-    if daysToMonday < 0 {
-        daysToMonday = 6
-    }
-    startOfWeek := now.AddDate(0, 0, -daysToMonday)
-    startOfWeek = time.Date(startOfWeek.Year(), startOfWeek.Month(), startOfWeek.Day(), 0, 0, 0, 0, now.Location())
-    endOfRange := now 
+	// --- 4. เรียกใช้ Gemini ---
+	analysis, err := AnalyzeHealthDataWithGemini(ctx, user.ID, healthData)
+	if err != nil {
+		log.Printf("Error analyzing data for user %d: %v\n", user.ID, err)
+		return
+	}
+	
+	// --- 5. จัดรูปแบบและส่ง Notification/Email ---
+	
+	// เตรียมเนื้อหา HTML สำหรับ Email
+	var htmlContent strings.Builder
+	htmlContent.WriteString(fmt.Sprintf("<p>สวัสดีครับ/ค่ะ คุณ %s,</p>", user.FirstName))
+	htmlContent.WriteString(fmt.Sprintf("<p>นี่คือสรุปข้อมูลสุขภาพสำหรับช่วง <b>%s ถึง %s</b> ของคุณจาก Gemini:</p>", 
+		analysisRangeStart.Format("2006-01-02"), 
+		analysisRangeEnd.Format("2006-01-02")))
+	htmlContent.WriteString("<ul>")
 
-    var healthData []entity.HealthData
-    
-    // 2. ดึงข้อมูลในช่วงที่กำหนด โดยใช้คอลัมน์ 'timestamp'
-    if err := config.DB().
-        Where("user_id = ?", user.ID).
-        Where("timestamp >= ? AND timestamp <= ?", startOfWeek, endOfRange).
-        Order("timestamp ASC"). 
-        Find(&healthData).Error; err != nil {
-        
-        log.Printf("Error retrieving health data for user %d: %v\n", user.ID, err)
-        return
-    }
+	// ลบเครื่องหมาย Markdown และแปลงเป็น <li>
+	lines := strings.Split(analysis, "\n")
+	for _, line := range lines {
+		// ลบ ** และ *
+		cleanedLine := strings.ReplaceAll(line, "**", "")
+		cleanedLine = strings.ReplaceAll(cleanedLine, "*", "")
+		cleanedLine = strings.TrimSpace(cleanedLine)
+		
+		if len(cleanedLine) > 0 {
+			htmlContent.WriteString("<li>" + cleanedLine + "</li>")
+		}
+	}
+	htmlContent.WriteString("</ul>")
 
-    // 3. เรียกใช้ Gemini (ต้องแน่ใจว่า AnalyzeHealthDataWithGemini ใช้ item.Timestamp ในการสร้าง CSV แล้ว)
-    analysis, err := AnalyzeHealthDataWithGemini(ctx, user.ID, healthData)
-    if err != nil {
-         log.Printf("Error analyzing data for user %d: %v\n", user.ID, err)
-         return
-    }
-    
-    // 4. จัดรูปแบบและส่ง Notification/Email (คัดลอก Logic ส่วนนี้จาก runWeeklyAnalysis เดิม)
-    var htmlContent strings.Builder
-    htmlContent.WriteString(fmt.Sprintf("<p>สวัสดีครับ/ค่ะ คุณ %s,</p>", user.FirstName))
-    htmlContent.WriteString("<p>นี่คือสรุปข้อมูลสุขภาพรายสัปดาห์ของคุณจาก Gemini:</p>")
-    htmlContent.WriteString("<ul>")
+	// 5.1 สร้าง entity.Notification
+	notif := entity.Notification{
+		Timestamp:time.Now(),
+		Title: fmt.Sprintf("สรุปสุขภาพรายสัปดาห์ (%s - %s)", 
+			analysisRangeStart.Format("01/02"), 
+			analysisRangeEnd.Format("01/02")),
+		Message: analysis, // Message ยังคงเก็บข้อความต้นฉบับที่มี \n และ ** เพื่อให้ Frontend จัดการได้
+		UserID: user.ID,
+		NotificationStatusID: 2,
+	}
+	if err := config.DB().Create(&notif).Error; err != nil {
+		log.Printf("Failed to save weekly summary notification for user %d: %v", user.ID, err)
+	}
 
-    lines := strings.Split(analysis, "\n")
-    for _, line := range lines {
-        trimmedLine := strings.TrimSpace(line)
-        if len(trimmedLine) > 0 {
-            htmlContent.WriteString("<li>" + trimmedLine + "</li>")
-        }
-    }
-    htmlContent.WriteString("</ul>")
-
-    // สร้าง entity.Notification
-    notif := entity.Notification{
-        Timestamp:time.Now(),
-        Title: "สรุปข้อมูลสุขภาพรายสัปดาห์",
-        Message: analysis,
-        UserID:  user.ID,
-        NotificationStatusID: 2,
-    }
-    if err := config.DB().Create(&notif).Error; err != nil {
-        log.Printf("Failed to save weekly summary notification for user %d: %v", user.ID, err)
-    }
-
-    // ส่งอีเมลด้วยเนื้อหา HTML
-    emailBody := htmlContent.String()
-    if err := gmail.SendEmail(user.Email, "Weekly Health Summary Update", emailBody, "text/html"); err != nil {
-        log.Printf("Failed to send email to user %d: %v", user.ID, err)
-    }
-    
-    log.Printf("Completed analysis and notification for user ID: %d\n", user.ID)
+	// 5.2 ส่งอีเมลด้วยเนื้อหา HTML
+	emailBody := htmlContent.String()
+	if err := gmail.SendEmail(user.Email, "Weekly Health Summary Update", emailBody); err != nil {
+		log.Printf("Failed to send email to user %d: %v", user.ID, err)
+	}
+	
+	log.Printf("Completed analysis and notification for user ID: %d\n", user.ID)
 }

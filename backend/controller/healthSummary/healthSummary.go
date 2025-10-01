@@ -8,7 +8,6 @@ import (
 	"time"
 
 	appConfig "github.com/JanisataMJ/WebApp/config"
-	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/entity"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -76,7 +75,7 @@ func StartOfWeek(t time.Time) time.Time {
 	}
 	// ลบวันเพื่อให้ถึงวันจันทร์
 	daysToSubtract := weekday - int(time.Monday)
-	
+
 	// Truncate เพื่อให้เป็น 00:00:00 UTC
 	return t.AddDate(0, 0, -daysToSubtract).Truncate(24 * time.Hour)
 }
@@ -89,7 +88,6 @@ func StartOfWeek(t time.Time) time.Time {
 func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) (HealthSummaryResponse, error) {
 	var healthDatas []entity.HealthData
 
-	// 💡 ค้นหาตาม UserID และช่วงเวลา (UTC)
 	if err := db.Where("user_id = ? AND timestamp BETWEEN ? AND ?", userID, startDate, endDate).
 		Find(&healthDatas).Error; err != nil {
 		return HealthSummaryResponse{}, fmt.Errorf("failed to fetch health data: %w", err)
@@ -99,43 +97,80 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 		return HealthSummaryResponse{}, fmt.Errorf("no health data found for summary period")
 	}
 
-	var totalSleep, totalBpm, totalCalories, totalSpo2 float64
-	var totalSteps int64
-	var minBpm, maxBpm uint = 300, 0 
+	type dailyAgg struct {
+		latestSteps   int64
+		totalBpm      float64
+		totalSleep    float64
+		totalCalories float64
+		totalSpo2     float64
+		countBpm      int
+		latestTime    time.Time
+	}
 
-	for i, hd := range healthDatas {
-		// การคำนวณ MinBpm, MaxBpm ต้องตรวจสอบเฉพาะค่าที่มีความหมาย (Bpm > 0)
+	dailyMap := make(map[string]*dailyAgg)
+
+	for _, hd := range healthDatas {
+		dateStr := hd.Timestamp.Format("2006-01-02")
+		if _, exists := dailyMap[dateStr]; !exists {
+			dailyMap[dateStr] = &dailyAgg{}
+		}
+
+		agg := dailyMap[dateStr]
+
+		// Steps: เลือกค่า timestamp ล่าสุดของวัน
+		if hd.Timestamp.After(agg.latestTime) {
+			agg.latestSteps = hd.Steps
+			agg.latestTime = hd.Timestamp
+		}
+
+		// คำนวณค่าอื่น ๆ
 		if hd.Bpm > 0 {
-			if i == 0 || hd.Bpm < minBpm {
-				minBpm = hd.Bpm
+			agg.totalBpm += float64(hd.Bpm)
+			agg.countBpm++
+		}
+
+		agg.totalSleep += ParseSleepHours(hd.SleepHours)
+		agg.totalCalories += hd.CaloriesBurned
+		agg.totalSpo2 += hd.Spo2
+	}
+
+	var sumBpm, sumSleep, sumCalories, sumSpo2 float64
+	var totalSteps int64
+	var minBpm, maxBpm uint = 300, 0
+
+	for _, agg := range dailyMap {
+		if agg.countBpm > 0 {
+			dailyAvgBpm := agg.totalBpm / float64(agg.countBpm)
+			sumBpm += dailyAvgBpm
+
+			if minBpm > 0 && uint(dailyAvgBpm) < minBpm {
+				minBpm = uint(dailyAvgBpm)
 			}
-			if hd.Bpm > maxBpm {
-				maxBpm = hd.Bpm
+			if uint(dailyAvgBpm) > maxBpm {
+				maxBpm = uint(dailyAvgBpm)
 			}
 		}
 
-		totalSleep += ParseSleepHours(hd.SleepHours)
-		totalBpm += float64(hd.Bpm)
-		totalSteps += hd.Steps
-		totalCalories += hd.CaloriesBurned
-		totalSpo2 += hd.Spo2
+		sumSleep += agg.totalSleep / float64(agg.countBpm)
+		sumCalories += agg.totalCalories / float64(agg.countBpm)
+		sumSpo2 += agg.totalSpo2 / float64(agg.countBpm)
+
+		// Steps: ผลรวมของทั้งสัปดาห์
+		totalSteps += agg.latestSteps
 	}
 
-	count := float64(len(healthDatas))
-	avgSleep := totalSleep / count
-	avgBpm := totalBpm / count
-	avgSteps := float64(totalSteps) / count
-	avgCalories := totalCalories / count
-	avgSpo2 := totalSpo2 / count
+	dayCount := float64(len(dailyMap))
+	avgBpm := sumBpm / dayCount
+	avgSleep := sumSleep / dayCount
+	avgCalories := sumCalories / dayCount
+	avgSpo2 := sumSpo2 / dayCount
 
 	_, weekNum := startDate.ISOWeek()
 
-	// ดึง RiskLevel ล่าสุด (ใช้ในการแสดงผล API)
 	var healthSummary entity.HealthSummary
 	riskLevelStr := "ไม่ระบุ"
-	// Query หา Summary ล่าสุด
 	if err := db.Preload("RiskLevel").
-		Where("user_id = ? AND period_start <= ?", userID, endDate). 
+		Where("user_id = ? AND period_start <= ?", userID, endDate).
 		Order("period_start DESC").
 		First(&healthSummary).Error; err == nil && healthSummary.RiskLevel.Rlevel != "" {
 		riskLevelStr = healthSummary.RiskLevel.Rlevel
@@ -148,7 +183,7 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 		MinBpm:      minBpm,
 		MaxBpm:      maxBpm,
 		TotalSteps:  totalSteps,
-		AvgSteps:    avgSteps,
+		AvgSteps:    0,
 		AvgSleep:    avgSleep,
 		AvgCalories: avgCalories,
 		AvgSpo2:     avgSpo2,
@@ -168,9 +203,9 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 func CreateWeeklySummaries(db *gorm.DB, userID string) {
 	// 1. กำหนดช่วงเวลาที่ต้องการสร้าง Summary (สัปดาห์ที่แล้ว)
 	today := time.Now().In(time.UTC) // 💡 ใช้ UTC เป็นหลัก
-	
+
 	// StartOfThisWeek คือวันจันทร์ 00:00:00 UTC ของสัปดาห์ปัจจุบัน
-	startOfThisWeek := StartOfWeek(today) 
+	startOfThisWeek := StartOfWeek(today)
 
 	// StartOfLastWeek คือวันจันทร์ 00:00:00 UTC ของสัปดาห์ที่แล้ว
 	startOfLastWeek := startOfThisWeek.AddDate(0, 0, -7)
@@ -211,14 +246,14 @@ func CreateWeeklySummaries(db *gorm.DB, userID string) {
 		MinBpm:      summaryData.MinBpm,
 		MaxBpm:      summaryData.MaxBpm,
 		AvgSteps:    summaryData.AvgSteps,
-		TotalSteps:  int(summaryData.TotalSteps), 
+		TotalSteps:  int(summaryData.TotalSteps),
 		AvgSleep:    summaryData.AvgSleep,
 		AvgCalories: summaryData.AvgCalories,
 		AvgSpo2:     summaryData.AvgSpo2,
 		WeekNumber:  summaryData.WeekNumber,
 		UserID:      uint(userIDUint),
-		RiskLevelID: lNormal.ID, 
-		TrendsID:    1, 		
+		RiskLevelID: lNormal.ID,
+		TrendsID:    1,
 	}
 
 	// 5. บันทึก/อัปเดต HealthSummary (Upsert Logic)
@@ -230,7 +265,7 @@ func CreateWeeklySummaries(db *gorm.DB, userID string) {
 		if createErr := db.Create(&summaryEntity).Error; createErr != nil {
 			fmt.Printf("GORM ERROR on CREATE Summary: %v\n", createErr)
 		} else {
-			fmt.Println("SUCCESS: New HealthSummary record created.") 
+			fmt.Println("SUCCESS: New HealthSummary record created.")
 		}
 	} else {
 		if result.Error != nil {
@@ -241,7 +276,7 @@ func CreateWeeklySummaries(db *gorm.DB, userID string) {
 		if updateErr := db.Model(&existingSummary).Updates(summaryEntity).Error; updateErr != nil {
 			fmt.Printf("GORM ERROR on UPDATE Summary: %v\n", updateErr)
 		} else {
-			fmt.Println("SUCCESS: Existing HealthSummary record updated.") 
+			fmt.Println("SUCCESS: Existing HealthSummary record updated.")
 		}
 	}
 }
@@ -300,91 +335,84 @@ type DailyData struct {
 	AvgSpo2    float64 `json:"avg_spo2"`
 }
 
+// ดึงข้อมูลไปแสดง
 func GetWeeklySummary(c *gin.Context) {
 	userID := c.Param("id")
 	mode := c.DefaultQuery("mode", "weekly") // weekly | lastweek | last2weeks
 
 	db := c.MustGet("db").(*gorm.DB)
 
-	var internalData []healthData.DailyData
-	var err error
+	var summaries []entity.HealthSummary
+
+	now := time.Now().UTC()
+	startOfThisWeek := StartOfWeek(now) // วันจันทร์ของสัปดาห์นี้
+	var startDate time.Time
 
 	switch mode {
-	case "weekly":
-		internalData, err = healthData.GetWeeklyHealthDataInternal(db, userID, "weekly")
-	case "lastweek":
-		internalData, err = healthData.GetWeeklyHealthDataInternal(db, userID, "lastweek")
-	case "last2weeks":
-		internalData, err = healthData.GetWeeklyHealthDataInternal(db, userID, "last2weeks")
+	case "weekly": // สัปดาห์นี้
+		startDate = startOfThisWeek
+	case "lastweek": // สัปดาห์ที่แล้ว
+		startDate = startOfThisWeek.AddDate(0, 0, -7)
+	case "last2weeks": // สัปดาห์ก่อนสัปดาห์ที่แล้ว
+		startDate = startOfThisWeek.AddDate(0, 0, -14) // วันจันทร์ 2 สัปดาห์ก่อน
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid mode"})
 		return
 	}
 
-	if err != nil {
+	// ดึง HealthSummary จาก DB
+	if err := db.Preload("RiskLevel").
+		Where("user_id = ? AND period_start = ?", userID, startDate). // เลือกสัปดาห์ตรง ๆ
+		Order("period_start ASC").
+		Find(&summaries).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// แปลง type
-	dailyData := make([]DailyData, len(internalData))
-	for i, d := range internalData {
-		dailyData[i] = DailyData{
-			Date:       d.Date,
-			AvgBpm:     d.AvgBpm,
-			Steps:      d.Steps,
-			SleepHours: d.SleepHours,
-			Calories:   d.Calories,
-			AvgSpo2:    d.AvgSpo2,
-		}
-	}
-
-	if len(dailyData) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No health data found"})
+	if len(summaries) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message":      "ไม่มีข้อมูลสรุปสำหรับ " + mode,
+			"avg_bpm":      nil,
+			"avg_spo2":     nil,
+			"total_steps":  nil,
+			"avg_calories": nil,
+			"avg_sleep":    nil,
+			"weeks":        []map[string]interface{}{},
+		})
 		return
 	}
 
-	// คำนวณ summary เหมือนเดิม
-	var sumBpm, sumSpo2, sumCalories float64
-	var sumSteps int64
-	var totalSleepMinutes int64
-	var sleepCount int64
+	// รวมค่า (จริง ๆ จะมีแค่ 1 สัปดาห์สำหรับ last2weeks)
+	var sumBpm, sumSpo2, sumCalories, sumSleep float64
+	var totalSteps int64
+	weekData := make([]map[string]interface{}, 0, len(summaries))
 
-	for _, d := range dailyData {
-		sumBpm += d.AvgBpm
-		sumSpo2 += d.AvgSpo2
-		sumCalories += d.Calories
-		sumSteps += d.Steps
+	for _, s := range summaries {
+		sumBpm += s.AvgBpm
+		sumSpo2 += s.AvgSpo2
+		sumCalories += s.AvgCalories
+		sumSleep += s.AvgSleep
+		totalSteps += int64(s.TotalSteps)
 
-		if d.SleepHours != "" {
-			var h, m int64
-			fmt.Sscanf(d.SleepHours, "%dh %dm", &h, &m)
-			totalSleepMinutes += h*60 + m
-			sleepCount++
-		}
+		weekData = append(weekData, map[string]interface{}{
+			"period_start": s.PeriodStart.Format("2006-01-02"),
+			"period_end":   s.PeriodEnd.Format("2006-01-02"),
+			"avg_bpm":      s.AvgBpm,
+			"avg_spo2":     s.AvgSpo2,
+			"total_steps":  s.TotalSteps,
+			"avg_calories": s.AvgCalories,
+			"avg_sleep":    s.AvgSleep,
+		})
 	}
 
-	count := float64(len(dailyData))
-	avgBpm := sumBpm / count
-	avgSpo2 := sumSpo2 / count
-	avgCalories := sumCalories / count
-
-	var avgSleep string
-	if sleepCount > 0 {
-		minutes := totalSleepMinutes / sleepCount
-		h := minutes / 60
-		m := minutes % 60
-		avgSleep = fmt.Sprintf("%dh %dm", h, m)
-	} else {
-		avgSleep = "0h 0m"
-	}
-
+	dayCount := float64(len(summaries))
 	summary := map[string]interface{}{
-		"avg_bpm":      avgBpm,
-		"avg_spo2":     avgSpo2,
-		"total_steps":  sumSteps,
-		"avg_calories": avgCalories,
-		"avg_sleep":    avgSleep,
+		"avg_bpm":      sumBpm / dayCount,
+		"avg_spo2":     sumSpo2 / dayCount,
+		"total_steps":  totalSteps,
+		"avg_calories": sumCalories / dayCount,
+		"avg_sleep":    sumSleep / dayCount,
+		"weeks":        weekData,
 	}
 
 	c.JSON(http.StatusOK, summary)
@@ -443,7 +471,7 @@ func BackfillAllWeeklySummaries(db *gorm.DB, userID string) {
 	}
 
 	// 2. กำหนดช่วงเวลาเริ่มต้นและสิ้นสุด (ใช้ UTC ทั้งหมด)
-	
+
 	// StartOfFirstWeek: วันจันทร์ 00:00:00 UTC ของสัปดาห์ที่มีข้อมูลเก่าสุด
 	startOfFirstWeek := StartOfWeek(firstRecord.Timestamp)
 

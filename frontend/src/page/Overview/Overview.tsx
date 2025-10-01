@@ -20,6 +20,7 @@ interface VitalCard {
   icon: React.ElementType;
   trend?: "up" | "down" | "same";
   change?: number;
+  noPrevDataMsg?: string;
 }
 
 const parseSleepToHours = (s?: string | number | null): number => {
@@ -84,6 +85,7 @@ const Overview = () => {
             change: previousWeek
               ? ((Number(latestWeek.avg_bpm) - Number(previousWeek.avg_bpm)) / Number(previousWeek.avg_bpm)) * 100
               : undefined,
+            noPrevDataMsg: previousWeek ? undefined : mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ที่แล้ว",
           },
           {
             label: "พลังงานที่เผาผลาญ",
@@ -93,15 +95,16 @@ const Overview = () => {
             color: "calories",
             icon: Flame,
             trend: previousWeek
-              ? Number(latestWeek.avg_calories) > Number(previousWeek.avg_calories)
+              ? Number(latestWeek.avg_bpm) > Number(previousWeek.avg_bpm)
                 ? "up"
-                : Number(latestWeek.avg_calories) < Number(previousWeek.avg_calories)
+                : Number(latestWeek.avg_bpm) < Number(previousWeek.avg_bpm)
                   ? "down"
                   : "same"
               : undefined,
             change: previousWeek
-              ? ((Number(latestWeek.avg_calories) - Number(previousWeek.avg_calories)) / Number(previousWeek.avg_calories)) * 100
+              ? ((Number(latestWeek.avg_bpm) - Number(previousWeek.avg_bpm)) / Number(previousWeek.avg_bpm)) * 100
               : undefined,
+            noPrevDataMsg: previousWeek ? undefined : mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ที่แล้ว",
           },
           {
             label: "จำนวนก้าว",
@@ -111,15 +114,16 @@ const Overview = () => {
             color: "steps",
             icon: Footprints,
             trend: previousWeek
-              ? Number(latestWeek.total_steps) > Number(previousWeek.total_steps)
+              ? Number(latestWeek.avg_bpm) > Number(previousWeek.avg_bpm)
                 ? "up"
-                : Number(latestWeek.total_steps) < Number(previousWeek.total_steps)
+                : Number(latestWeek.avg_bpm) < Number(previousWeek.avg_bpm)
                   ? "down"
                   : "same"
               : undefined,
             change: previousWeek
-              ? ((Number(latestWeek.total_steps) - Number(previousWeek.total_steps)) / Number(previousWeek.total_steps)) * 100
+              ? ((Number(latestWeek.avg_bpm) - Number(previousWeek.avg_bpm)) / Number(previousWeek.avg_bpm)) * 100
               : undefined,
+            noPrevDataMsg: previousWeek ? undefined : mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ที่แล้ว",
           },
           {
             label: "ออกซิเจนในเลือด",
@@ -129,15 +133,16 @@ const Overview = () => {
             color: "spo2",
             icon: Activity,
             trend: previousWeek
-              ? Number(latestWeek.avg_spo2) > Number(previousWeek.avg_spo2)
+              ? Number(latestWeek.avg_bpm) > Number(previousWeek.avg_bpm)
                 ? "up"
-                : Number(latestWeek.avg_spo2) < Number(previousWeek.avg_spo2)
+                : Number(latestWeek.avg_bpm) < Number(previousWeek.avg_bpm)
                   ? "down"
                   : "same"
               : undefined,
             change: previousWeek
-              ? ((Number(latestWeek.avg_spo2) - Number(previousWeek.avg_spo2)) / Number(previousWeek.avg_spo2)) * 100
+              ? ((Number(latestWeek.avg_bpm) - Number(previousWeek.avg_bpm)) / Number(previousWeek.avg_bpm)) * 100
               : undefined,
+            noPrevDataMsg: previousWeek ? undefined : mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ที่แล้ว",
           },
           {
             label: "การนอนหลับ",
@@ -147,15 +152,16 @@ const Overview = () => {
             color: "sleep",
             icon: Moon,
             trend: previousWeek
-              ? parseSleepToHours(latestWeek.avg_sleep) > parseSleepToHours(previousWeek.avg_sleep)
+              ? Number(latestWeek.avg_bpm) > Number(previousWeek.avg_bpm)
                 ? "up"
-                : parseSleepToHours(latestWeek.avg_sleep) < parseSleepToHours(previousWeek.avg_sleep)
+                : Number(latestWeek.avg_bpm) < Number(previousWeek.avg_bpm)
                   ? "down"
                   : "same"
               : undefined,
             change: previousWeek
-              ? ((parseSleepToHours(latestWeek.avg_sleep) - parseSleepToHours(previousWeek.avg_sleep)) / parseSleepToHours(previousWeek.avg_sleep)) * 100
+              ? ((Number(latestWeek.avg_bpm) - Number(previousWeek.avg_bpm)) / Number(previousWeek.avg_bpm)) * 100
               : undefined,
+            noPrevDataMsg: previousWeek ? undefined : mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ที่แล้ว",
           },
         ];
         setVitalSigns(vitals);
@@ -255,30 +261,29 @@ const Overview = () => {
   const comparisonData = [
     {
       metric: "ค่าเฉลี่ยอัตราการเต้นหัวใจ",
-      thisWeek: summary?.avg_bpm?.toFixed(0),
-      lastWeek: prevSummary?.avg_bpm?.toFixed(0),
+      thisWeek: summary?.avg_bpm?.toFixed(0) || "-",
+      lastWeek: prevSummary?.avg_bpm?.toFixed(0) || (mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ที่แล้ว"),
     },
     {
       metric: "ค่าเฉลี่ยพลังงานที่เผาผลาญ",
-      thisWeek: summary?.avg_calories?.toFixed(0),
-      lastWeek: prevSummary?.avg_calories?.toFixed(0),
+      thisWeek: summary?.avg_calories?.toFixed(0) || "-",
+      lastWeek: prevSummary?.avg_calories?.toFixed(0) || (mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ก่อนหน้า"),
     },
     {
       metric: "จำนวนก้าวเดินทั้งหมด",
-      thisWeek: summary?.total_steps?.toFixed(0),
-      lastWeek: prevSummary?.total_steps?.toFixed(0),
+      thisWeek: summary?.total_steps?.toFixed(0) || "-",
+      lastWeek: prevSummary?.total_steps?.toFixed(0) || (mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ก่อนหน้า"),
     },
     {
       metric: "ค่าเฉลี่ยออกซิเจนในเลือด",
-      thisWeek: summary?.avg_spo2?.toFixed(0),
-      lastWeek: prevSummary?.avg_spo2?.toFixed(0),
+      thisWeek: summary?.avg_spo2?.toFixed(0) || "-",
+      lastWeek: prevSummary?.avg_spo2?.toFixed(0) || (mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ก่อนหน้า"),
     },
     {
       metric: "ค่าเฉลี่ยจำนวนการนอน",
-      thisWeek: parseSleepToHours(summary?.avg_sleep)?.toFixed(1),
-      lastWeek: parseSleepToHours(prevSummary?.avg_sleep)?.toFixed(1),
+      thisWeek: parseSleepToHours(summary?.avg_sleep)?.toFixed(1) || "-",
+      lastWeek: parseSleepToHours(prevSummary?.avg_sleep)?.toFixed(1) || (mode === "weekly" ? "ไม่มีข้อมูลสัปดาห์ที่แล้ว" : "ไม่มีข้อมูล2สัปดาห์ก่อนหน้า"),
     }
-
   ];
 
   const comparisonTitleMap: Record<typeof mode, string> = {
@@ -372,15 +377,19 @@ const Overview = () => {
                   <div className={`vital-icon ${v.color}`}>
                     <v.icon className="icon" />
                   </div>
-                  {v.trend && (
-                    <span className={`trend ${v.trend}`}>
-                      {v.trend === "up" && <TrendingUp color="green" />}
-                      {v.trend === "down" && <TrendingDown color="red" />}
-                      {v.trend === "same" && <ArrowRightLeft color="gray" />}
-                      <span className="trend-change">
-                        {v.change ? `${v.change.toFixed(1)}%` : ""}
+                  {v.noPrevDataMsg ? (
+                    <span className="no-prev-data">{v.noPrevDataMsg}</span>
+                  ) : (
+                    v.trend && (
+                      <span className={`trend ${v.trend}`}>
+                        {v.trend === "up" && <TrendingUp color="green" />}
+                        {v.trend === "down" && <TrendingDown color="red" />}
+                        {v.trend === "same" && <ArrowRightLeft color="gray" />}
+                        <span className="trend-change">
+                          {v.change ? `${v.change.toFixed(1)}%` : ""}
+                        </span>
                       </span>
-                    </span>
+                    )
                   )}
                 </div>
                 <h3 className="vital-label">{v.label}</h3>

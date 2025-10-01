@@ -54,7 +54,7 @@ func main() {
 	config.SetupDatabase()
 
 	//seed.SeedHealthData(gormDB)
-	seed.SeedHealthDataTwoWeeks(gormDB)
+	seed.SeedHealthDataThreeWeeks(gormDB)
 
 	sqlDB, err := gormDB.DB()
 	if err != nil {

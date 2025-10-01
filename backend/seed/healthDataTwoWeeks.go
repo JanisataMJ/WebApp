@@ -1,3 +1,5 @@
+// three weeks
+
 package seed
 
 import (
@@ -13,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SeedHealthDataTwoWeeks(db *gorm.DB) {
+func SeedHealthDataThreeWeeks(db *gorm.DB) {
 	// ---------------------------
 	// 1️⃣ สร้าง RiskLevel
 	// ---------------------------
@@ -26,11 +28,10 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	for i, level := range Rlevels {
 		db.FirstOrCreate(&Rlevels[i], entity.RiskLevel{Rlevel: level.Rlevel})
 	}
-
 	lNormal = Rlevels[1]
 
 	// ---------------------------
-	// 2️⃣ ดึง User ที่มีอยู่แล้ว (สร้างจาก dc.go) โดยใช้ Email หรือ ID
+	// 2️⃣ ดึง User
 	// ---------------------------
 	var user entity.User
 	if err := db.Where("email = ?", "usercpe21@gmail.com").First(&user).Error; err != nil {
@@ -41,18 +42,17 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	now := time.Now().Truncate(24 * time.Hour)
 
 	// ---------------------------
-	// 3️⃣ สร้าง HealthData + HealthAnalysis ย้อนหลัง 2 สัปดาห์
+	// 3️⃣ สร้าง HealthData ย้อนหลัง 3 สัปดาห์
 	// ---------------------------
-	today := time.Now() // เก็บวันที่และเวลาปัจจุบัน
+	today := time.Now()
 	startOfDay := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, today.Location())
 
-	for daysAgo := 13; daysAgo >= 0; daysAgo-- {
+	for daysAgo := 20; daysAgo >= 0; daysAgo-- { // 🔥 เปลี่ยนจาก 13 → 20 (3 สัปดาห์ = 21 วัน)
 		day := startOfDay.AddDate(0, 0, -daysAgo)
 
 		sleepDuration := 6 + rand.Float64()*3
 		hours := int(sleepDuration)
 		minutes := int((sleepDuration - float64(hours)) * 60)
-
 		sleepString := fmt.Sprintf("%dh %dm", hours, minutes)
 
 		maxHour := 23
@@ -67,7 +67,6 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 		cumulativeCalories := 0.0
 
 		for hour := 0; hour <= maxHour; hour++ {
-
 			stepsThisHour := int64(rand.Intn(200) + 50)
 			cumulativeSteps += stepsThisHour
 
@@ -94,11 +93,11 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 	}
 
 	// ---------------------------
-	// 4️⃣ สร้าง HealthSummary รายสัปดาห์ 2 สัปดาห์
+	// 4️⃣ สร้าง HealthSummary รายสัปดาห์ 3 สัปดาห์
 	// ---------------------------
-	for week := 0; week < 2; week++ {
-		start := now.AddDate(0, 0, -(13 - week*7))
-		end := start.AddDate(0, 0, 6).Add(23*time.Hour + 59*time.Minute + 59*time.Second) // สิ้นสุดวันอาทิตย์
+	for week := 0; week < 3; week++ { // 🔥 เปลี่ยนจาก 2 → 3
+		start := now.AddDate(0, 0, -(20 - week*7))
+		end := start.AddDate(0, 0, 6).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 
 		_, currentWeekNum := now.ISOWeek()
 
@@ -131,19 +130,7 @@ func SeedHealthDataTwoWeeks(db *gorm.DB) {
 			RiskLevelID: lNormal.ID,
 		}
 		db.Create(&summary)
-
-		/* // Seed Notification สำหรับ summary
-		notif := entity.Notification{
-			Timestamp:            time.Now(),
-			Title:                fmt.Sprintf("Weekly Health Summary Week %d", summary.WeekNumber),
-			Message:              "ตัวอย่างข้อความสรุปสุขภาพ",
-			UserID:               user.ID,
-			HealthSummaryID:      &summary.ID,
-			HealthTypeID:         1,
-			NotificationStatusID: 2,
-		}
-		db.Create(&notif) */
 	}
 
-	log.Println("Seed data for 2 weeks created successfully!")
+	log.Println("Seed data for 3 weeks created successfully!")
 }

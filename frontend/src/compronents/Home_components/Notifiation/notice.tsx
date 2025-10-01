@@ -39,7 +39,6 @@ const Notice: React.FC = () => {
             UserID: n.UserID,
             HealthTypeID: n.HealthTypeID,
             NotificationStatusID: n.NotificationStatusID,
-            HealthType: n.HealthType || { ID: 0, Type: 'ไม่ระบุ' },
             NotificationStatus: n.NotificationStatus || { ID: n.NotificationStatusID, Status: 'ไม่ทราบสถานะ' },
           }))
           .sort((a, b) => new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime());
@@ -85,7 +84,6 @@ const Notice: React.FC = () => {
         const safeUpdated = {
           ...updatedNoti,
           NotificationStatus: updatedNoti.NotificationStatus || { ID: 1, Status: 'อ่านแล้ว' },
-          HealthType: updatedNoti.HealthType || { ID: 0, Type: 'ไม่ระบุ' },
         };
 
         setNotifications((prev) =>
@@ -193,7 +191,7 @@ const Notice: React.FC = () => {
 
                       {expanded === index && (
                         <div className="detail-container">
-                          <p className="detail-noti">{item.Message}</p>
+                          <p className="detail-noti">{item.Message.replace(/\*\*/g, '')}</p>
                         </div>
                       )}
                     </div>

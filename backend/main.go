@@ -2,12 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
-	"fmt"
-	"time"
 	"strconv"
 
 	"github.com/JanisataMJ/WebApp/config"
@@ -30,6 +27,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
+
 )
 
 const PORT = "8000"
@@ -39,15 +37,6 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-}
-
-// SSE clients map per user
-var sseClients = make(map[uint][]chan entity.Notification)
-
-// Helper: convert notification to JSON
-func notifToJSON(n entity.Notification) string {
-	b, _ := json.Marshal(n)
-	return string(b)
 }
 
 func main() {
@@ -81,7 +70,7 @@ func main() {
 	// 🚩 ImportSheetData ถูกสร้างขึ้นเพื่อแทนที่ ImportHealthData เดิม
 	log.Println("▶️ Starting initial data import for HealthData_Daily...")
 	healthData.ImportSheetData(sqlDB, "HealthData_Daily")
-	
+
 	log.Println("▶️ Starting initial data import for HealthData_LatestAll...")
 	healthData.ImportSheetData(sqlDB, "HealthData_LatestAll")
 	// ----------------------------------------------------
@@ -89,50 +78,52 @@ func main() {
 	log.Println("▶️ Starting initial Health Analysis...")
 	healthAnalysis.AnalyzeHealthData(gormDB) // 💡 เรียกใช้ Analysis หลัง Import
 	log.Println("✅ Initial Health Analysis completed.")
-	
+
 	// ----------------------------------------------------
 	// 🚩 การเรียกใช้ Backfill Summary
 	// ----------------------------------------------------
 	log.Println("▶️ Starting FULL BACKFILL Summary Job...")
-	healthSummary.RunSummaryJob(gormDB, true) 
+	healthSummary.RunSummaryJob(gormDB, true)
 	log.Println("✅ FULL BACKFILL Summary Job completed.")
 	// ----------------------------------------------------
 
 	// Start data import job (จะเรียกใช้ ImportSheetData สองครั้งซ้ำๆ)
 	// 💡 ต้องแน่ใจว่า healthData.StartDataImportJob ถูกแก้ไขให้เรียก ImportSheetData()
-	go healthData.StartDataImportJob(sqlDB) 
+	go healthData.StartDataImportJob(sqlDB)
 
 	// Gin framework setup
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 	r.Use(middlewares.DBMiddleware(config.DB()))
 
-	healthController := notification.HealthAlertController{DB: config.DB()}
-
 	// Define routes...
-	r.POST("/signup", user.SignUp)
-	r.POST("/signin", user.SignIn)
-	r.POST("/create-admin", user.CreateAdmin)
+	r.POST("/signup", user.SignUp)            // ใช้ Alias 'user'
+	r.POST("/signin", user.SignIn)            // ใช้ Alias 'user'
+	r.POST("/create-admin", user.CreateAdmin) // ใช้ Alias 'user'
 
 	router := r.Group("/")
 	{
 		router.Use(middlewares.Authorizes())
 		r.Static("/uploads", "./uploads")
-		router.PUT("/user/:id", user.Update) // ใช้ Alias 'user'
-		router.GET("/users", user.GetAll) 	// ใช้ Alias 'user'
-		router.GET("/user/:id", user.Get) 	// ใช้ Alias 'user'
+		router.PUT("/user/:id", user.Update)    // ใช้ Alias 'user'
+		router.GET("/users", user.GetAll)       // ใช้ Alias 'user'
+		router.GET("/user/:id", user.Get)       // ใช้ Alias 'user'
 		router.DELETE("/user/:id", user.Delete) // ใช้ Alias 'user'
 		router.POST("/create-notification/:id", notification.CreateNotification)
 		router.GET("/notification/:id", notification.GetNotificationsByUserID)
 		router.PATCH("/notification/:id/status", notification.UpdateNotificationStatusByID)
-		router.GET("/send-weekly-summary/:userID", func(c *gin.Context) {
-			id, _ := strconv.Atoi(c.Param("userID"))
-			go gmail.SendWeeklySummary(config.DB(), uint(id))
-			c.JSON(200, gin.H{"message": "Weekly summary email process started", "userID": id})
+		router.GET("/run-weekly-analysis/:userID", func(c *gin.Context) { // เปลี่ยนชื่อ Endpoint ให้สื่อความหมาย
+			id, err := strconv.ParseUint(c.Param("userID"), 10, 32)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+				return
+			}
+			go func() {
+				// รันการวิเคราะห์รายสัปดาห์ด้วย Logic ใหม่
+				healthAnalysis.RunWeeklyAnalysisForSingleUser(context.Background(), uint(id))
+			}()
+			c.JSON(200, gin.H{"message": "Weekly analysis process started", "userID": id})
 		})
-
-		router.GET("/health/check/:userID", healthController.CheckHealth)
-
 		router.POST("/check-realtime-alert", gmail.SendRealtimeAlert)
 		router.POST("/create-article/:id", article.CreateArticle)
 		router.GET("/list-article", article.ListArticles)
@@ -148,6 +139,7 @@ func main() {
 		router.GET("/healthAnalysis/:id", healthAnalysis.GetHealthAnalysis)
 		router.GET("/sleep-analysis/:id", healthAnalysis.GetSleepAnalysisByUser)
 		router.POST("/analyze-with-gemini/:userID", healthAnalysis.AnalyzeWithGeminiHandler)
+		router.POST("/health-data", healthAnalysis.SaveHealthDataHandler)
 		router.GET("/list-healthData", healthData.ListHealthData)
 		router.GET("/healthData/:id", healthData.GetHealthDataByUserID)
 		router.GET("/healthData/weekly/:id", healthData.GetWeeklyHealthData)
@@ -158,47 +150,7 @@ func main() {
 		router.GET("/daily-sleep", healthData.GetDailySleep)
 		router.POST("/create-smartwatch/:id", smartwatchDevice.CreateSmartwatchDevice)
 		router.GET("/smartwatch/:id", smartwatchDevice.GetSmartwatchDevice)
-		router.GET("/admin-counts", adminCount.GetAdminCounts)
-
-		router.GET("/notification/sse/:userID", func(c *gin.Context) {
-			userIDStr := c.Param("userID")
-			userID, err := strconv.Atoi(userIDStr)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
-				return
-			}
-
-			c.Writer.Header().Set("Content-Type", "text/event-stream")
-			c.Writer.Header().Set("Cache-Control", "no-cache")
-			c.Writer.Header().Set("Connection", "keep-alive")
-
-			messageChan := make(chan entity.Notification)
-			sseClients[uint(userID)] = append(sseClients[uint(userID)], messageChan)
-
-			notify := c.Writer.CloseNotify()
-			go func() {
-				<-notify
-				clients := sseClients[uint(userID)]
-				for i, ch := range clients {
-					if ch == messageChan {
-						sseClients[uint(userID)] = append(clients[:i], clients[i+1:]...)
-						break
-					}
-				}
-			}()
-
-			for {
-				select {
-				case notif := <-messageChan:
-					fmt.Fprintf(c.Writer, "data: %s\n\n", notifToJSON(notif))
-					c.Writer.Flush()
-				case <-time.After(time.Minute * 5):
-					// Ping to keep connection alive
-					fmt.Fprintf(c.Writer, ": ping\n\n")
-					c.Writer.Flush()
-				}
-			}
-		})
+		router.GET("/admin-counts", adminCount.GetAdminCounts) // ใช้ Alias 'adminCount'
 	}
 
 	r.GET("/genders", gender.GetAll) // ใช้ Alias 'gender'
@@ -206,8 +158,28 @@ func main() {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
-	// หลังจาก validate password และ generate token แล้ว
-	//go healthAnalysis.CheckForCriticalAlerts(context.Background(), dbUser.ID)
+	 // 🚩 [แก้ไข] เริ่มต้น Real-time Health Monitoring สำหรับผู้ใช้ทั้งหมด
+    log.Println("▶️ Starting Realtime Health Monitoring Job...")
+    
+    var usersToMonitor []entity.User
+    // ดึงผู้ใช้ทั้งหมดที่ต้องการให้ตรวจสอบ (อาจจะกรองด้วย RoleID หรือเงื่อนไขอื่น ๆ ได้)
+    if err := gormDB.Find(&usersToMonitor).Error; err != nil {
+        log.Fatalf("Failed to fetch users for monitoring: %v", err)
+    }
+
+    // กำหนดรอบเวลาตรวจสอบ (เช่น ทุก 60 วินาที)
+    const monitorIntervalSeconds = 60 
+    
+    for _, user := range usersToMonitor {
+        log.Printf("Starting monitoring goroutine for User ID: %d, Interval: %d seconds\n", user.ID, monitorIntervalSeconds)
+        // เริ่ม Goroutine สำหรับผู้ใช้แต่ละคน
+        go healthAnalysis.StartUserRealtimeAlertMonitoring(user.ID, monitorIntervalSeconds)
+    }
+    log.Println("✅ Realtime Health Monitoring started.")
+
+    // ---------------------------------------------------------------------------------------
+
+	//go healthAnalysis.CheckForCriticalAlerts(context.Background())
 	go healthAnalysis.WeeklyAnalysisJob(context.Background())
 	r.Run("localhost:" + PORT)
 }

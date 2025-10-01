@@ -147,14 +147,14 @@ const Overview = () => {
             color: "sleep",
             icon: Moon,
             trend: previousWeek
-              ? Number(latestWeek.avg_sleep) > Number(previousWeek.avg_sleep)
+              ? parseSleepToHours(latestWeek.avg_sleep) > parseSleepToHours(previousWeek.avg_sleep)
                 ? "up"
-                : Number(latestWeek.avg_sleep) < Number(previousWeek.avg_sleep)
+                : parseSleepToHours(latestWeek.avg_sleep) < parseSleepToHours(previousWeek.avg_sleep)
                   ? "down"
                   : "same"
               : undefined,
             change: previousWeek
-              ? ((Number(latestWeek.avg_sleep) - Number(previousWeek.avg_sleep)) / Number(previousWeek.avg_sleep)) * 100
+              ? ((parseSleepToHours(latestWeek.avg_sleep) - parseSleepToHours(previousWeek.avg_sleep)) / parseSleepToHours(previousWeek.avg_sleep)) * 100
               : undefined,
           },
         ];

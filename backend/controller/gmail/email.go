@@ -1,21 +1,88 @@
 package gmail
 
 import (
-    "fmt"
-    "log"
-    "net/http"
-    "os"
-    "strconv"
-    "time"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 
-    "github.com/gin-gonic/gin"
-    "gopkg.in/gomail.v2"
-    "gorm.io/gorm"
+	"github.com/gin-gonic/gin"
+	"gopkg.in/gomail.v2"
+	"gorm.io/gorm"
 
-    "github.com/JanisataMJ/WebApp/config"
-    "github.com/JanisataMJ/WebApp/entity"
+	"github.com/JanisataMJ/WebApp/config"
+	"github.com/JanisataMJ/WebApp/entity"
 )
 
+// ... (SendEmail และ SendImmediateAlertBackground ฟังก์ชันอื่น ๆ ยังคงอยู่) ...
+
+// ✅ [เพิ่ม] ฟังก์ชันใหม่สำหรับใช้ใน Goroutine Background
+func SendImmediateAlertBackground(db *gorm.DB, user entity.User, healthTypeID uint, message string) {
+    // ... (โค้ดสำหรับสร้าง Notification และส่ง Email) ...
+    notification := entity.Notification{
+        Timestamp:time.Now(),
+        Title:"🚨 แจ้งเตือนสุขภาพผิดปกติ",
+        Message: message,
+        UserID: user.ID,
+        HealthTypeID:2,
+        NotificationStatusID: 2,
+    }
+
+    if err := db.Create(&notification).Error; err != nil {
+        log.Printf("❌ Failed to save notification in background: %v\n", err)
+        return
+    }
+
+    err := SendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
+    if err != nil {
+        log.Println("❌ ส่ง Email ไม่สำเร็จ:", err)
+    }
+}
+
+
+// POST /check-realtime-alert
+// 🚩 [ปรับปรุง] ทำหน้าที่รับข้อมูล, บันทึก DB, และตอบกลับอย่างรวดเร็ว
+// การตรวจสอบ Alert จะถูกจัดการโดย Goroutine ชื่อ StartUserRealtimeAlertMonitoring
+func SendRealtimeAlert(c *gin.Context) {
+    type HealthInput struct {
+        UserID uint    `json:"userID"`
+        Bpm    int     `json:"bpm"`
+        Spo2   float64 `json:"spo2"`
+        // หากมีข้อมูลอื่นที่ต้องการบันทึกเพิ่ม ให้เพิ่มที่นี่
+    }
+
+    var input HealthInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input format: " + err.Error()})
+        return
+    }
+
+    // 🚩 [สำคัญ] Logic การบันทึกข้อมูลที่รับมาลงในตาราง HealthData
+    healthData := entity.HealthData{
+        UserID:  input.UserID,
+        Timestamp: time.Now(),
+        Bpm:    uint(input.Bpm),
+        Spo2:    input.Spo2,
+        // เพิ่มฟิลด์อื่น ๆ เช่น DeviceID, Temperature ถ้ามี
+    }
+
+    db := config.DB()
+    if err := db.Create(&healthData).Error; err != nil {
+        log.Printf("❌ Failed to save real-time health data: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save health data"})
+        return
+    }
+    
+    // 💡 ไม่ต้องมีการตรวจสอบ Alert ตรงนี้แล้ว
+    // เพราะ StartUserRealtimeAlertMonitoring จะทำงานใน Background
+    // โดยการดึงข้อมูลล่าสุด (รวมถึงข้อมูลที่เพิ่งบันทึกนี้) มาตรวจสอบเอง
+    
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Health data received and saved. Realtime monitoring is active and will check for alerts shortly.",
+    })
+}
 
 func SendEmail(to string, subject string, body string, attachments ...string) error {
     from := os.Getenv("EMAIL_USER")
@@ -24,6 +91,7 @@ func SendEmail(to string, subject string, body string, attachments ...string) er
     smtpPort := os.Getenv("SMTP_PORT")
 
     if from == "" || pass == "" || smtpHost == "" || smtpPort == "" {
+        // NOTE: Make sure the os package is imported!
         return fmt.Errorf("missing email environment variables")
     }
 
@@ -32,6 +100,7 @@ func SendEmail(to string, subject string, body string, attachments ...string) er
         return fmt.Errorf("invalid SMTP_PORT: %v", err)
     }
 
+    // NOTE: Make sure the gopkg.in/gomail.v2 package is imported!
     m := gomail.NewMessage()
     m.SetHeader("From", from)
     m.SetHeader("To", to)
@@ -39,10 +108,11 @@ func SendEmail(to string, subject string, body string, attachments ...string) er
     m.SetBody("text/html", body) 
 
     for _, file := range attachments {
+        // NOTE: Make sure the os package is imported!
         if _, err := os.Stat(file); err == nil {
             m.Attach(file)
         } else {
-            fmt.Printf("⚠️  Attachment not found: %s\n", file)
+            fmt.Printf("⚠️ Attachment not found: %s\n", file)
         }
     }
 
@@ -55,191 +125,4 @@ func SendEmail(to string, subject string, body string, attachments ...string) er
 
     fmt.Println("✅ Email sent to:", to)
     return nil
-}
-
-// ✅ [แก้ไข] ฟังก์ชันนี้จะใช้สำหรับ API Endpoint เท่านั้น
-func SendImmediateAlert(c *gin.Context, db *gorm.DB, user entity.User, healthTypeID uint, message string) {
-	notification := entity.Notification{
-		Timestamp:          time.Now(),
-		Title:              "🚨 แจ้งเตือนสุขภาพผิดปกติ",
-		Message:            message,
-		UserID:             user.ID,
-		HealthTypeID:       healthTypeID,
-		NotificationStatusID: 2,
-	}
-
-	if err := db.Create(&notification).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// ✅ โหลดข้อมูลกลับมาเฉพาะส่วนที่จำเป็น
-	if err := db.Preload("HealthType").
-		Preload("NotificationStatus").
-		First(&notification, notification.ID).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to preload notification"})
-		return
-	}
-
-	err := SendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
-	if err != nil {
-		log.Println("❌ ส่ง Email ไม่สำเร็จ:", err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ส่งแจ้งเตือนเรียบร้อย",
-		"data":    notification,
-	})
-}
-
-// ✅ [เพิ่ม] ฟังก์ชันใหม่สำหรับใช้ใน Goroutine Background
-func SendImmediateAlertBackground(db *gorm.DB, user entity.User, healthTypeID uint, message string) {
-	notification := entity.Notification{
-		Timestamp:          time.Now(),
-		Title:              "🚨 แจ้งเตือนสุขภาพผิดปกติ",
-		Message:            message,
-		UserID:             user.ID,
-		HealthTypeID:       healthTypeID,
-		NotificationStatusID: 2,
-	}
-
-	if err := db.Create(&notification).Error; err != nil {
-		log.Printf("❌ Failed to save notification in background: %v\n", err)
-		return
-	}
-
-	err := SendEmail(user.Email, "แจ้งเตือนสุขภาพผิดปกติ", message)
-	if err != nil {
-		log.Println("❌ ส่ง Email ไม่สำเร็จ:", err)
-	}
-}
-
-// ✅ [แก้ไข] เปลี่ยนไปใช้ฟังก์ชันใหม่
-/* func SendRealtimeAlert(c *gin.Context) {
-    var data entity.HealthData
-    if err := c.ShouldBindJSON(&data); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    db := config.DB()
-
-    var user entity.User
-    if err := db.First(&user, data.UserID).Error; err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-        return
-    }
-
-    alerts := ""
-    if data.Bpm < 50 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำ: %d bpm\n", data.Bpm)
-    } else if data.Bpm > 120 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูง: %d bpm\n", data.Bpm)
-    }
-    if data.Spo2 < 90 {
-        alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำ: %.2f%%\n", data.Spo2)
-    }
-
-    if alerts != "" {
-        if user.RoleID == 2 {
-            go SendImmediateAlertBackground(db, user, 1, alerts)
-            c.JSON(http.StatusOK, gin.H{"message": "Alert detected and email is being sent in the background."})
-        } else {
-            c.JSON(http.StatusOK, gin.H{"message": "Alert detected, but not sending email because Role != User"})
-        }
-    } else {
-        c.JSON(http.StatusOK, gin.H{"message": "No critical values, no alert sent."})
-    }
-} */
- // POST /check-realtime-alert
-func SendRealtimeAlert(c *gin.Context) {
-    type HealthInput struct {
-        UserID uint    `json:"userID"`
-        Bpm    int     `json:"bpm"`
-        Spo2   float64 `json:"spo2"`
-    }
-
-    var input HealthInput
-    if err := c.ShouldBindJSON(&input); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    alerts := ""
-    if input.Bpm >= 120 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจสูงผิดปกติ: %d bpm\n", input.Bpm)
-    }
-    if input.Bpm <= 50 {
-        alerts += fmt.Sprintf("- อัตราการเต้นหัวใจต่ำผิดปกติ: %d bpm\n", input.Bpm)
-    }
-    if input.Spo2 <= 90.0 {
-        alerts += fmt.Sprintf("- ค่าออกซิเจนในเลือดต่ำผิดปกติ: %.2f%%\n", input.Spo2)
-    }
-
-    if alerts != "" {
-        var user entity.User
-        if err := config.DB().First(&user, input.UserID).Error; err != nil {
-            c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-            return
-        }
-        // ส่งอีเมลแจ้งเตือน 1 ครั้ง
-        SendImmediateAlertBackground(config.DB(), user, 1, alerts)
-        c.JSON(http.StatusOK, gin.H{"message": "Alert sent", "alerts": alerts})
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"message": "No alert"})
-}
-
-
-// แจ้งเตือนสรุปรายสัปดาห์ (เลือก UserID ได้)
-func SendWeeklySummary(db *gorm.DB, userID uint) {
-    var summary entity.HealthSummary
-
-    if err := db.Preload("User").
-        Where("user_id = ?", userID).
-        Order("period_end desc").
-        First(&summary).Error; err != nil {
-        log.Printf("error fetching latest weekly summary: %v", err)
-        return
-    }
-
-    if summary.User == nil || summary.User.RoleID != 2 {
-        return // ส่งเฉพาะ role User
-    }
-
-    summaryText := fmt.Sprintf(
-        "📊 Weekly Health Summary (Week %d)\n"+
-            "ช่วงเวลา: %s ถึง %s\n\n"+
-            "- Heart Rate: เฉลี่ย %.1f bpm (ต่ำสุด %d, สูงสุด %d)\n"+
-            "- Steps: เฉลี่ย %.1f, รวม %d ก้าว\n"+
-            "- Sleep: เฉลี่ย %.1f ชั่วโมง\n"+
-            "- Calories: เฉลี่ย %.1f kcal\n"+
-            "- SpO₂: เฉลี่ย %.1f%%\n"+
-            "- Body Temp: เฉลี่ย %.1f °C (ต่ำสุด %.1f, สูงสุด %.1f)\n",
-        summary.WeekNumber,
-        summary.PeriodStart.Format("2006-01-02"),
-        summary.PeriodEnd.Format("2006-01-02"),
-        summary.AvgBpm, summary.MinBpm, summary.MaxBpm,
-        summary.AvgSteps, summary.TotalSteps,
-        summary.AvgSleep,
-        summary.AvgCalories,
-        summary.AvgSpo2,
-    )
-
-    if err := SendEmail(summary.User.Email, "Weekly Health Summary", summaryText); err != nil {
-        log.Printf("failed to send email: %v", err)
-    }
-
-    notif := entity.Notification{
-        Timestamp:          time.Now(),
-        Title:              fmt.Sprintf("Weekly Health Summary (Week %d)", summary.WeekNumber),
-        Message:            summaryText,
-        UserID:             summary.UserID,
-        HealthSummaryID:    &summary.ID,
-        NotificationStatusID: 1,
-    }
-    if err := db.Create(&notif).Error; err != nil {
-        log.Printf("failed to save weekly summary notification: %v", err)
-    }
 }

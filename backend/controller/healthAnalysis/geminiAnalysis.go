@@ -40,6 +40,7 @@ func ParseSleepHours(sleepStr string, userID uint) float64 {
 
 // AnalyzeHealthDataWithGemini ส่งข้อมูลสุขภาพไปให้ Gemini วิเคราะห์
 func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []entity.HealthData) (string, error) {
+	log.Printf("Analyzing health data for UserID: %d. Number of records received: %d", userID, len(healthData))
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
 		return "", fmt.Errorf("GEMINI_API_KEY environment variable not set")
@@ -56,7 +57,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 		sleepValue := ParseSleepHours(item.SleepHours, userID)
 		
 		dataString.WriteString(fmt.Sprintf("%s,%d,%d,%.2f,%.2f,%f\n",
-			item.CreatedAt.Format("2006-01-02"),
+			item.Timestamp.Format("2006-01-02"), // ✅ ถูกต้อง
 			item.Bpm,
 			item.Steps,
 			item.Spo2,
@@ -71,7 +72,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 			"ข้อมูลประกอบด้วย: อัตราการเต้นหัวใจ (BPM), จำนวนก้าว, ออกซิเจนในเลือด (SpO2), ชั่วโมงการนอนหลับ (แปลงเป็นทศนิยม), และแคลอรี่ที่ใช้ไป\n"+
 			"ข้อมูลดิบ:\n"+
 			"%s\n"+
-			"โปรดสรุปแนวโน้มโดยรวมของสุขภาพ และให้คำแนะนำที่สามารถนำไปปฏิบัติได้จริงเพื่อปรับปรุงสุขภาพ",
+			"โปรดสรุปแนวโน้มโดยรวมของสุขภาพสั้นกระชับ ไม่ยาวจนเกินไป และให้คำแนะนำที่สามารถนำไปปฏิบัติได้จริงเพื่อปรับปรุงสุขภาพ โปรดเว้นวรรค ย่อหน้า ให้สวยงามด้วย โดยแสดงช่วงวันที่ของข้อมูลทีนำมาวิเคราะห์ด้วย",
 		dataString.String(),
 	)
 
@@ -82,7 +83,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 	}
 	defer client.Close()
 
-	model := client.GenerativeModel("gemini-1.5-flash-latest")
+	model := client.GenerativeModel("gemini-2.5-flash")
 	resp, err := model.GenerateContent(ctx, genai.Text(promptText))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate content from Gemini: %w", err)
@@ -97,5 +98,7 @@ func AnalyzeHealthDataWithGemini(ctx context.Context, userID uint, healthData []
 	} else {
 		geminiResponse = "ไม่สามารถรับการวิเคราะห์จาก Gemini ได้"
 	}
-	return geminiResponse, nil
+
+	cleanedResponse := strings.ReplaceAll(geminiResponse, "**", "")
+	return cleanedResponse, nil
 }

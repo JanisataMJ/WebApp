@@ -209,18 +209,10 @@ func ImportSheetData(db *sql.DB, sheetName string) {
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
-<<<<<<< HEAD
-	// 💡 เปลี่ยนชื่อตัวแปร 'config' เป็น 'oauthConfig'
-=======
->>>>>>> f729ad321d13e39fac387080b4b03f87a909d160
 	oauthConfig, err := google.ConfigFromJSON(b, sheets.SpreadsheetsReadonlyScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-<<<<<<< HEAD
-	// 💡 ใช้ชื่อใหม่ในการเรียก getClient
-=======
->>>>>>> f729ad321d13e39fac387080b4b03f87a909d160
 	client := getClient(oauthConfig)
 	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
@@ -264,14 +256,9 @@ func ImportSheetData(db *sql.DB, sheetName string) {
 
 	dataRows := resp.Values
 	rowsProcessed := 0
-<<<<<<< HEAD
-
-	userIndex, timeIndex, heartRateIndex, stepsIndex, spo2Index, sleepIndex, caloriesIndex := 0, 1, 2, 3, 4, 5, 6
-=======
 	
 	// B=1: timestamp | C=2: bpm | D=3: steps | E=4: spo2 | F=5: sleep_hours | G=6: calories_burned | H=7: source
 	timeIndex, heartRateIndex, stepsIndex, spo2Index, sleepIndex, caloriesIndex, sourceIndex := 1, 2, 3, 4, 5, 6, 7 
->>>>>>> f729ad321d13e39fac387080b4b03f87a909d160
 
 	for _, row := range dataRows {
 		// ตรวจสอบว่ามีข้อมูลครบถึงคอลัมน์ H (Index 7)
@@ -308,31 +295,8 @@ func ImportSheetData(db *sql.DB, sheetName string) {
 		// 4. แปลงค่า String (Sleep) 
 		sleepHours := parseStringOrEmpty(row[sleepIndex])
 
-<<<<<<< HEAD
-		sleepHours := fmt.Sprintf("%v", row[sleepIndex])
-
-		var caloriesBurned float64
-		caloriesStr := fmt.Sprintf("%v", row[caloriesIndex])
-		if caloriesStr != "" && caloriesStr != "<nil>" && caloriesStr != "null" {
-			// ลองแปลงเป็น float ก่อน
-			if val, err := strconv.ParseFloat(caloriesStr, 64); err == nil {
-				caloriesBurned = val
-			} else {
-				log.Printf("Failed to parse calories '%s': %v", caloriesStr, err)
-			}
-		}
-
-		// จากนั้นเปลี่ยน SQL statement ให้ใช้ float64 แทน int
-		stmt, err := tx.Prepare("INSERT OR IGNORE INTO health_data(user_id, timestamp, bpm, steps , spo2, sleep_hours, calories_burned) VALUES(?, ?, ?, ?, ?, ?, ?)")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// ใน stmt.Exec ส่ง caloriesBurned เป็น float64
-=======
 
 		// 5. บันทึกข้อมูล (INSERT OR IGNORE จะจัดการการซ้ำซ้อน)
->>>>>>> f729ad321d13e39fac387080b4b03f87a909d160
 		_, err = stmt.Exec(userID, formattedTime, bpm, steps, spo2, sleepHours, caloriesBurned)
 		if err != nil {
 			log.Printf("Failed to insert row for user %d (Source: %s) at time %s from %s: %v", userID, sourceStr, formattedTime, sheetName, err)
@@ -354,15 +318,7 @@ func ImportSheetData(db *sql.DB, sheetName string) {
 		if err != nil {
 			log.Fatalf("Failed to update %s in config: %v", key, err)
 		}
-<<<<<<< HEAD
-		fmt.Printf("Data import finished. Successfully processed %d new rows. Next read will start at row %d.\n", rowsProcessed, newLastRow)
-		fmt.Println("Starting HealthAnalysis...")
-		// 💡 เรียกใช้ฟังก์ชันวิเคราะห์ โดยดึง *gorm.DB จาก config.DB()
-		healthAnalysis.AnalyzeHealthData(appConfig.DB())
-		fmt.Println("HealthAnalysis completed.")
-=======
 		fmt.Printf("Data import for %s finished. Successfully processed %d new rows. Next read will start at row %d.\n", sheetName, rowsProcessed, newLastRow)
->>>>>>> f729ad321d13e39fac387080b4b03f87a909d160
 	} else {
 		fmt.Printf("Data import for %s finished. No new rows were processed.\n", sheetName)
 	}

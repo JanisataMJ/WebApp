@@ -14,6 +14,7 @@ import (
 	// ✅ เปลี่ยน Alias: gender
 	gender "github.com/JanisataMJ/WebApp/controller/gender"
 	"github.com/JanisataMJ/WebApp/controller/gmail"
+	"github.com/JanisataMJ/WebApp/entity"
 	"github.com/JanisataMJ/WebApp/controller/healthAnalysis"
 	"github.com/JanisataMJ/WebApp/controller/healthData"
 	"github.com/JanisataMJ/WebApp/controller/healthSummary"
@@ -26,7 +27,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/JanisataMJ/WebApp/entity"
+
 )
 
 const PORT = "8000"
@@ -53,7 +54,7 @@ func main() {
 	config.SetupDatabase()
 
 	//seed.SeedHealthData(gormDB)
-	seed.SeedHealthDataTwoWeeks(gormDB)
+	seed.SeedHealthDataThreeWeeks(gormDB)
 
 	sqlDB, err := gormDB.DB()
 	if err != nil {

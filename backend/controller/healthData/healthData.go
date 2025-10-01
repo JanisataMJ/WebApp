@@ -1,10 +1,9 @@
 package healthData
 
 import (
-	"log"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
-	"sort"
 	"time"
 
 	"github.com/JanisataMJ/WebApp/config"
@@ -78,7 +77,6 @@ func GetWeeklyHealthData(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
-
 // GetWeeklyHealthDataInternal ดึงข้อมูลสุขภาพรายสัปดาห์สำหรับ Backend (Internal Function)
 // ใช้สำหรับเรียกจากฟังก์ชันอื่น เช่น HealthSummary หรือ HealthAnalysis
 func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData, error) {
@@ -94,15 +92,15 @@ func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData,
 	dayOffset := int(time.Monday) - weekday // ถ้าเป็นจันทร์ (1) จะเป็น 0. ถ้าเป็นอาทิตย์ (0) จะเป็น 1
 	if dayOffset > 0 {
 		dayOffset -= 7 // หากเป็นวันจันทร์ถึงวันอาทิตย์ Go จะให้ค่า 0 ถึง 6.
-                       // หากเป็นวันอาทิตย์ (0), time.Monday(1) - 0 = 1, ต้องย้อน 6 วัน (1-7=-6)
-                       // การใช้: dayOffset := (int(time.Monday) - weekday + 7) % 7 // จะได้ 0..6
+		// หากเป็นวันอาทิตย์ (0), time.Monday(1) - 0 = 1, ต้องย้อน 6 วัน (1-7=-6)
+		// การใช้: dayOffset := (int(time.Monday) - weekday + 7) % 7 // จะได้ 0..6
 	}
 
 	startOfThisWeek := today.AddDate(0, 0, dayOffset) // วันจันทร์ของสัปดาห์นี้
-	
+
 	// ปรับให้เป็น 00:00:00 ของวันจันทร์
 	startOfThisWeek = time.Date(startOfThisWeek.Year(), startOfThisWeek.Month(), startOfThisWeek.Day(), 0, 0, 0, 0, time.UTC)
-    
+
 	switch mode {
 	case "lastweek":
 		// สัปดาห์ที่แล้ว: จันทร์ที่แล้ว - อาทิตย์ที่แล้ว
@@ -121,7 +119,7 @@ func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData,
 	// 🟢 FIX 2: ตั้งเวลาให้เริ่มต้นและสิ้นสุดวันใน UTC เสมอ
 	startDate = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC)
 	// ตั้งเวลาสิ้นสุดที่ 23:59:59.999999999 เพื่อครอบคลุมทั้งวัน
-	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, 999999999, time.UTC) 
+	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, 999999999, time.UTC)
 
 	// 🟢 เพิ่ม Log เพื่อตรวจสอบช่วงเวลาที่ใช้ Query
 	log.Printf("DB Query Health Data - UserID: %s Mode: %s. Period: %s (UTC) to %s (UTC)", userID, mode, startDate.Format(time.RFC3339), endDate.Format(time.RFC3339))
@@ -135,7 +133,6 @@ func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData,
 	// 🟢 Log จำนวน Record ที่ดึงได้ (เพื่อยืนยันว่าได้ข้อมูลหรือไม่)
 	log.Printf("DB Query Health Data - Records retrieved: %d", len(healthData))
 
-
 	// Group by day (การจัดกลุ่มและคำนวณค่าเฉลี่ยยังคงเดิม)
 	dailyMap := make(map[string][]entity.HealthData)
 	for _, hd := range healthData {
@@ -144,8 +141,26 @@ func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData,
 		dailyMap[day] = append(dailyMap[day], hd)
 	}
 
+	// หลังจากที่คุณสร้าง dailyMap เสร็จแล้ว
 	var results []DailyData
-	for date, list := range dailyMap {
+
+	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+		dayStr := d.Format("2006-01-02")
+		list, exists := dailyMap[dayStr]
+
+		if !exists || len(list) == 0 {
+			// ถ้าไม่มีข้อมูลในวันนั้น → ส่งค่า default
+			results = append(results, DailyData{
+				Date:       dayStr,
+				AvgBpm:     0,
+				Steps:      0,
+				SleepHours: "",
+				Calories:   0,
+				AvgSpo2:    0,
+			})
+			continue
+		}
+
 		var sumBpm, sumSpo2 float64
 		var lastSteps int64
 		var lastCalories float64
@@ -162,12 +177,8 @@ func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData,
 		}
 
 		count := float64(len(list))
-		if count == 0 { // ป้องกันการหารด้วยศูนย์
-			continue
-		}
-
 		results = append(results, DailyData{
-			Date:       date,
+			Date:       dayStr,
 			AvgBpm:     sumBpm / count,
 			Steps:      lastSteps,
 			SleepHours: lastSleep,
@@ -175,10 +186,5 @@ func GetWeeklyHealthDataInternal(db *gorm.DB, userID, mode string) ([]DailyData,
 			AvgSpo2:    sumSpo2 / count,
 		})
 	}
-
-	sort.Slice(results, func(i, j int) bool {
-		return results[i].Date < results[j].Date
-	})
-
 	return results, nil
 }

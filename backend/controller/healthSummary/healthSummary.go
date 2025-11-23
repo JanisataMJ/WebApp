@@ -100,10 +100,13 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 	type dailyAgg struct {
 		latestSteps   int64
 		totalBpm      float64
-		totalSleep    float64
-		totalCalories float64
-		totalSpo2     float64
 		countBpm      int
+		totalSleep    float64
+		countSleep    int
+		totalCalories float64
+		countCalories int
+		totalSpo2     float64
+		countSpo2     int
 		latestTime    time.Time
 	}
 
@@ -117,21 +120,35 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 
 		agg := dailyMap[dateStr]
 
-		// Steps: เลือกค่า timestamp ล่าสุดของวัน
+		// Steps: ใช้ค่าล่าสุดของวัน
 		if hd.Timestamp.After(agg.latestTime) {
 			agg.latestSteps = hd.Steps
 			agg.latestTime = hd.Timestamp
 		}
 
-		// คำนวณค่าอื่น ๆ
+		// Bpm
 		if hd.Bpm > 0 {
 			agg.totalBpm += float64(hd.Bpm)
 			agg.countBpm++
 		}
 
-		agg.totalSleep += ParseSleepHours(hd.SleepHours)
-		agg.totalCalories += hd.CaloriesBurned
-		agg.totalSpo2 += hd.Spo2
+		// Sleep
+		if hd.SleepHours != "" {
+			agg.totalSleep += ParseSleepHours(hd.SleepHours)
+			agg.countSleep++
+		}
+
+		// Calories
+		if hd.CaloriesBurned > 0 {
+			agg.totalCalories += hd.CaloriesBurned
+			agg.countCalories++
+		}
+
+		// Spo2
+		if hd.Spo2 > 0 {
+			agg.totalSpo2 += hd.Spo2
+			agg.countSpo2++
+		}
 	}
 
 	var sumBpm, sumSleep, sumCalories, sumSpo2 float64
@@ -139,11 +156,12 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 	var minBpm, maxBpm uint = 300, 0
 
 	for _, agg := range dailyMap {
+		// Bpm
 		if agg.countBpm > 0 {
 			dailyAvgBpm := agg.totalBpm / float64(agg.countBpm)
 			sumBpm += dailyAvgBpm
 
-			if minBpm > 0 && uint(dailyAvgBpm) < minBpm {
+			if uint(dailyAvgBpm) < minBpm {
 				minBpm = uint(dailyAvgBpm)
 			}
 			if uint(dailyAvgBpm) > maxBpm {
@@ -151,19 +169,43 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 			}
 		}
 
-		sumSleep += agg.totalSleep / float64(agg.countBpm)
-		sumCalories += agg.totalCalories / float64(agg.countBpm)
-		sumSpo2 += agg.totalSpo2 / float64(agg.countBpm)
+		// Sleep
+		if agg.countSleep > 0 {
+			sumSleep += agg.totalSleep / float64(agg.countSleep)
+		}
 
-		// Steps: ผลรวมของทั้งสัปดาห์
+		// Calories
+		if agg.countCalories > 0 {
+			sumCalories += agg.totalCalories / float64(agg.countCalories)
+		}
+
+		// Spo2
+		if agg.countSpo2 > 0 {
+			sumSpo2 += agg.totalSpo2 / float64(agg.countSpo2)
+		}
+
+		// Steps รวมทั้งสัปดาห์
 		totalSteps += agg.latestSteps
 	}
 
 	dayCount := float64(len(dailyMap))
-	avgBpm := sumBpm / dayCount
-	avgSleep := sumSleep / dayCount
-	avgCalories := sumCalories / dayCount
-	avgSpo2 := sumSpo2 / dayCount
+
+	avgBpm := 0.0
+	if dayCount > 0 {
+		avgBpm = sumBpm / dayCount
+	}
+	avgSleep := 0.0
+	if dayCount > 0 {
+		avgSleep = sumSleep / dayCount
+	}
+	avgCalories := 0.0
+	if dayCount > 0 {
+		avgCalories = sumCalories / dayCount
+	}
+	avgSpo2 := 0.0
+	if dayCount > 0 {
+		avgSpo2 = sumSpo2 / dayCount
+	}
 
 	_, weekNum := startDate.ISOWeek()
 
@@ -183,7 +225,7 @@ func CalculateSummary(db *gorm.DB, userID string, startDate, endDate time.Time) 
 		MinBpm:      minBpm,
 		MaxBpm:      maxBpm,
 		TotalSteps:  totalSteps,
-		AvgSteps:    0,
+		AvgSteps:    0, // ถ้าต้องการให้เฉลี่ย steps ต่อวันก็เอา totalSteps/dayCount
 		AvgSleep:    avgSleep,
 		AvgCalories: avgCalories,
 		AvgSpo2:     avgSpo2,

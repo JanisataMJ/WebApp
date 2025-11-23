@@ -204,7 +204,7 @@
 }
 
 .label-center {
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .label-side {
@@ -611,4 +611,15 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.label-no-data {
+  font-size: 0.5rem;   /* ตัวเล็กลง */
+  color: #6b7280;      /* เทา */
+  font-weight: 400;
+}
+
+.value-no-data {
+  font-size: 0.5rem;
+  color: #9ca3af;
 }

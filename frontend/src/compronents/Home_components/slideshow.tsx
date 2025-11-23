@@ -14,6 +14,7 @@ type HealthItem = {
   sub?: string;
   color: string;
   bgGradient: string;
+  isNoData?: boolean; 
 };
 
 
@@ -125,36 +126,56 @@ const Slider: React.FC = () => {
         );
 
         if (sorted.length === 0) {
-          // ไม่มีข้อมูลเลย
-          const emptyData: RealTimeInterface = {
-            ID: 0,
-            Timestamp: new Date().toISOString(),
-            Bpm: 0,
-            CaloriesBurned: 0,
-            Spo2: 0,
-            SleepHours: 0,
-            Steps: 0,
-            HealthAnalysis: []
-          };
-          setHealthItems(
-            mapHealthData(emptyData).map(i => ({ ...i, sub: "ไม่พบข้อมูลสุขภาพตอนนี้" }))
-          );
+          setHealthItems([{
+            icon: Heart,
+            label: "ไม่พบบันทึกข้อมูลของวันนี้",
+            value: "-",
+            sub: "",
+            color: "#9ca3af",
+            bgGradient: "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)",
+            isNoData: true,
+          }]);
+          setCurrentIndex(0);   // ✅ ป้องกัน index เกิน
           return;
         }
+
+        // หลังจาก sort เสร็จแล้ว
+        const today = new Date().toLocaleDateString("th-TH", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        });
+
+        const latestDate = new Date(sorted[0].Timestamp).toLocaleDateString("th-TH", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        });
+
+
+        if (today !== latestDate) {
+          setHealthItems([{
+            icon: Heart,
+            label: "ไม่พบข้อมูลสุขภาพของวันนี้",
+            value: "-",
+            sub: "",
+            color: "#9ca3af",
+            bgGradient: "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)"
+          }]);
+          setCurrentIndex(0);   // ✅ เพิ่มตรงนี้ด้วย
+          return;
+        }
+
 
         // ✅ หาค่า latest แบบ fallback ไป record ก่อนหน้า
         const latestBpm = getLatestNonNull(sorted, "Bpm") ?? 0;
         const latestCalories = getLatestNonNull(sorted, "CaloriesBurned") ?? 0;
         const latestSpo2 = getLatestNonNull(sorted, "Spo2") ?? 0;
-
-        /* const latestSleepRaw = getLatestNonNull(sorted, "SleepHours") ?? 0;
-        const latestSleep = parseSleepToHours(latestSleepRaw); */
         const latestSleep = getLatestNonNull(sorted, "SleepHours") || "ไม่มีข้อมูล";
-
         const latestSteps = getLatestNonNull(sorted, "Steps") ?? 0;
 
         const mergedData: RealTimeInterface = {
-          ...sorted[0], // clone field อื่น เช่น HealthAnalysis
+          ...sorted[0],
           Bpm: latestBpm,
           CaloriesBurned: latestCalories,
           Spo2: latestSpo2,
@@ -171,6 +192,7 @@ const Slider: React.FC = () => {
 
     fetchHealthdatas();
   }, [UserID]);
+
 
 
   useEffect(() => {
@@ -211,7 +233,7 @@ const Slider: React.FC = () => {
     return now.toLocaleTimeString('th-TH', { hour: 'numeric', minute: '2-digit', hour12: false });
   };
 
-  if (healthItems.length === 0) {
+  if (healthItems.length === 0 || !healthItems[currentIndex]) {
     return <div>โหลดข้อมูลสุขภาพ...</div>;
   }
 
@@ -256,7 +278,7 @@ const Slider: React.FC = () => {
                   />
                 </div>
 
-                <div className={`card-label ${position === 'center' ? 'label-center' : 'label-side'}`}>
+                {/* <div className={`card-label ${position === 'center' ? 'label-center' : 'label-side'}`}>
                   {item.label}
                 </div>
 
@@ -265,7 +287,20 @@ const Slider: React.FC = () => {
                   style={{ color: position === 'center' ? item.color : '#374151' }}
                 >
                   {item.value}
+                </div> */}
+                <div
+                  className={`card-label ${item.isNoData ? 'label-no-data' : (position === 'center' ? 'label-center' : 'label-side')}`}
+                >
+                  {item.label}
                 </div>
+
+                <div
+                  className={`card-value ${item.isNoData ? 'value-no-data' : (position === 'center' ? 'value-center' : 'value-side')}`}
+                  style={{ color: position === 'center' ? item.color : '#374151' }}
+                >
+                  {item.value}
+                </div>
+
 
                 {item.sub && position === 'center' && (
                   <div className="card-sub" style={{ color: `${item.color}80` }}>
